@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>LAMAN WEB LOT FINAL</title>
+
+<link rel="stylesheet" href="css/leaflet.css">
+
+<style>
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* ================= HEADER ================= */
+#header {
+    height: 65px;
+    background: linear-gradient(135deg, #1b5e20, #2e7d32);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+/* ================= SIDEBAR ================= */
+#sidebar {
+    position: fixed;
+    top: 65px;
+    left: -280px;
+    width: 280px;
+    height: calc(100% - 65px);
+    background: #2e7d32;
+    color: white;
+    padding: 20px;
+    transition: 0.4s;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+#sidebar.active {
+    left: 0;
+}
+
+#sidebar h3 {
+    margin-top: 0;
+}
+
+#sidebar input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    margin-top: 10px;
+}
+
+#sidebar button {
+    width: 100%;
+    padding: 8px;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: none;
+    background: #a5d6a7;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#sidebar button:hover {
+    background: #c8e6c9;
+}
+
+/* Toggle Button */
+#toggleBtn {
+    position: absolute;
+    top: 75px;
+    left: 10px;
+    z-index: 1100;
+    background: #1b5e20;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* ================= MAP ================= */
+#map {
+    position: absolute;
+    top: 65px;
+    bottom: 0;
+    width: 100%;
+}
+
+.popup-btn {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.popup-btn:hover {
+    background: #1b5e20;
+}
+</style>
+</head>
+
+<body>
+
+<div id="header">
+🌿 LAMAN WEB LOT FINAL
+</div>
+
+<div id="toggleBtn" onclick="toggleSidebar()">☰ Menu</div>
+
+<div id="sidebar">
+    <h3>Land Explorer</h3>
+
+    <input type="text" id="searchLot" placeholder="Search Lot Number">
+    <button onclick="searchLot()">🔍 Search</button>
+    <button onclick="resetMap()">🔄 Reset</button>
+
+    <hr>
+
+    <p><b>Total Lots:</b> <span id="totalLots">0</span></p>
+    <p><b>Selected Area:</b> <span id="selectedArea">-</span></p>
+</div>
+
+<div id="map"></div>
+
+<script src="js/leaflet.js"></script>
+<script src="data/LOTFINAL_0.js"></script>
+<script src="data/BKLMERGED_1.js"></script>
+
+<script>
+
+// ================= SIDEBAR TOGGLE =================
+function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("active");
+}
+
+// ================= MAP INIT =================
+var map = L.map('map')
+.fitBounds([[2.1028210898387267,102.5208953333649],
+            [2.104582114972745,102.5248101292728]]);
+
+// ================= BASEMAP =================
+var street = L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { attribution: '&copy; OpenStreetMap contributors' }
+).addTo(map);
+
+var satellite = L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    { attribution: 'Tiles &copy; Esri' }
+);
+
+L.control.layers({
+    "🗺 Street": street,
+    "🛰 Satellite": satellite
+}).addTo(map);
+
+// ================= STYLE =================
+function styleLot() {
+    return {
+        color: "#1b5e20",
+        weight: 1,
+        fillColor: "#66bb6a",
+        fillOpacity: 0.7
+    };
+}
+
+// ================= STREET VIEW =================
+function openStreetView(lat, lng) {
+    var url = "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=" + lat + "," + lng;
+    window.open(url, "_blank");
+}
+
+// ================= LOT LAYER =================
+var lotLayer = L.geoJSON(json_LOTFINAL_0, {
+    style: styleLot,
+    onEachFeature: function(feature, layer){
+
+        document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
+
+        var center = layer.getBounds().getCenter();
+
+        var popup =
+            "<b>Lot:</b> " + feature.properties.NO_LOT + "<br>" +
+            "<b>Area:</b> " + feature.properties.AREA + "<br><br>" +
+            "<button class='popup-btn' onclick='openStreetView(" +
+            center.lat + "," + center.lng +
+            ")'>👁 Street View</button>";
+
+        layer.bindPopup(popup);
+
+        layer.on("mouseover", function(){
+            layer.setStyle({ fillColor:"#a5d6a7" });
+        });
+
+        layer.on("mouseout", function(){
+            layer.setStyle(styleLot());
+        });
+
+        layer.on("click", function(){
+            document.getElementById("selectedArea").innerText =
+                feature.properties.AREA;
+        });
+    }
+}).addTo(map);
+
+// ================= SEARCH =================
+function searchLot(){
+    var input = document.getElementById("searchLot").value.toLowerCase();
+
+    lotLayer.eachLayer(function(layer){
+        if(layer.feature.properties.NO_LOT.toLowerCase().includes(input)){
+            map.fitBounds(layer.getBounds());
+            layer.setStyle({ fillColor:"#ffeb3b" });
+        }
+    });
+}
+
+// ================= RESET =================
+function resetMap(){
+    document.getElementById("searchLot").value="";
+    document.getElementById("selectedArea").innerText="-";
+
+    lotLayer.eachLayer(function(layer){
+        layer.setStyle(styleLot());
+    });
+
+    map.fitBounds(lotLayer.getBounds());
+}
+
+</script>
+</body>
+</html>
