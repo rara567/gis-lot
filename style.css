@@ -1,0 +1,126 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* ================= HEADER ================= */
+#header {
+    height: 65px;
+    background: linear-gradient(135deg, #1b5e20, #2e7d32);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: bold;
+    gap: 15px;
+}
+
+#header img {
+    height: 45px;
+}
+
+/* ================= SIDEBAR ================= */
+#sidebar {
+    position: fixed;
+    top: 65px;
+    left: -300px;
+    width: 300px;
+    height: calc(100% - 65px);
+    background: #1e4620;
+    color: white;
+    padding: 20px;
+    transition: 0.35s ease;
+    z-index: 1000;
+    box-shadow: 4px 0 12px rgba(0,0,0,0.3);
+}
+
+#sidebar.active {
+    left: 0;
+}
+
+#sidebar h3 {
+    text-align: center;
+    margin: 10px 0 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    padding-bottom: 10px;
+}
+
+#sidebar input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    margin-bottom: 10px;
+}
+
+#sidebar button {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    margin-bottom: 10px;
+    background: #a5d6a7;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#sidebar button:hover {
+    background: #c8e6c9;
+}
+
+.close-btn {
+    background: #2e7d32 !important;
+    color: white;
+}
+
+/* ================= INFO ================= */
+.info {
+    background: rgba(255,255,255,0.1);
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+hr {
+    border: none;
+    height: 1px;
+    background: rgba(255,255,255,0.3);
+    margin: 15px 0;
+}
+
+/* ================= TOGGLE BUTTON ================= */
+#toggleBtn {
+    position: fixed;
+    top: 140px;
+    left: 10px;
+    background: #1b5e20;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 1100;
+}
+
+/* HIDE TOGGLE WHEN SIDEBAR OPEN */
+#sidebar.active ~ #toggleBtn {
+    display: none;
+}
+
+/* ================= MAP ================= */
+#map {
+    position: absolute;
+    top: 65px;
+    bottom: 0;
+    width: 100%;
+}
+
+.popup-btn {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
