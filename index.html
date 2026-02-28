@@ -26,6 +26,12 @@ html, body {
     font-size: 22px;
     font-weight: bold;
     letter-spacing: 2px;
+    gap: 15px;
+}
+
+#header img {
+    height: 45px;
+    width: auto;
 }
 
 /* ================= SIDEBAR ================= */
@@ -111,12 +117,16 @@ html, body {
 
 <body>
 
+<!-- HEADER -->
 <div id="header">
-🌿 LAMAN WEB LOT FINAL
+    <img src="images/puo.png" alt="Logo PUO">
+    <span>🌿 LAMAN WEB LOT FINAL</span>
 </div>
 
+<!-- TOGGLE BUTTON -->
 <div id="toggleBtn" onclick="toggleSidebar()">☰ Menu</div>
 
+<!-- SIDEBAR -->
 <div id="sidebar">
     <h3>Land Explorer</h3>
 
@@ -130,6 +140,7 @@ html, body {
     <p><b>Selected Area:</b> <span id="selectedArea">-</span></p>
 </div>
 
+<!-- MAP -->
 <div id="map"></div>
 
 <script src="js/leaflet.js"></script>
@@ -137,7 +148,6 @@ html, body {
 <script src="data/BKLMERGED_1.js"></script>
 
 <script>
-
 // ================= SIDEBAR TOGGLE =================
 function toggleSidebar() {
     document.getElementById("sidebar").classList.toggle("active");
@@ -145,8 +155,10 @@ function toggleSidebar() {
 
 // ================= MAP INIT =================
 var map = L.map('map')
-.fitBounds([[2.1028210898387267,102.5208953333649],
-            [2.104582114972745,102.5248101292728]]);
+.fitBounds([
+    [2.1028210898387267,102.5208953333649],
+    [2.104582114972745,102.5248101292728]
+]);
 
 // ================= BASEMAP =================
 var street = L.tileLayer(
@@ -185,7 +197,8 @@ var lotLayer = L.geoJSON(json_LOTFINAL_0, {
     style: styleLot,
     onEachFeature: function(feature, layer){
 
-        document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
+        document.getElementById("totalLots").innerText =
+            json_LOTFINAL_0.features.length;
 
         var center = layer.getBounds().getCenter();
 
@@ -236,7 +249,7 @@ function resetMap(){
 
     map.fitBounds(lotLayer.getBounds());
 }
-
 </script>
+
 </body>
 </html>
