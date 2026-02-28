@@ -1,43 +1,55 @@
 html, body {
     height: 100%;
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: Segoe UI, sans-serif;
 }
 
-/* ================= HEADER ================= */
+/* HEADER */
 #header {
     height: 65px;
-    background: linear-gradient(135deg, #1b5e20, #2e7d32);
+    background: linear-gradient(135deg,#1b5e20,#2e7d32);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 15px;
     font-size: 22px;
     font-weight: bold;
-    gap: 15px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1200;
 }
 
 #header img {
-    height: 45px;
+    height: 40px;
 }
 
-/* ================= SIDEBAR ================= */
+/* MAP */
+#map {
+    position: absolute;
+    top: 65px;
+    bottom: 0;
+    width: 100%;
+}
+
+/* SIDEBAR */
 #sidebar {
     position: fixed;
     top: 65px;
-    left: -300px;
+    left: -300px;   /* HIDDEN */
     width: 300px;
     height: calc(100% - 65px);
     background: #1e4620;
     color: white;
     padding: 20px;
-    transition: 0.35s ease;
-    z-index: 1000;
-    box-shadow: 4px 0 12px rgba(0,0,0,0.3);
+    transition: left 0.3s ease;
+    z-index: 1100;
+    box-shadow: 4px 0 10px rgba(0,0,0,0.4);
 }
 
 #sidebar.active {
-    left: 0;
+    left: 0;        /* MASUK TEPAT */
 }
 
 #sidebar h3 {
@@ -47,40 +59,31 @@ html, body {
     padding-bottom: 10px;
 }
 
-#sidebar input {
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    margin-bottom: 10px;
-}
-
+#sidebar input,
 #sidebar button {
     width: 100%;
     padding: 10px;
+    margin-bottom: 10px;
     border-radius: 8px;
     border: none;
-    margin-bottom: 10px;
+}
+
+#sidebar button {
     background: #a5d6a7;
     font-weight: bold;
     cursor: pointer;
 }
 
-#sidebar button:hover {
-    background: #c8e6c9;
-}
-
-.close-btn {
+.closeBtn {
     background: #2e7d32 !important;
     color: white;
 }
 
-/* ================= INFO ================= */
+/* INFO */
 .info {
     background: rgba(255,255,255,0.1);
     padding: 12px;
     border-radius: 8px;
-    margin-top: 15px;
 }
 
 hr {
@@ -90,37 +93,20 @@ hr {
     margin: 15px 0;
 }
 
-/* ================= TOGGLE BUTTON ================= */
+/* TOGGLE BUTTON */
 #toggleBtn {
     position: fixed;
-    top: 140px;
+    top: 150px;          /* BAWAH ZOOM LEAFLET */
     left: 10px;
     background: #1b5e20;
     color: white;
     padding: 10px 14px;
     border-radius: 8px;
     cursor: pointer;
-    z-index: 1100;
+    z-index: 1300;
 }
 
-/* HIDE TOGGLE WHEN SIDEBAR OPEN */
+/* SEMBUNYI MENU BILA SIDEBAR BUKA */
 #sidebar.active ~ #toggleBtn {
     display: none;
-}
-
-/* ================= MAP ================= */
-#map {
-    position: absolute;
-    top: 65px;
-    bottom: 0;
-    width: 100%;
-}
-
-.popup-btn {
-    background: #2e7d32;
-    color: white;
-    border: none;
-    padding: 6px 10px;
-    border-radius: 6px;
-    cursor: pointer;
 }
