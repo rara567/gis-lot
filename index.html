@@ -14,20 +14,20 @@
 
 <!-- HEADER -->
 <div id="header">
-    <img src="images/puo.png" alt="Logo PUO">
+    <img src="images/puo.png" alt="PUO">
     <span>🌿 TAMAN PERUMAHAN</span>
 </div>
 
-<!-- TOGGLE BUTTON (LUAR SIDEBAR) -->
-<div id="toggleBtn" onclick="toggleSidebar()">☰ Menu</div>
+<!-- TOGGLE BUTTON -->
+<button id="toggleBtn" onclick="toggleSidebar()">☰ Menu</button>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
-    <button class="close-btn" onclick="toggleSidebar()">✖ Tutup Menu</button>
+    <button class="closeBtn" onclick="toggleSidebar()">✖ Tutup</button>
 
     <h3>🌍 Land Explorer</h3>
 
-    <input type="text" id="searchLot" placeholder="🔎 Lot Number">
+    <input type="text" id="searchLot" placeholder="Lot Number">
     <button onclick="searchLot()">Search</button>
     <button onclick="resetMap()">Reset Map</button>
 
@@ -47,111 +47,60 @@
 
 <script src="js/leaflet.js"></script>
 <script src="data/LOTFINAL_0.js"></script>
-<script src="data/BKLMERGED_1.js"></script>
 
 <script>
-// ================= SIDEBAR TOGGLE =================
-function toggleSidebar() {
+function toggleSidebar(){
     document.getElementById("sidebar").classList.toggle("active");
 }
 
-// ================= MAP INIT =================
+/* MAP */
 var map = L.map('map').fitBounds([
-    [2.1028210898387267,102.5208953333649],
-    [2.104582114972745,102.5248101292728]
+    [2.102821,102.520895],
+    [2.104582,102.524810]
 ]);
 
-// ================= BASEMAP =================
-var street = L.tileLayer(
-    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    { attribution: '&copy; OpenStreetMap contributors' }
+L.tileLayer(
+'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 ).addTo(map);
 
-var satellite = L.tileLayer(
-    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    { attribution: 'Tiles &copy; Esri' }
-);
-
-L.control.layers({
-    "🗺 Street": street,
-    "🛰 Satellite": satellite
-}).addTo(map);
-
-// ================= STYLE =================
-function styleLot() {
+function styleLot(){
     return {
-        color: "#1b5e20",
-        weight: 1,
-        fillColor: "#66bb6a",
-        fillOpacity: 0.7
+        color:"#1b5e20",
+        weight:1,
+        fillColor:"#66bb6a",
+        fillOpacity:0.7
     };
 }
 
-// ================= STREET VIEW =================
-function openStreetView(lat, lng) {
-    window.open(
-        "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=" +
-        lat + "," + lng,
-        "_blank"
-    );
-}
-
-// ================= LOT LAYER =================
-var lotLayer = L.geoJSON(json_LOTFINAL_0, {
-    style: styleLot,
-    onEachFeature: function(feature, layer){
-
+var lotLayer = L.geoJSON(json_LOTFINAL_0,{
+    style:styleLot,
+    onEachFeature:function(feature,layer){
         document.getElementById("totalLots").innerText =
-            json_LOTFINAL_0.features.length;
+        json_LOTFINAL_0.features.length;
 
-        var center = layer.getBounds().getCenter();
-
-        var popup =
-            "<b>Lot:</b> " + feature.properties.NO_LOT + "<br>" +
-            "<b>Area:</b> " + feature.properties.AREA + "<br><br>" +
-            "<button class='popup-btn' onclick='openStreetView(" +
-            center.lat + "," + center.lng +
-            ")'>👁 Street View</button>";
-
-        layer.bindPopup(popup);
-
-        layer.on("mouseover", function(){
-            layer.setStyle({ fillColor:"#a5d6a7" });
-        });
-
-        layer.on("mouseout", function(){
-            layer.setStyle(styleLot());
-        });
-
-        layer.on("click", function(){
+        layer.on("click",function(){
             document.getElementById("selectedArea").innerText =
-                feature.properties.AREA;
+            feature.properties.AREA;
         });
     }
 }).addTo(map);
 
-// ================= SEARCH =================
 function searchLot(){
     var input = document.getElementById("searchLot").value.toLowerCase();
-
     lotLayer.eachLayer(function(layer){
         if(layer.feature.properties.NO_LOT.toLowerCase().includes(input)){
             map.fitBounds(layer.getBounds());
-            layer.setStyle({ fillColor:"#ffeb3b" });
+            layer.setStyle({fillColor:"#ffeb3b"});
         }
     });
 }
 
-// ================= RESET =================
 function resetMap(){
     document.getElementById("searchLot").value="";
     document.getElementById("selectedArea").innerText="-";
-
     lotLayer.eachLayer(function(layer){
         layer.setStyle(styleLot());
     });
-
-    map.fitBounds(lotLayer.getBounds());
 }
 </script>
 
