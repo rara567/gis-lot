@@ -1,112 +1,113 @@
-html, body {
-    height: 100%;
-    margin: 0;
-    font-family: Segoe UI, sans-serif;
+html,body{
+    margin:0;
+    height:100%;
+    font-family: "Segoe UI", sans-serif;
 }
 
 /* HEADER */
-#header {
-    height: 65px;
-    background: linear-gradient(135deg,#1b5e20,#2e7d32);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    font-size: 22px;
-    font-weight: bold;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1200;
+#header{
+    height:55px;
+    background:#1b5e20;
+    color:white;
+    display:flex;
+    align-items:center;
+    padding:0 15px;
+    font-weight:bold;
 }
 
-#header img {
-    height: 40px;
+#header img{
+    height:40px;
+    margin-right:10px;
 }
 
 /* MAP */
-#map {
-    position: absolute;
-    top: 65px;
-    bottom: 0;
-    width: 100%;
+#map{
+    height:calc(100% - 55px);
+}
+
+/* TOGGLE */
+#toggleBtn{
+    position:absolute;
+    top:70px;
+    left:10px;
+    z-index:1000;
+    background:#1b5e20;
+    color:white;
+    border:none;
+    padding:10px 12px;
+    border-radius:6px;
+    cursor:pointer;
 }
 
 /* SIDEBAR */
-#sidebar {
-    position: fixed;
-    top: 65px;
-    left: -300px;   /* HIDDEN */
-    width: 300px;
-    height: calc(100% - 65px);
-    background: #1e4620;
-    color: white;
-    padding: 20px;
-    transition: left 0.3s ease;
-    z-index: 1100;
-    box-shadow: 4px 0 10px rgba(0,0,0,0.4);
+#sidebar{
+    position:absolute;
+    top:55px;
+    left:-280px;
+    width:260px;
+    height:calc(100% - 55px);
+    background:white;
+    padding:15px;
+    box-shadow:3px 0 8px rgba(0,0,0,0.2);
+    transition:0.3s;
+    z-index:1001;
 }
 
-#sidebar.active {
-    left: 0;        /* MASUK TEPAT */
+#sidebar.active{
+    left:0;
 }
 
-#sidebar h3 {
-    text-align: center;
-    margin: 10px 0 15px;
-    border-bottom: 1px solid rgba(255,255,255,0.3);
-    padding-bottom: 10px;
+.closeBtn{
+    float:right;
+    background:none;
+    border:none;
+    font-size:18px;
+    cursor:pointer;
 }
 
-#sidebar input,
-#sidebar button {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    border: none;
+#sidebar h3{
+    margin-top:0;
 }
 
-#sidebar button {
-    background: #a5d6a7;
-    font-weight: bold;
-    cursor: pointer;
+/* FORM */
+#sidebar input{
+    width:100%;
+    padding:8px;
+    margin-bottom:8px;
 }
 
-.closeBtn {
-    background: #2e7d32 !important;
-    color: white;
+.btn{
+    width:100%;
+    padding:8px;
+    margin-bottom:6px;
+    background:#2e7d32;
+    color:white;
+    border:none;
+    cursor:pointer;
+    border-radius:4px;
+}
+
+.btn.reset{
+    background:#9e9e9e;
 }
 
 /* INFO */
-.info {
-    background: rgba(255,255,255,0.1);
-    padding: 12px;
-    border-radius: 8px;
+.info{
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
 }
 
-hr {
-    border: none;
-    height: 1px;
-    background: rgba(255,255,255,0.3);
-    margin: 15px 0;
+.box{
+    background:#f1f1f1;
+    padding:10px;
+    width:48%;
+    text-align:center;
+    border-radius:6px;
 }
 
-/* TOGGLE BUTTON */
-#toggleBtn {
-    position: fixed;
-    top: 150px;          /* BAWAH ZOOM LEAFLET */
-    left: 10px;
-    background: #1b5e20;
-    color: white;
-    padding: 10px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    z-index: 1300;
-}
-
-/* SEMBUNYI MENU BILA SIDEBAR BUKA */
-#sidebar.active ~ #toggleBtn {
-    display: none;
+.box span{
+    font-size:18px;
+    font-weight:bold;
+    display:block;
 }
