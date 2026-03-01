@@ -1,9 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIRTUAL LOT</title>
+
+<!-- LEAFLET CSS -->
+<link rel="stylesheet" href="css/leaflet.css">
+
+<style>
+/* ================== GLOBAL ================== */
+html, body {
+    margin:0;
+    padding:0;
+    height:100%;
+    font-family: Arial, sans-serif;
+}
+#map {
+    height:100vh;
+}
+
+/* ================== HEADER ================== */
+#header {
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:60px;
+    background:#1b5e20;
+    color:white;
+    display:flex;
+    align-items:center;
+    padding:0 15px;
+    z-index:1000;
+}
+#header img {
+    height:40px;
+    margin-right:10px;
+}
+
+/* ================== TOGGLE ================== */
+#toggleBtn {
+    position:absolute;
+    top:70px;
+    left:10px;
+    z-index:1100;
+    padding:8px 12px;
+    font-size:18px;
+    background:#1b5e20;
+    color:white;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+/* ================== SIDEBAR ================== */
+#sidebar {
+    position:absolute;
+    top:60px;
+    left:-300px;
+    width:300px;
+    height:calc(100% - 60px);
+    background:white;
+    box-shadow:2px 0 10px rgba(0,0,0,0.3);
+    padding:15px;
+    transition:0.3s;
+    z-index:1200;
+}
+#sidebar.active {
+    left:0;
+}
+.closeBtn {
+    float:right;
+    border:none;
+    background:none;
+    font-size:18px;
+    cursor:pointer;
+}
+#sidebar h3 {
+    color:#1b5e20;
+}
+#sidebar input {
+    width:100%;
+    padding:8px;
+    margin-bottom:8px;
+    border-radius:5px;
+    border:1px solid #ccc;
+}
+.btn {
+    width:100%;
+    padding:8px;
+    margin-bottom:6px;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+.btn.primary {
+    background:#2e7d32;
+    color:white;
+}
+.btn.danger {
+    background:#c62828;
+    color:white;
+}
+.info {
+    display:flex;
+    gap:10px;
+}
+.box {
+    flex:1;
+    background:#f1f8e9;
+    padding:10px;
+    border-radius:5px;
+    text-align:center;
+}
+.box span {
+    font-size:18px;
+    font-weight:bold;
+    color:#1b5e20;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div id="header">
+    <img src="images/puo.png">
+    <span>TAMAN PERUMAHAN</span>
+</div>
+
+<button id="toggleBtn" onclick="toggleSidebar()">☰</button>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+    <button class="closeBtn" onclick="toggleSidebar()">✖</button>
+    <h3>🌍 Land Explorer</h3>
+
+    <input type="text" id="searchLot" placeholder="Masukkan No Lot">
+    <button class="btn primary" onclick="searchLot()">Cari Lot</button>
+    <button class="btn danger" onclick="resetMap()">Reset</button>
+
+    <hr>
+
+    <div class="info">
+        <div class="box">
+            <p>Total Lot</p>
+            <span id="totalLots">0</span>
+        </div>
+        <div class="box">
+            <p>Luas Lot</p>
+            <span id="selectedArea">-</span>
+        </div>
+    </div>
+</div>
+
+<!-- MAP -->
+<div id="map"></div>
+
+<!-- LEAFLET JS -->
+<script src="js/leaflet.js"></script>
+
+<!-- DATA LOT -->
+<script src="data/LOTFINAL_0.js"></script>
+
 <script>
+/* ================== SIDEBAR ================== */
 function toggleSidebar(){
     document.getElementById("sidebar").classList.toggle("active");
 }
 
-/* MAP */
+/* ================== MAP ================== */
 var map = L.map('map').fitBounds([
     [2.102821,102.520895],
     [2.104582,102.524810]
@@ -22,14 +189,14 @@ var googleSatellite = L.tileLayer(
     subdomains:['mt0','mt1','mt2','mt3']
 }).addTo(map);
 
-/* 🔥 BUAT PANE KHAS UNTUK LOT */
+/* ================== LOT PANE ================== */
 map.createPane('lotPane');
 map.getPane('lotPane').style.zIndex = 650;
 
-/* STYLE LOT */
+/* LOT STYLE */
 function styleLot(){
     return {
-        pane: 'lotPane',
+        pane:'lotPane',
         color:"#1b5e20",
         weight:1,
         fillColor:"#66bb6a",
@@ -49,7 +216,7 @@ var lotLayer = L.geoJSON(json_LOTFINAL_0,{
             document.getElementById("selectedArea").innerText =
             feature.properties.AREA + " m²";
 
-            layer.bringToFront(); // 🔥 PENTING
+            layer.bringToFront();
 
             layer.bindPopup(
                 "<b>No Lot:</b> " + feature.properties.NO_LOT +
@@ -59,7 +226,7 @@ var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     }
 }).addTo(map);
 
-/* SEARCH */
+/* ================== SEARCH ================== */
 function searchLot(){
     var input = document.getElementById("searchLot").value.toLowerCase();
 
@@ -72,12 +239,12 @@ function searchLot(){
                 fillColor:"#ffeb3b",
                 color:"#f57f17"
             });
-            layer.bringToFront(); // 🔥
+            layer.bringToFront();
         }
     });
 }
 
-/* RESET */
+/* ================== RESET ================== */
 function resetMap(){
     document.getElementById("searchLot").value="";
     document.getElementById("selectedArea").innerText="-";
@@ -89,7 +256,7 @@ function resetMap(){
     map.fitBounds(lotLayer.getBounds());
 }
 
-/* LAYER CONTROL */
+/* ================== LAYER CONTROL ================== */
 L.control.layers(
     {
         "Google Street": googleStreet,
@@ -99,5 +266,8 @@ L.control.layers(
         "Lot Tanah": lotLayer
     }
 ).addTo(map);
-
 </script>
+
+</body>
+</html>s
+
