@@ -6,6 +6,7 @@
 <title>VIRTUAL LOT - TAMAN PERUMAHAN</title>
 
 <link rel="stylesheet" href="css/leaflet.css">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 
 <style>
 /* CSS GLOBAL */
@@ -17,7 +18,7 @@ html, body {
 }
 #map { height:100vh; }
 
-/* ===== HEADER UTAMA ===== */
+/* ===== HEADER UTAMA (BARU DENGAN FONT image_6.png) ===== */
 #header {
     position:absolute;
     top:0;
@@ -33,24 +34,29 @@ html, body {
     z-index:1000;
 }
 #header img { height:45px; }
-#header span { font-size:18px; font-weight:bold; letter-spacing:1px; }
-
-/* ============================================================
-   UBAH PAKSI X DI SINI (KIRI/KANAN)
-   ============================================================
-*/
-
-/* 1. Butang Layer (Pilihan Google Street/Satellite/Lot) */
-.leaflet-top.leaflet-right {
-    margin-top: 85px;   /* Paksi Y (Atas/Bawah) */
-    margin-right: 25px; /* <--- UBAH PAKSI X DI SINI (Contoh: 25px) */
+/* Gantikan teks dengan smart resident menggunakan font baharu */
+#header .custom-font {
+    font-family: 'Dancing Script', cursive; /* Font yang ditukar mengikut image_6.png */
+    font-size: 32px; /* Besarkan sedikit supaya seimbang */
+    font-weight: 700;
+    letter-spacing: 1px;
 }
 
-/* 2. Butang Toggle Menu (☰) */
+/* ================== KOD LAIN KEKAL SAMA ================== */
+/* ADJUST KEDUDUKAN CONTROL PETA */
+.leaflet-top.leaflet-left { margin-top: 85px; margin-left: 10px; }
+.leaflet-top.leaflet-right { margin-top: 85px; margin-right: 15px; }
+
+/* Tema Gelap untuk Butang Peta */
+.leaflet-bar, .leaflet-control-layers { border: 1px solid #444 !important; box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important; }
+.leaflet-bar a, .leaflet-control-layers-toggle { background-color: #242731 !important; color: white !important; }
+.leaflet-bar a:hover { background-color: #3d414e !important; }
+
+/* TOGGLE BUTTON SIDEBAR */
 #toggleBtn {
     position:absolute;
-    top: 145px;         /* Paksi Y (Atas/Bawah) */
-    right: 25px;        /* <--- UBAH PAKSI X DI SINI (Samakan dengan nilai margin-right di atas) */
+    top: 145px;
+    right: 15px;
     z-index: 1100;
     width: 44px;
     height: 44px;
@@ -65,29 +71,7 @@ html, body {
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
-
-/* ============================================================ */
-
-/* Turunkan butang Zoom (Kiri) */
-.leaflet-top.leaflet-left {
-    margin-top: 85px; 
-    margin-left: 10px;
-}
-
-/* Tema Gelap untuk Butang Peta */
-.leaflet-bar, .leaflet-control-layers {
-    border: 1px solid #444 !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
-}
-
-.leaflet-bar a, .leaflet-control-layers-toggle {
-    background-color: #242731 !important;
-    color: white !important;
-}
-
-#toggleBtn:hover, .leaflet-bar a:hover {
-    background-color: #3d414e !important;
-}
+#toggleBtn:hover { background-color: #3d414e !important; }
 
 /* SIDEBAR DARK MODE */
 #sidebar {
@@ -106,74 +90,18 @@ html, body {
     overflow-y: auto;
 }
 #sidebar.active { right:0; }
-
-.closeBtn {
-    float:right;
-    background:none;
-    border:none;
-    color:#888;
-    font-size:24px;
-    cursor:pointer;
-}
-
-.sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 20px;
-    font-weight: bold;
-    margin: 40px 0 20px 0;
-    border-bottom: 1px solid #3d414e;
-    padding-bottom: 15px;
-}
-
+.closeBtn { float:right; background:none; border:none; color:#888; font-size:24px; cursor:pointer; }
+.sidebar-header { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: bold; margin: 40px 0 20px 0; border-bottom: 1px solid #3d414e; padding-bottom: 15px; }
 #sidebar h3 { color:#81c784; font-size: 16px; margin-top: 20px; }
-#sidebar input {
-    width:100%;
-    padding:12px;
-    margin-bottom:12px;
-    border-radius:8px;
-    border: 1px solid #444;
-    background: #1a1c23;
-    color: white;
-    box-sizing: border-box;
-}
-
-.btn {
-    width:100%;
-    padding:12px;
-    margin-bottom:10px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    font-weight: bold;
-}
+#sidebar input { width:100%; padding:12px; margin-bottom:12px; border-radius:8px; border: 1px solid #444; background: #1a1c23; color: white; box-sizing: border-box; }
+.btn { width:100%; padding:12px; margin-bottom:10px; border:none; border-radius:8px; cursor:pointer; font-weight: bold; }
 .btn.primary { background:#2e7d32; color:white; }
 .btn.danger { background:#c62828; color:white; }
-
-.box {
-    background:#1a1c23;
-    padding:15px;
-    border-radius:10px;
-    margin-bottom:12px;
-    border-left: 4px solid #2e7d32;
-}
+.box { background:#1a1c23; padding:15px; border-radius:10px; margin-bottom:12px; border-left: 4px solid #2e7d32; }
 .box p { margin:0; font-size:11px; color:#aaa; text-transform: uppercase; }
 .box span { font-size:16px; font-weight:bold; color:#81c784; }
-
-/* POPUP STREET VIEW */
 .popup-sv { text-align: center; }
-.btn-sv {
-    display: inline-block;
-    margin-top: 8px;
-    padding: 8px 12px;
-    background: #4285f4;
-    color: white !important;
-    text-decoration: none;
-    border-radius: 4px;
-    font-weight: bold;
-    font-size: 11px;
-}
+.btn-sv { display: inline-block; margin-top: 8px; padding: 8px 12px; background: #4285f4; color: white !important; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 11px; }
 </style>
 </head>
 
@@ -181,7 +109,7 @@ html, body {
 
 <div id="header">
     <img src="images/puo.png" alt="Politeknik Ungku Omar">
-    <span>VIRTUAL LOT – TAMAN PERUMAHAN</span>
+    <span class="custom-font">smart resident</span>
 </div>
 
 <button id="toggleBtn" onclick="toggleSidebar()">☰</button>
