@@ -1,86 +1,35 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>VIRTUAL LOT</title>
-
-<link rel="stylesheet" href="css/leaflet.css">
-<link rel="stylesheet" href="style.css">
-
-</head>
-
-<body>
-
-<!-- HEADER -->
-<div id="header">
-    <img src="images/puo.png">
-    <span>VIRTUAL LOT – TAMAN PERUMAHAN</span>
-</div>
-
-<!-- TOGGLE BUTTON -->
-<button id="toggleBtn" onclick="toggleSidebar()">☰</button>
-
-<!-- SIDEBAR -->
-<div id="sidebar">
-    <button class="closeBtn" onclick="toggleSidebar()">✖</button>
-
-    <h3>🌍 Land Explorer</h3>
-
-    <input type="text" id="searchLot" placeholder="Cari No Lot">
-    <button class="btn" onclick="searchLot()">🔍 Search</button>
-    <button class="btn reset" onclick="resetMap()">♻ Reset</button>
-
-    <hr>
-
-    <div class="info">
-        <div class="box">
-            <small>Total Lot</small>
-            <span id="totalLots">0</span>
-        </div>
-
-        <div class="box">
-            <small>Keluasan Lot</small>
-            <span id="selectedArea">-</span>
-        </div>
-    </div>
-</div>
-
-<!-- MAP -->
-<div id="map"></div>
-
-<script src="js/leaflet.js"></script>
-<script src="js/Leaflet.GoogleMutant.js"></script>
-<script src="data/LOTFINAL_0.js"></script>
-
 <script>
 function toggleSidebar(){
     document.getElementById("sidebar").classList.toggle("active");
 }
 
-/* MAP INIT */
+/* MAP */
 var map = L.map('map').fitBounds([
     [2.102821,102.520895],
     [2.104582,102.524810]
 ]);
 
-/* BASE MAPS */
-var googleSat = L.gridLayer.googleMutant({
-    type: 'satellite'
-}).addTo(map);
-
-var googleStreet = L.gridLayer.googleMutant({
-    type: 'roadmap'
+/* GOOGLE MAPS */
+var googleStreet = L.tileLayer(
+'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+    maxZoom:20,
+    subdomains:['mt0','mt1','mt2','mt3']
 });
 
-var esri = L.tileLayer(
-'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-);
+var googleSatellite = L.tileLayer(
+'https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+    maxZoom:20,
+    subdomains:['mt0','mt1','mt2','mt3']
+}).addTo(map);
 
-/* LOT STYLE */
+/* 🔥 BUAT PANE KHAS UNTUK LOT */
+map.createPane('lotPane');
+map.getPane('lotPane').style.zIndex = 650;
+
+/* STYLE LOT */
 function styleLot(){
     return {
+        pane: 'lotPane',
         color:"#1b5e20",
         weight:1,
         fillColor:"#66bb6a",
@@ -96,39 +45,34 @@ var lotLayer = L.geoJSON(json_LOTFINAL_0,{
         document.getElementById("totalLots").innerText =
         json_LOTFINAL_0.features.length;
 
-        layer.bindPopup(
-            "<b>No Lot:</b> "+feature.properties.NO_LOT+
-            "<br><b>Keluasan:</b> "+feature.properties.AREA
-        );
-
         layer.on("click",function(){
             document.getElementById("selectedArea").innerText =
-            feature.properties.AREA;
+            feature.properties.AREA + " m²";
+
+            layer.bringToFront(); // 🔥 PENTING
+
+            layer.bindPopup(
+                "<b>No Lot:</b> " + feature.properties.NO_LOT +
+                "<br><b>Luas:</b> " + feature.properties.AREA + " m²"
+            ).openPopup();
         });
     }
 }).addTo(map);
 
-/* LAYER CONTROL */
-var baseMaps = {
-    "🛰 Google Satellite": googleSat,
-    "🛣 Google Street": googleStreet,
-    "🌍 Esri Satellite": esri
-};
-
-var overlayMaps = {
-    "📐 Lot Tanah": lotLayer
-};
-
-L.control.layers(baseMaps, overlayMaps).addTo(map);
-
-/* SEARCH LOT */
+/* SEARCH */
 function searchLot(){
     var input = document.getElementById("searchLot").value.toLowerCase();
 
     lotLayer.eachLayer(function(layer){
-        if(layer.feature.properties.NO_LOT.toLowerCase().includes(input)){
+        layer.setStyle(styleLot());
+
+        if(layer.feature.properties.NO_LOT.toLowerCase() === input){
             map.fitBounds(layer.getBounds());
-            layer.setStyle({fillColor:"#ffeb3b"});
+            layer.setStyle({
+                fillColor:"#ffeb3b",
+                color:"#f57f17"
+            });
+            layer.bringToFront(); // 🔥
         }
     });
 }
@@ -141,8 +85,19 @@ function resetMap(){
     lotLayer.eachLayer(function(layer){
         layer.setStyle(styleLot());
     });
-}
-</script>
 
-</body>
-</html>
+    map.fitBounds(lotLayer.getBounds());
+}
+
+/* LAYER CONTROL */
+L.control.layers(
+    {
+        "Google Street": googleStreet,
+        "Google Satellite": googleSatellite
+    },
+    {
+        "Lot Tanah": lotLayer
+    }
+).addTo(map);
+
+</script>
