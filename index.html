@@ -8,37 +8,42 @@
 
 <link rel="stylesheet" href="css/leaflet.css">
 <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
 <!-- HEADER -->
 <div id="header">
-    <img src="images/puo.png" alt="PUO">
-    <span>TAMAN PERUMAHAN</span>
+    <img src="images/puo.png">
+    <span>VIRTUAL LOT – TAMAN PERUMAHAN</span>
 </div>
 
 <!-- TOGGLE BUTTON -->
-<button id="toggleBtn" onclick="toggleSidebar()">☰ Menu</button>
+<button id="toggleBtn" onclick="toggleSidebar()">☰</button>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
-    <button class="closeBtn" onclick="toggleSidebar()">✖ Tutup</button>
+    <button class="closeBtn" onclick="toggleSidebar()">✖</button>
 
     <h3>🌍 Land Explorer</h3>
 
-    <input type="text" id="searchLot" placeholder="Lot Number">
-    <button onclick="searchLot()">Search</button>
-    <button onclick="resetMap()">Reset Map</button>
+    <input type="text" id="searchLot" placeholder="Cari No Lot">
+    <button class="btn" onclick="searchLot()">🔍 Search</button>
+    <button class="btn reset" onclick="resetMap()">♻ Reset</button>
 
     <hr>
 
     <div class="info">
-        <p><b>Total Lots</b><br>
-        <span id="totalLots">0</span></p>
+        <div class="box">
+            <small>Total Lot</small>
+            <span id="totalLots">0</span>
+        </div>
 
-        <p><b>Selected Area</b><br>
-        <span id="selectedArea">-</span></p>
+        <div class="box">
+            <small>Keluasan Lot</small>
+            <span id="selectedArea">-</span>
+        </div>
     </div>
 </div>
 
@@ -46,6 +51,7 @@
 <div id="map"></div>
 
 <script src="js/leaflet.js"></script>
+<script src="js/Leaflet.GoogleMutant.js"></script>
 <script src="data/LOTFINAL_0.js"></script>
 
 <script>
@@ -53,16 +59,26 @@ function toggleSidebar(){
     document.getElementById("sidebar").classList.toggle("active");
 }
 
-/* MAP */
+/* MAP INIT */
 var map = L.map('map').fitBounds([
     [2.102821,102.520895],
     [2.104582,102.524810]
 ]);
 
-L.tileLayer(
-'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-).addTo(map);
+/* BASE MAPS */
+var googleSat = L.gridLayer.googleMutant({
+    type: 'satellite'
+}).addTo(map);
 
+var googleStreet = L.gridLayer.googleMutant({
+    type: 'roadmap'
+});
+
+var esri = L.tileLayer(
+'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+);
+
+/* LOT STYLE */
 function styleLot(){
     return {
         color:"#1b5e20",
@@ -72,11 +88,18 @@ function styleLot(){
     };
 }
 
+/* LOT LAYER */
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     style:styleLot,
     onEachFeature:function(feature,layer){
+
         document.getElementById("totalLots").innerText =
         json_LOTFINAL_0.features.length;
+
+        layer.bindPopup(
+            "<b>No Lot:</b> "+feature.properties.NO_LOT+
+            "<br><b>Keluasan:</b> "+feature.properties.AREA
+        );
 
         layer.on("click",function(){
             document.getElementById("selectedArea").innerText =
@@ -85,8 +108,23 @@ var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     }
 }).addTo(map);
 
+/* LAYER CONTROL */
+var baseMaps = {
+    "🛰 Google Satellite": googleSat,
+    "🛣 Google Street": googleStreet,
+    "🌍 Esri Satellite": esri
+};
+
+var overlayMaps = {
+    "📐 Lot Tanah": lotLayer
+};
+
+L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+/* SEARCH LOT */
 function searchLot(){
     var input = document.getElementById("searchLot").value.toLowerCase();
+
     lotLayer.eachLayer(function(layer){
         if(layer.feature.properties.NO_LOT.toLowerCase().includes(input)){
             map.fitBounds(layer.getBounds());
@@ -95,9 +133,11 @@ function searchLot(){
     });
 }
 
+/* RESET */
 function resetMap(){
     document.getElementById("searchLot").value="";
     document.getElementById("selectedArea").innerText="-";
+
     lotLayer.eachLayer(function(layer){
         layer.setStyle(styleLot());
     });
