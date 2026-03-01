@@ -35,7 +35,7 @@ html, body {
 #header img { height:45px; }
 #header span { font-size:18px; font-weight:bold; letter-spacing:1px; }
 
-/* ===== ADJUST KEDUDUKAN CONTROL PETA ===== */
+/* ===== ADJUST KEDUDUKAN BUTANG PETA (ZOOM & LAYER) ===== */
 /* Turunkan butang Zoom (Kiri) */
 .leaflet-top.leaflet-left {
     margin-top: 85px; 
@@ -48,7 +48,7 @@ html, body {
     margin-right: 10px;
 }
 
-/* Tema Gelap untuk Butang Peta supaya selaras dengan Sidebar */
+/* Tema Gelap untuk Butang Peta */
 .leaflet-bar, .leaflet-control-layers {
     border: 1px solid #444 !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
@@ -63,19 +63,28 @@ html, body {
     background-color: #3d414e !important;
 }
 
-/* ===== TOGGLE BUTTON SIDEBAR ===== */
+/* ===== TOGGLE BUTTON SIDEBAR (DI BAWAH LAYER CONTROL) ===== */
 #toggleBtn {
     position:absolute;
-    top:140px; /* Turunkan sikit supaya tak rapat sangat dengan Layer Control */
-    right:10px;
-    z-index:1100;
-    padding:10px 14px;
-    font-size:18px;
-    background:#242731;
-    color:white;
-    border:1px solid #444;
-    border-radius:8px;
-    cursor:pointer;
+    top: 145px; /* Jarak yang cukup di bawah butang Layer Control */
+    right: 10px;
+    z-index: 1100;
+    width: 44px;  /* Saiz disamakan dengan butang Layer */
+    height: 44px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    background: #242731;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 4px; /* Samakan bentuk dengan butang Layer */
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+#toggleBtn:hover {
+    background-color: #3d414e;
 }
 
 /* ===== SIDEBAR DARK MODE ===== */
@@ -202,7 +211,9 @@ function toggleSidebar(){
     document.getElementById("sidebar").classList.toggle("active");
 }
 
-var map = L.map('map').fitBounds([
+var map = L.map('map', {
+    zoomControl: true
+}).fitBounds([
     [2.102821,102.520895],
     [2.104582,102.524810]
 ]);
