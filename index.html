@@ -8,15 +8,16 @@
 <link rel="stylesheet" href="css/leaflet.css">
 
 <style>
+/* CSS ASAL & GLOBAL */
 html, body {
     margin:0;
     padding:0;
     height:100%;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Arial, sans-serif;
 }
 #map { height:100vh; }
 
-/* ===== HEADER (CENTER) ===== */
+/* ===== HEADER ===== */
 #header {
     position:absolute;
     top:0;
@@ -31,100 +32,134 @@ html, body {
     gap:12px;
     z-index:1000;
 }
-#header img {
-    height:45px;
-}
-#header span {
-    font-size:18px;
-    font-weight:bold;
-    letter-spacing:1px;
-}
+#header img { height:45px; }
+#header span { font-size:18px; font-weight:bold; letter-spacing:1px; }
 
-/* ===== TOGGLE ===== */
+/* ===== TOGGLE BUTTON (DI KANAN) ===== */
 #toggleBtn {
     position:absolute;
     top:85px;
-    left:10px;
+    right:10px; /* Diubah ke kanan */
     z-index:1100;
     padding:8px 12px;
     font-size:18px;
-    background:#1b5e20;
+    background:#242731;
     color:white;
-    border:none;
+    border:1px solid #444;
     border-radius:5px;
     cursor:pointer;
 }
 
-/* ===== SIDEBAR ===== */
+/* ===== SIDEBAR (DESIGN BARU - DARK MODE) ===== */
 #sidebar {
     position:absolute;
-    top:70px;
-    left:-300px;
-    width:300px;
-    height:calc(100% - 70px);
-    background:white;
-    box-shadow:2px 0 10px rgba(0,0,0,0.3);
-    padding:15px;
+    top:0;
+    right:-320px; /* Mula dari kanan luar skrin */
+    width:320px;
+    height:100%;
+    background:#242731; /* Warna gelap seperti imej */
+    color: white;
+    box-shadow:-2px 0 15px rgba(0,0,0,0.5);
+    padding:20px;
     transition:0.3s;
     z-index:1200;
+    box-sizing: border-box;
+    overflow-y: auto;
 }
-#sidebar.active { left:0; }
+#sidebar.active { right:0; }
 
 .closeBtn {
     float:right;
     background:none;
     border:none;
-    font-size:18px;
+    color:#888;
+    font-size:22px;
     cursor:pointer;
 }
 
-#sidebar h3 { color:#1b5e20; }
+/* HEADER SIDEBAR (Tetapan Paparan) */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    margin: 30px 0 20px 0;
+}
 
+/* SECTION UPLOAD */
+.upload-label {
+    display: block;
+    font-size: 14px;
+    color: #ccc;
+    margin-bottom: 10px;
+}
+
+.upload-box {
+    border: 2px dashed #3d414e;
+    background-color: #1a1c23;
+    border-radius: 12px;
+    padding: 30px 15px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.upload-box p { margin: 0 0 5px 0; font-size: 16px; color: #fff; }
+.upload-box span { display: block; font-size: 11px; color: #666; margin-bottom: 15px; }
+
+.browse-btn {
+    background-color: #2d303a;
+    color: white;
+    border: 1px solid #444;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+/* INPUT & BUTTONS */
+#sidebar h3 { color:#81c784; font-size: 16px; margin-top: 0; }
 #sidebar input {
     width:100%;
-    padding:8px;
-    margin-bottom:8px;
+    padding:10px;
+    margin-bottom:10px;
     border-radius:5px;
-    border:1px solid #ccc;
+    border:1px solid #444;
+    background: #1a1c23;
+    color: white;
+    box-sizing: border-box;
 }
 
 .btn {
     width:100%;
-    padding:8px;
-    margin-bottom:6px;
+    padding:10px;
+    margin-bottom:8px;
     border:none;
     border-radius:5px;
     cursor:pointer;
+    font-weight: bold;
 }
 .btn.primary { background:#2e7d32; color:white; }
 .btn.danger { background:#c62828; color:white; }
 
-/* INFO BOX */
-.info {
-    margin-top:10px;
-}
+/* INFO BOX (DARK) */
+.info { margin-top:15px; }
 .box {
-    background:#f1f8e9;
-    padding:10px;
-    border-radius:5px;
-    margin-bottom:8px;
+    background:#1a1c23;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:10px;
+    border-left: 4px solid #2e7d32;
 }
-.box p {
-    margin:0;
-    font-size:13px;
-    color:#555;
-}
-.box span {
-    font-size:16px;
-    font-weight:bold;
-    color:#1b5e20;
-}
+.box p { margin:0; font-size:11px; color:#aaa; text-transform: uppercase; }
+.box span { font-size:15px; font-weight:bold; color:#81c784; }
+
+hr { border: 0; border-top: 1px solid #3d414e; margin: 20px 0; }
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
 <div id="header">
     <img src="images/puo.png" alt="Politeknik Ungku Omar">
     <span>VIRTUAL LOT – TAMAN PERUMAHAN</span>
@@ -132,33 +167,40 @@ html, body {
 
 <button id="toggleBtn" onclick="toggleSidebar()">☰</button>
 
-<!-- SIDEBAR -->
 <div id="sidebar">
-    <button class="closeBtn" onclick="toggleSidebar()">✖</button>
-    <h3>🌍 Land Explorer</h3>
+    <button class="closeBtn" onclick="toggleSidebar()">«</button>
+    
+    <div class="sidebar-header">
+        <span>⚙️</span> Tetapan Paparan
+    </div>
 
+    <label class="upload-label">Upload fail CSV</label>
+    <div class="upload-box">
+        <p>Drag and drop file here</p>
+        <span>Limit 200MB per file • CSV</span>
+        <button class="browse-btn">Browse files</button>
+    </div>
+
+    <hr>
+
+    <h3>🌍 Land Explorer</h3>
     <input type="text" id="searchLot" placeholder="Masukkan No Lot">
     <button class="btn primary" onclick="searchLot()">Cari Lot</button>
     <button class="btn danger" onclick="resetMap()">Reset</button>
-
-    <hr>
 
     <div class="info">
         <div class="box">
             <p>Total Lot</p>
             <span id="totalLots">0</span>
         </div>
-
         <div class="box">
             <p>No Lot Dipilih</p>
             <span id="lotNo">-</span>
         </div>
-
         <div class="box">
             <p>Nama Pemilik</p>
             <span id="ownerName">-</span>
         </div>
-
         <div class="box">
             <p>Luas Lot</p>
             <span id="selectedArea">-</span>
@@ -176,7 +218,7 @@ function toggleSidebar(){
     document.getElementById("sidebar").classList.toggle("active");
 }
 
-/* MAP */
+/* LOGIK MAP ANDA KEKAL DI SINI */
 var map = L.map('map').fitBounds([
     [2.102821,102.520895],
     [2.104582,102.524810]
@@ -194,7 +236,6 @@ var googleSatellite = L.tileLayer(
     subdomains:['mt0','mt1','mt2','mt3']
 }).addTo(map);
 
-/* LOT PANE */
 map.createPane('lotPane');
 map.getPane('lotPane').style.zIndex = 650;
 
@@ -208,52 +249,35 @@ function styleLot(){
     };
 }
 
-/* LOT LAYER */
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     style:styleLot,
     onEachFeature:function(feature,layer){
-        document.getElementById("totalLots").innerText =
+        document.getElementById("totalLots").innerText = 
         json_LOTFINAL_0.features.length;
     }
 }).addTo(map);
 
-/* 🔍 SEARCH + PAPAR MAKLUMAT */
 function searchLot(){
     var input = document.getElementById("searchLot").value.toLowerCase();
-
     lotLayer.eachLayer(function(layer){
         layer.setStyle(styleLot());
-
         if(layer.feature.properties.NO_LOT.toLowerCase() === input){
-
             map.fitBounds(layer.getBounds());
             layer.setStyle({ fillColor:"#ffeb3b", color:"#f57f17" });
             layer.bringToFront();
-
-            /* PAPAR INFO */
-            document.getElementById("lotNo").innerText =
-                layer.feature.properties.NO_LOT;
-
-            document.getElementById("ownerName").innerText =
-                layer.feature.properties.PEMILIK || "Tiada Data";
-
-            document.getElementById("selectedArea").innerText =
-                layer.feature.properties.AREA + " m²";
+            document.getElementById("lotNo").innerText = layer.feature.properties.NO_LOT;
+            document.getElementById("ownerName").innerText = layer.feature.properties.PEMILIK || "Tiada Data";
+            document.getElementById("selectedArea").innerText = layer.feature.properties.AREA + " m²";
         }
     });
 }
 
-/* RESET */
 function resetMap(){
     document.getElementById("searchLot").value="";
     document.getElementById("lotNo").innerText="-";
     document.getElementById("ownerName").innerText="-";
     document.getElementById("selectedArea").innerText="-";
-
-    lotLayer.eachLayer(function(layer){
-        layer.setStyle(styleLot());
-    });
-
+    lotLayer.eachLayer(function(layer){ layer.setStyle(styleLot()); });
     map.fitBounds(lotLayer.getBounds());
 }
 
@@ -265,4 +289,3 @@ L.control.layers(
 
 </body>
 </html>
-
