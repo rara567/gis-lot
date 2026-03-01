@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VIRTUAL LOT - STREET VIEW</title>
+<title>VIRTUAL LOT - TAMAN PERUMAHAN</title>
 
 <link rel="stylesheet" href="css/leaflet.css">
 
@@ -35,10 +35,38 @@ html, body {
 #header img { height:45px; }
 #header span { font-size:18px; font-weight:bold; letter-spacing:1px; }
 
-/* ===== TOGGLE BUTTON ===== */
+/* ===== ADJUST KEDUDUKAN CONTROL PETA ===== */
+/* Turunkan butang Zoom (Kiri) */
+.leaflet-top.leaflet-left {
+    margin-top: 85px; 
+    margin-left: 10px;
+}
+
+/* Turunkan butang Layer Control (Kanan) */
+.leaflet-top.leaflet-right {
+    margin-top: 85px;
+    margin-right: 10px;
+}
+
+/* Tema Gelap untuk Butang Peta supaya selaras dengan Sidebar */
+.leaflet-bar, .leaflet-control-layers {
+    border: 1px solid #444 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
+}
+
+.leaflet-bar a, .leaflet-control-layers-toggle {
+    background-color: #242731 !important;
+    color: white !important;
+}
+
+.leaflet-bar a:hover {
+    background-color: #3d414e !important;
+}
+
+/* ===== TOGGLE BUTTON SIDEBAR ===== */
 #toggleBtn {
     position:absolute;
-    top:85px;
+    top:140px; /* Turunkan sikit supaya tak rapat sangat dengan Layer Control */
     right:10px;
     z-index:1100;
     padding:10px 14px;
@@ -61,7 +89,7 @@ html, body {
     color: white;
     box-shadow:-4px 0 15px rgba(0,0,0,0.5);
     padding:20px;
-    transition: 0.3s;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index:1200;
     box-sizing: border-box;
     overflow-y: auto;
@@ -112,7 +140,6 @@ html, body {
 .btn.primary { background:#2e7d32; color:white; }
 .btn.danger { background:#c62828; color:white; }
 
-/* INFO BOX */
 .box {
     background:#1a1c23;
     padding:15px;
@@ -123,11 +150,8 @@ html, body {
 .box p { margin:0; font-size:11px; color:#aaa; text-transform: uppercase; }
 .box span { font-size:16px; font-weight:bold; color:#81c784; }
 
-/* STYLE UNTUK POPUP STREET VIEW */
-.popup-sv {
-    text-align: center;
-    font-family: sans-serif;
-}
+/* POPUP STREET VIEW */
+.popup-sv { text-align: center; }
 .btn-sv {
     display: inline-block;
     margin-top: 8px;
@@ -137,7 +161,7 @@ html, body {
     text-decoration: none;
     border-radius: 4px;
     font-weight: bold;
-    font-size: 12px;
+    font-size: 11px;
 }
 </style>
 </head>
@@ -198,29 +222,21 @@ function styleLot(){
     return { pane:'lotPane', color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 };
 }
 
-/* KOD BARU: TAMBAH STREET VIEW DALAM POPUP */
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     style:styleLot,
     onEachFeature:function(feature, layer){
-        // 1. Dapatkan koordinat tengah lot
         var center = layer.getBounds().getCenter();
-        
-        // 2. Bina URL Google Street View
         var svUrl = "https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=" + center.lat + "," + center.lng;
 
-        // 3. Bind Popup dengan butang Street View
         layer.bindPopup(`
             <div class="popup-sv">
                 <b style="color:#1b5e20">LOT ${feature.properties.NO_LOT}</b><br>
-                <p style="margin:5px 0; color:#555;">Klik untuk lihat kawasan 360°</p>
-                <a href="${svUrl}" target="_blank" class="btn-sv">Lihat Street View</a>
+                <a href="${svUrl}" target="_blank" class="btn-sv">Lihat Street View 360°</a>
             </div>
         `);
 
-        // Update jumlah lot di sidebar
         document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
         
-        // Fungsi Klik untuk update sidebar
         layer.on('click', function() {
             document.getElementById("lotNo").innerText = feature.properties.NO_LOT;
             document.getElementById("ownerName").innerText = feature.properties.PEMILIK || "Tiada Data";
@@ -236,7 +252,7 @@ function searchLot(){
         if(layer.feature.properties.NO_LOT.toLowerCase() === input){
             map.fitBounds(layer.getBounds());
             layer.setStyle({ fillColor:"#ffeb3b", color:"#f57f17" });
-            layer.openPopup(); // Terus buka popup street view bila dijumpai
+            layer.openPopup();
             
             document.getElementById("lotNo").innerText = layer.feature.properties.NO_LOT;
             document.getElementById("ownerName").innerText = layer.feature.properties.PEMILIK || "Tiada Data";
