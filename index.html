@@ -18,7 +18,7 @@ html, body {
 }
 #map { height:100vh; }
 
-/* ===== HEADER UTAMA (BARU DENGAN FONT image_6.png) ===== */
+/* ===== HEADER UTAMA ===== */
 #header {
     position:absolute;
     top:0;
@@ -34,25 +34,36 @@ html, body {
     z-index:1000;
 }
 #header img { height:45px; }
-/* Gantikan teks dengan smart resident menggunakan font baharu */
 #header .custom-font {
-    font-family: 'Dancing Script', cursive; /* Font yang ditukar mengikut image_6.png */
-    font-size: 32px; /* Besarkan sedikit supaya seimbang */
+    font-family: 'Dancing Script', cursive;
+    font-size: 32px;
     font-weight: 700;
     letter-spacing: 1px;
 }
 
+/* ===== FOOTER (BARU) ===== */
+#footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(27, 94, 32, 0.9); /* Hijau gelap telus sikit */
+    color: white;
+    text-align: center;
+    padding: 8px 0;
+    font-size: 12px;
+    z-index: 1000;
+    letter-spacing: 0.5px;
+}
+
 /* ================== KOD LAIN KEKAL SAMA ================== */
-/* ADJUST KEDUDUKAN CONTROL PETA */
 .leaflet-top.leaflet-left { margin-top: 85px; margin-left: 10px; }
 .leaflet-top.leaflet-right { margin-top: 85px; margin-right: 15px; }
 
-/* Tema Gelap untuk Butang Peta */
 .leaflet-bar, .leaflet-control-layers { border: 1px solid #444 !important; box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important; }
 .leaflet-bar a, .leaflet-control-layers-toggle { background-color: #242731 !important; color: white !important; }
 .leaflet-bar a:hover { background-color: #3d414e !important; }
 
-/* TOGGLE BUTTON SIDEBAR */
 #toggleBtn {
     position:absolute;
     top: 145px;
@@ -73,7 +84,6 @@ html, body {
 }
 #toggleBtn:hover { background-color: #3d414e !important; }
 
-/* SIDEBAR DARK MODE */
 #sidebar {
     position:absolute;
     top:0;
@@ -132,6 +142,10 @@ html, body {
 </div>
 
 <div id="map"></div>
+
+<div id="footer">
+    Hak Cipta Terpelihara 2026 © Myn
+</div>
 
 <script src="js/leaflet.js"></script>
 <script src="data/LOTFINAL_0.js"></script>
