@@ -102,6 +102,9 @@ html, body {
 .box { background:#1a1c23; padding:15px; border-radius:10px; margin-bottom:12px; border-left: 4px solid #2e7d32; }
 .box p { margin:0; font-size:11px; color:#aaa; text-transform: uppercase; }
 .box span { font-size:16px; font-weight:bold; color:#81c784; }
+
+/* Popup style */
+.custom-popup b { color: #1b5e20; font-size: 14px; }
 </style>
 </head>
 
@@ -144,6 +147,11 @@ function toggleSidebar(){
 
 var map = L.map('map').fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
 
+// LAYER PETA KEKAL DI SINI
+var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+    maxZoom:20, subdomains:['mt0','mt1','mt2','mt3']
+});
+
 var googleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
     maxZoom:20, subdomains:['mt0','mt1','mt2','mt3']
 }).addTo(map);
@@ -155,19 +163,18 @@ function styleLot(){
     return { pane:'lotPane', color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 };
 }
 
-// Fungsi Kemaskini Sidebar
-function updateSidebarInfo(properties) {
-    document.getElementById("lotNo").innerText = properties.NO_LOT;
-    // Menarik nama pemilik dari data
-    document.getElementById("ownerName").innerText = properties.PEMILIK || "Data Tidak Ditemui";
-    document.getElementById("selectedArea").innerText = (properties.AREA || "0") + " m²";
+// Fungsi kemaskini sidebar (Mengekalkan data Pemilik & Luas)
+function updateSidebarInfo(props) {
+    document.getElementById("lotNo").innerText = props.NO_LOT;
+    document.getElementById("ownerName").innerText = props.PEMILIK || "Data Tidak Ditemui";
+    document.getElementById("selectedArea").innerText = (props.AREA || "0") + " m²";
 }
 
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     style: styleLot,
     onEachFeature: function(feature, layer){
-        // Popup hanya tunjuk No Lot (360 dibuang)
-        layer.bindPopup("<b>LOT " + feature.properties.NO_LOT + "</b>");
+        // Fitur 360/Street View dibuang dari sini
+        layer.bindPopup("<div class='custom-popup'><b>LOT " + feature.properties.NO_LOT + "</b></div>");
         
         document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
         
@@ -182,16 +189,14 @@ function searchLot(){
     var found = false;
 
     lotLayer.eachLayer(function(layer){
-        // Reset warna asal
         layer.setStyle(styleLot()); 
-        
         if(layer.feature.properties.NO_LOT.toString().toLowerCase() === input){
             found = true;
             map.fitBounds(layer.getBounds());
             layer.setStyle({ fillColor:"#ffeb3b", color:"#f57f17", fillOpacity: 0.9 });
             layer.openPopup();
             
-            // KEMASKINI MAKLUMAT TERMASUK NAMA PEMILIK
+            // Nama pemilik dan maklumat lain muncul di sidebar semasa carian
             updateSidebarInfo(layer.feature.properties);
         }
     });
@@ -208,6 +213,13 @@ function resetMap(){
     map.closePopup();
     map.fitBounds(lotLayer.getBounds());
 }
+
+// KAWALAN LAYER (STREET & SATELLITE) KEKAL
+L.control.layers(
+    { "Google Street": googleStreet, "Google Satellite": googleSatellite },
+    { "Lot Tanah": lotLayer }
+).addTo(map);
+
 </script>
 </body>
 </html>
