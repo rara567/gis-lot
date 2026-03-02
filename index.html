@@ -56,19 +56,12 @@ html, body {
     letter-spacing: 0.5px;
 }
 
-/* ADJUST KEDUDUKAN CONTROL PETA */
 .leaflet-top.leaflet-left { margin-top: 85px; margin-left: 10px; }
-
-/* PENYELARASAN PAKSI X (KE KANAN) UNTUK BUTANG LAYER */
-.leaflet-top.leaflet-right { 
-    margin-top: 85px; 
-    margin-right: 10px; /* Dikurangkan supaya selari dengan butang sidebar di paksi X */
-}
+.leaflet-top.leaflet-right { margin-top: 85px; margin-right: 10px; }
 
 /* Tema Gelap untuk Butang Peta */
 .leaflet-bar, .leaflet-control-layers { border: 1px solid #444 !important; box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important; }
 .leaflet-bar a, .leaflet-control-layers-toggle { background-color: #242731 !important; color: white !important; }
-.leaflet-bar a:hover { background-color: #3d414e !important; }
 
 /* TOGGLE BUTTON SIDEBAR */
 #toggleBtn {
@@ -87,9 +80,7 @@ html, body {
     border: 1px solid #444;
     border-radius: 4px;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
-#toggleBtn:hover { background-color: #3d414e !important; }
 
 /* SIDEBAR DARK MODE */
 #sidebar {
@@ -183,6 +174,13 @@ function styleLot(){
     return { pane:'lotPane', color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 };
 }
 
+// Fungsi untuk kemaskini Sidebar (Pusat Data)
+function updateSidebar(props) {
+    document.getElementById("lotNo").innerText = props.NO_LOT;
+    document.getElementById("ownerName").innerText = props.PEMILIK || "Tiada Data";
+    document.getElementById("selectedArea").innerText = props.AREA + " m²";
+}
+
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     style:styleLot,
     onEachFeature:function(feature, layer){
@@ -199,27 +197,29 @@ var lotLayer = L.geoJSON(json_LOTFINAL_0,{
         document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
         
         layer.on('click', function() {
-            document.getElementById("lotNo").innerText = feature.properties.NO_LOT;
-            document.getElementById("ownerName").innerText = feature.properties.PEMILIK || "Tiada Data";
-            document.getElementById("selectedArea").innerText = feature.properties.AREA + " m²";
+            updateSidebar(feature.properties);
         });
     }
 }).addTo(map);
 
 function searchLot(){
-    var input = document.getElementById("searchLot").value.toLowerCase();
+    var input = document.getElementById("searchLot").value.trim().toLowerCase();
+    var found = false;
+
     lotLayer.eachLayer(function(layer){
-        layer.setStyle(styleLot());
-        if(layer.feature.properties.NO_LOT.toLowerCase() === input){
+        layer.setStyle(styleLot()); // Reset style
+        if(layer.feature.properties.NO_LOT.toString().toLowerCase() === input){
+            found = true;
             map.fitBounds(layer.getBounds());
-            layer.setStyle({ fillColor:"#ffeb3b", color:"#f57f17" });
+            layer.setStyle({ fillColor:"#ffeb3b", color:"#f57f17", fillOpacity: 0.9 });
             layer.openPopup();
             
-            document.getElementById("lotNo").innerText = layer.feature.properties.NO_LOT;
-            document.getElementById("ownerName").innerText = layer.feature.properties.PEMILIK || "Tiada Data";
-            document.getElementById("selectedArea").innerText = layer.feature.properties.AREA + " m²";
+            // KEMASKINI NAMA PEMILIK DI SIDEBAR SEMASA CARIAN
+            updateSidebar(layer.feature.properties);
         }
     });
+
+    if(!found && input !== "") alert("No Lot tidak dijumpai!");
 }
 
 function resetMap(){
