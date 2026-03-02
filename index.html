@@ -41,13 +41,13 @@ html, body {
     letter-spacing: 1px;
 }
 
-/* ===== FOOTER (BARU) ===== */
+/* ===== FOOTER ===== */
 #footer {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(27, 94, 32, 0.9); /* Hijau gelap telus sikit */
+    background: rgba(27, 94, 32, 0.9);
     color: white;
     text-align: center;
     padding: 8px 0;
@@ -56,17 +56,24 @@ html, body {
     letter-spacing: 0.5px;
 }
 
-/* ================== KOD LAIN KEKAL SAMA ================== */
+/* ADJUST KEDUDUKAN CONTROL PETA */
 .leaflet-top.leaflet-left { margin-top: 85px; margin-left: 10px; }
-.leaflet-top.leaflet-right { margin-top: 85px; margin-right: 15px; }
 
+/* PENYELARASAN BUTANG YANG DIBULATKAN (LAYER CONTROL) */
+.leaflet-top.leaflet-right { 
+    margin-top: 85px; 
+    margin-right: 15px; 
+}
+
+/* Tema Gelap untuk Butang Peta */
 .leaflet-bar, .leaflet-control-layers { border: 1px solid #444 !important; box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important; }
 .leaflet-bar a, .leaflet-control-layers-toggle { background-color: #242731 !important; color: white !important; }
 .leaflet-bar a:hover { background-color: #3d414e !important; }
 
+/* TOGGLE BUTTON SIDEBAR */
 #toggleBtn {
     position:absolute;
-    top: 145px;
+    top: 135px; /* Disesuaikan supaya rapat di bawah butang layer */
     right: 15px;
     z-index: 1100;
     width: 44px;
@@ -84,6 +91,7 @@ html, body {
 }
 #toggleBtn:hover { background-color: #3d414e !important; }
 
+/* SIDEBAR DARK MODE */
 #sidebar {
     position:absolute;
     top:0;
