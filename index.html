@@ -53,18 +53,17 @@
             padding: 8px 0;
             font-size: 12px;
             z-index: 1000;
-            letter-spacing: 0.5px;
         }
 
-        /* ADJUST KEDUDUKAN CONTROL PETA */
+        /* KEDUDUKAN KAWALAN PETA */
         .leaflet-top.leaflet-left { margin-top: 85px; margin-left: 10px; }
         .leaflet-top.leaflet-right { margin-top: 85px; margin-right: 10px; }
 
-        /* Tema Gelap untuk Butang Peta */
-        .leaflet-bar, .leaflet-control-layers { border: 1px solid #444 !important; box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important; }
+        /* TEMA GELAP BUTANG */
+        .leaflet-bar, .leaflet-control-layers { border: 1px solid #444 !important; }
         .leaflet-bar a, .leaflet-control-layers-toggle { background-color: #242731 !important; color: white !important; }
 
-        /* TOGGLE BUTTON SIDEBAR */
+        /* SIDEBAR */
         #toggleBtn {
             position:absolute;
             top: 145px; 
@@ -83,7 +82,6 @@
             cursor: pointer;
         }
 
-        /* SIDEBAR DARK MODE */
         #sidebar {
             position:absolute;
             top:0;
@@ -94,15 +92,14 @@
             color: white;
             box-shadow:-4px 0 15px rgba(0,0,0,0.5);
             padding:20px;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: 0.3s;
             z-index:1200;
             box-sizing: border-box;
             overflow-y: auto;
         }
         #sidebar.active { right:0; }
         .closeBtn { float:right; background:none; border:none; color:#888; font-size:24px; cursor:pointer; }
-        .sidebar-header { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: bold; margin: 40px 0 20px 0; border-bottom: 1px solid #3d414e; padding-bottom: 15px; }
-        #sidebar h3 { color:#81c784; font-size: 16px; margin-top: 20px; }
+        .sidebar-header { font-size: 20px; font-weight: bold; margin: 40px 0 20px 0; border-bottom: 1px solid #3d414e; padding-bottom: 15px; }
         #sidebar input { width:100%; padding:12px; margin-bottom:12px; border-radius:8px; border: 1px solid #444; background: #1a1c23; color: white; box-sizing: border-box; }
         .btn { width:100%; padding:12px; margin-bottom:10px; border:none; border-radius:8px; cursor:pointer; font-weight: bold; }
         .btn.primary { background:#2e7d32; color:white; }
@@ -115,150 +112,127 @@
 
 <body>
 
-    <div id="header">
-        <img src="images/puo.png" alt="Logo">
-        <span class="custom-font">smart resident</span>
+<div id="header">
+    <img src="puo.png" alt="Logo">
+    <span class="custom-font">smart resident</span>
+</div>
+
+<button id="toggleBtn" onclick="toggleSidebar()">☰</button>
+
+<div id="sidebar">
+    <button class="closeBtn" onclick="toggleSidebar()">«</button>
+    <div class="sidebar-header">⚙️ Tetapan Paparan</div>
+
+    <h3>🌍 Land Explorer</h3>
+    <input type="text" id="searchLot" placeholder="Masukkan No Lot">
+    <button class="btn primary" onclick="searchLot()">Cari Lot</button>
+    <button class="btn danger" onclick="resetMap()">Reset Peta</button>
+
+    <div class="info">
+        <div class="box"><p>Total Lot</p><span id="totalLots">0</span></div>
+        <div class="box"><p>No Lot Dipilih</p><span id="lotNo">-</span></div>
+        <div class="box"><p>Nama Pemilik</p><span id="ownerName">-</span></div>
+        <div class="box"><p>Luas Lot</p><span id="selectedArea">-</span></div>
     </div>
+</div>
 
-    <button id="toggleBtn" onclick="toggleSidebar()">☰</button>
+<div id="map"></div>
+<div id="footer">Hak Cipta Terpelihara 2026 © Myn</div>
 
-    <div id="sidebar">
-        <button class="closeBtn" onclick="toggleSidebar()">«</button>
-        <div class="sidebar-header"><span>⚙️</span> Tetapan Paparan</div>
+<script src="js/leaflet.js"></script>
+<script src="data/LOTFINAL_0.js"></script>
 
-        <h3>🌍 Land Explorer</h3>
-        <input type="text" id="searchLot" placeholder="Masukkan No Lot">
-        <button class="btn primary" onclick="searchLot()">Cari Lot</button>
-        <button class="btn danger" onclick="resetMap()">Reset Peta</button>
+<script>
+function toggleSidebar(){
+    document.getElementById("sidebar").classList.toggle("active");
+}
 
-        <div class="info">
-            <div class="box"><p>Total Lot</p><span id="totalLots">0</span></div>
-            <div class="box"><p>No Lot Dipilih</p><span id="lotNo">-</span></div>
-            <div class="box"><p>Nama Pemilik</p><span id="ownerName">-</span></div>
-            <div class="box"><p>Luas Lot</p><span id="selectedArea">-</span></div>
-        </div>
-    </div>
+var map = L.map('map').fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
 
-    <div id="map"></div>
+var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
+    maxZoom:20, subdomains:['mt0','mt1','mt2','mt3']
+});
 
-    <div id="footer">
-        Hak Cipta Terpelihara 2026 © Myn
-    </div>
+var googleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+    maxZoom:20, subdomains:['mt0','mt1','mt2','mt3']
+}).addTo(map);
 
-    <script src="js/leaflet.js"></script>
-    <script src="data/LOTFINAL_0.js"></script>
+map.createPane('lotPane');
+map.getPane('lotPane').style.zIndex = 650;
 
-    <script>
-        function toggleSidebar(){
-            document.getElementById("sidebar").classList.toggle("active");
-        }
+function styleLot(){
+    return { pane:'lotPane', color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 };
+}
 
-        var map = L.map('map').fitBounds([
-            [2.102821,102.520895],
-            [2.104582,102.524810]
-        ]);
+// FUNGSI UNTUK MENGAMBIL NAMA PEMILIK DARI DATA QGIS
+function getOwnerName(props) {
+    // Mencari nilai yang mempunyai teks panjang (Nama selalunya string terpanjang)
+    let values = Object.values(props);
+    let longStrings = values.filter(v => typeof v === 'string' && v.length > 10);
+    
+    // Berdasarkan gambar anda, nama berada di barisan terakhir atau string panjang
+    return longStrings.length > 0 ? longStrings[longStrings.length - 1] : "Data Tidak Ditemui";
+}
 
-        var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
-            maxZoom:20, subdomains:['mt0','mt1','mt2','mt3']
+function updateSidebar(props) {
+    document.getElementById("lotNo").innerText = props.NO_LOT || "Tiada Data";
+    document.getElementById("ownerName").innerText = getOwnerName(props);
+    
+    // Mengesan keluasan (biasanya nombor dengan perpuluhan)
+    let values = Object.values(props);
+    let area = values.find(v => typeof v === 'number' && v > 50) || "0";
+    document.getElementById("selectedArea").innerText = area + " m²";
+}
+
+var lotLayer = L.geoJSON(json_LOTFINAL_0,{
+    style: styleLot,
+    onEachFeature: function(feature, layer){
+        //Popup hanya No Lot (360 DIBUANG)
+        layer.bindPopup("<b>LOT " + feature.properties.NO_LOT + "</b>");
+        document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
+        
+        layer.on('click', function() {
+            updateSidebar(feature.properties);
         });
+    }
+}).addTo(map);
 
-        var googleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
-            maxZoom:20, subdomains:['mt0','mt1','mt2','mt3']
-        }).addTo(map);
+function searchLot(){
+    var input = document.getElementById("searchLot").value.trim().toLowerCase();
+    var found = false;
 
-        map.createPane('lotPane');
-        map.getPane('lotPane').style.zIndex = 650;
-
-        function styleLot(){
-            return { pane:'lotPane', color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 };
-        }
-
-        // FUNGSI UNTUK MENGESAN NAMA PEMILIK SECARA AUTOMATIK
-        function updateSidebarInfo(props) {
-            document.getElementById("lotNo").innerText = props.NO_LOT || "Tiada Data";
-
-            // Mencari nama pemilik: Kod ini mengimbas semua 'field' dan mengambil teks paling panjang 
-            // (Kerana nama pemilik selalunya teks yang paling panjang dalam data anda)
-            let detectedOwner = "Data Tidak Ditemui";
+    lotLayer.eachLayer(function(layer){
+        layer.setStyle(styleLot()); 
+        if(layer.feature.properties.NO_LOT.toString().toLowerCase() === input){
+            found = true;
+            map.fitBounds(layer.getBounds());
+            layer.setStyle({ fillColor:"#ffeb3b", color:"#f57f17", fillOpacity: 0.9, weight: 3 });
+            layer.openPopup();
             
-            // Senarai field yang mungkin mengandungi nama pemilik
-            let possibleKeys = ['PEMILIK', 'Nama', 'Owner', 'field_7', 'field_8', 'field_9'];
+            // KEMASKINI SIDEBAR TERMASUK NAMA PEMILIK
+            updateSidebar(layer.feature.properties);
             
-            for (let key of possibleKeys) {
-                if (props[key] && props[key].toString().length > 5) {
-                    detectedOwner = props[key];
-                    break;
-                }
-            }
-
-            // Jika masih tak jumpa, cari mana-masing string > 15 aksara
-            if (detectedOwner === "Data Tidak Ditemui") {
-                for (let k in props) {
-                    if (typeof props[k] === 'string' && props[k].length > 15) {
-                        detectedOwner = props[k];
-                        break;
-                    }
-                }
-            }
-
-            document.getElementById("ownerName").innerText = detectedOwner;
-            document.getElementById("selectedArea").innerText = (props.AREA || props.field_2 || "0") + " m²";
+            if(!document.getElementById("sidebar").classList.contains("active")) toggleSidebar();
         }
+    });
 
-        var lotLayer = L.geoJSON(json_LOTFINAL_0,{
-            style:styleLot,
-            onEachFeature:function(feature, layer){
-                // Fitur 360 dibuang dari popup
-                layer.bindPopup(`<b>LOT ${feature.properties.NO_LOT}</b>`);
+    if(!found && input !== "") alert("No Lot tidak dijumpai!");
+}
 
-                document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
-                
-                layer.on('click', function() {
-                    updateSidebarInfo(feature.properties);
-                });
-            }
-        }).addTo(map);
+function resetMap(){
+    document.getElementById("searchLot").value="";
+    document.getElementById("lotNo").innerText="-";
+    document.getElementById("ownerName").innerText="-";
+    document.getElementById("selectedArea").innerText="-";
+    lotLayer.eachLayer(function(layer){ layer.setStyle(styleLot()); });
+    map.closePopup();
+    map.fitBounds(lotLayer.getBounds());
+}
 
-        function searchLot(){
-            var input = document.getElementById("searchLot").value.trim().toLowerCase();
-            var found = false;
-
-            lotLayer.eachLayer(function(layer){
-                layer.setStyle(styleLot()); // Reset style asal
-                
-                if(layer.feature.properties.NO_LOT.toString().toLowerCase() === input){
-                    found = true;
-                    map.fitBounds(layer.getBounds());
-                    
-                    // Highlight lot yang dijumpai
-                    layer.setStyle({ fillColor:"#ffeb3b", color:"#f57f17", fillOpacity: 0.9, weight: 3 });
-                    layer.openPopup();
-                    
-                    // KEMASKINI MAKLUMAT PEMILIK DI SIDEBAR
-                    updateSidebarInfo(layer.feature.properties);
-
-                    // Buka sidebar jika tertutup
-                    if(!document.getElementById("sidebar").classList.contains("active")) toggleSidebar();
-                }
-            });
-
-            if(!found && input !== "") alert("No Lot tidak dijumpai!");
-        }
-
-        function resetMap(){
-            document.getElementById("searchLot").value="";
-            document.getElementById("lotNo").innerText="-";
-            document.getElementById("ownerName").innerText="-";
-            document.getElementById("selectedArea").innerText="-";
-            lotLayer.eachLayer(function(layer){ layer.setStyle(styleLot()); });
-            map.closePopup();
-            map.fitBounds(lotLayer.getBounds());
-        }
-
-        L.control.layers(
-            { "Google Street": googleStreet, "Google Satellite": googleSatellite },
-            { "Lot Tanah": lotLayer }
-        ).addTo(map);
-    </script>
+L.control.layers(
+    { "Google Street": googleStreet, "Google Satellite": googleSatellite },
+    { "Lot Tanah": lotLayer }
+).addTo(map);
+</script>
 </body>
 </html>
