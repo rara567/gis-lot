@@ -7,6 +7,8 @@
 
     <link rel="stylesheet" href="css/leaflet.css">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
         /* CSS GLOBAL */
@@ -104,6 +106,7 @@
         .btn { width:100%; padding:12px; margin-bottom:10px; border:none; border-radius:8px; cursor:pointer; font-weight: bold; }
         .btn.primary { background:#2e7d32; color:white; }
         .btn.danger { background:#c62828; color:white; }
+        .btn.export { background:#0288d1; color:white; margin-top: 5px; }
         .box { background:#1a1c23; padding:15px; border-radius:10px; margin-bottom:12px; border-left: 4px solid #2e7d32; }
         .box p { margin:0; font-size:11px; color:#aaa; text-transform: uppercase; }
         .box span { font-size:16px; font-weight:bold; color:#81c784; }
@@ -127,6 +130,8 @@
     <input type="text" id="searchLot" placeholder="Masukkan No Lot">
     <button class="btn primary" onclick="searchLot()">Cari Lot</button>
     <button class="btn danger" onclick="resetMap()">Reset Peta</button>
+    
+    <button class="btn export" onclick="exportToPDF()">📄 Export Detail (PDF)</button>
 
     <div class="info">
         <div class="box"><p>Total Lot</p><span id="totalLots">0</span></div>
@@ -164,13 +169,9 @@ function styleLot(){
     return { pane:'lotPane', color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 };
 }
 
-// FUNGSI UNTUK MENGAMBIL NAMA PEMILIK DARI DATA QGIS
 function getOwnerName(props) {
-    // Mencari nilai yang mempunyai teks panjang (Nama selalunya string terpanjang)
     let values = Object.values(props);
     let longStrings = values.filter(v => typeof v === 'string' && v.length > 10);
-    
-    // Berdasarkan gambar anda, nama berada di barisan terakhir atau string panjang
     return longStrings.length > 0 ? longStrings[longStrings.length - 1] : "Data Tidak Ditemui";
 }
 
@@ -178,7 +179,6 @@ function updateSidebar(props) {
     document.getElementById("lotNo").innerText = props.NO_LOT || "Tiada Data";
     document.getElementById("ownerName").innerText = getOwnerName(props);
     
-    // Mengesan keluasan (biasanya nombor dengan perpuluhan)
     let values = Object.values(props);
     let area = values.find(v => typeof v === 'number' && v > 50) || "0";
     document.getElementById("selectedArea").innerText = area + " m²";
@@ -187,7 +187,6 @@ function updateSidebar(props) {
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     style: styleLot,
     onEachFeature: function(feature, layer){
-        //Popup hanya No Lot (360 DIBUANG)
         layer.bindPopup("<b>LOT " + feature.properties.NO_LOT + "</b>");
         document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
         
@@ -208,10 +207,7 @@ function searchLot(){
             map.fitBounds(layer.getBounds());
             layer.setStyle({ fillColor:"#ffeb3b", color:"#f57f17", fillOpacity: 0.9, weight: 3 });
             layer.openPopup();
-            
-            // KEMASKINI SIDEBAR TERMASUK NAMA PEMILIK
             updateSidebar(layer.feature.properties);
-            
             if(!document.getElementById("sidebar").classList.contains("active")) toggleSidebar();
         }
     });
@@ -227,6 +223,53 @@ function resetMap(){
     lotLayer.eachLayer(function(layer){ layer.setStyle(styleLot()); });
     map.closePopup();
     map.fitBounds(lotLayer.getBounds());
+}
+
+// FUNGSI BARU: EXPORT KE PDF
+function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    const lotNo = document.getElementById("lotNo").innerText;
+    const owner = document.getElementById("ownerName").innerText;
+    const area = document.getElementById("selectedArea").innerText;
+
+    if (lotNo === "-" || lotNo === "Tiada Data") {
+        alert("Sila pilih lot di peta atau cari No Lot terlebih dahulu!");
+        return;
+    }
+
+    const doc = new jsPDF();
+    
+    // Header Hijau
+    doc.setFillColor(27, 94, 32);
+    doc.rect(0, 0, 210, 30, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
+    doc.text("SMART RESIDENT - MAKLUMAT LOT", 105, 20, { align: 'center' });
+
+    // Kandungan
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.text("Ringkasan Maklumat Tanah:", 20, 50);
+    
+    doc.setFont(undefined, 'normal');
+    doc.text(`Nombor Lot      : ${lotNo}`, 20, 65);
+    doc.text(`Nama Pemilik   : ${owner}`, 20, 75);
+    doc.text(`Keluasan Lot    : ${area}`, 20, 85);
+    
+    doc.setLineWidth(0.5);
+    doc.line(20, 95, 190, 95);
+
+    // Footer PDF
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    const today = new Date().toLocaleString();
+    doc.text(`Dijana pada: ${today}`, 20, 110);
+    doc.text("Hak Cipta Terpelihara 2026 © Myn", 105, 285, { align: 'center' });
+
+    // Download Fail
+    doc.save(`Maklumat_Lot_${lotNo}.pdf`);
 }
 
 L.control.layers(
