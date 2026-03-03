@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         /* CSS GLOBAL */
@@ -131,7 +132,7 @@
     <button class="btn primary" onclick="searchLot()">Cari Lot</button>
     <button class="btn danger" onclick="resetMap()">Reset Peta</button>
     
-    <button class="btn export" onclick="exportToPDF()">📄 Export Detail (PDF)</button>
+    <button class="btn export" onclick="exportToPDF()">📄 Export Detail + Map (PDF)</button>
 
     <div class="info">
         <div class="box"><p>Total Lot</p><span id="totalLots">0</span></div>
@@ -152,14 +153,15 @@ function toggleSidebar(){
     document.getElementById("sidebar").classList.toggle("active");
 }
 
-var map = L.map('map').fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
+// Gunakan preferCanvas: true untuk memudahkan html2canvas menangkap polygon
+var map = L.map('map', {preferCanvas: true}).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
 
 var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
-    maxZoom:20, subdomains:['mt0','mt1','mt2','mt3']
+    maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: true
 });
 
 var googleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
-    maxZoom:20, subdomains:['mt0','mt1','mt2','mt3']
+    maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: true
 }).addTo(map);
 
 map.createPane('lotPane');
@@ -225,51 +227,76 @@ function resetMap(){
     map.fitBounds(lotLayer.getBounds());
 }
 
-// FUNGSI BARU: EXPORT KE PDF
-function exportToPDF() {
+// FUNGSI EXPORT DENGAN GAMBAR POLYGON
+async function exportToPDF() {
     const { jsPDF } = window.jspdf;
     const lotNo = document.getElementById("lotNo").innerText;
     const owner = document.getElementById("ownerName").innerText;
     const area = document.getElementById("selectedArea").innerText;
 
     if (lotNo === "-" || lotNo === "Tiada Data") {
-        alert("Sila pilih lot di peta atau cari No Lot terlebih dahulu!");
+        alert("Sila pilih lot di peta terlebih dahulu!");
         return;
     }
 
-    const doc = new jsPDF();
-    
-    // Header Hijau
-    doc.setFillColor(27, 94, 32);
-    doc.rect(0, 0, 210, 30, 'F');
-    
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(18);
-    doc.text("SMART RESIDENT - MAKLUMAT LOT", 105, 20, { align: 'center' });
+    // Paparkan loading ringkas (opsyenal)
+    const btn = document.querySelector(".btn.export");
+    const originalText = btn.innerText;
+    btn.innerText = "Generating PDF...";
+    btn.disabled = true;
 
-    // Kandungan
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(12);
-    doc.setFont(undefined, 'bold');
-    doc.text("Ringkasan Maklumat Tanah:", 20, 50);
-    
-    doc.setFont(undefined, 'normal');
-    doc.text(`Nombor Lot      : ${lotNo}`, 20, 65);
-    doc.text(`Nama Pemilik   : ${owner}`, 20, 75);
-    doc.text(`Keluasan Lot    : ${area}`, 20, 85);
-    
-    doc.setLineWidth(0.5);
-    doc.line(20, 95, 190, 95);
+    try {
+        // Tangkap gambar peta menggunakan html2canvas
+        const mapElement = document.getElementById('map');
+        const canvas = await html2canvas(mapElement, {
+            useCORS: true, // Penting untuk membolehkan tiles Google Map masuk
+            logging: false,
+            ignoreElements: (el) => el.classList.contains('leaflet-control-container') // Sorok butang zoom dlm PDF
+        });
+        const imgData = canvas.toDataURL('image/png');
 
-    // Footer PDF
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    const today = new Date().toLocaleString();
-    doc.text(`Dijana pada: ${today}`, 20, 110);
-    doc.text("Hak Cipta Terpelihara 2026 © Myn", 105, 285, { align: 'center' });
+        const doc = new jsPDF();
+        
+        // Header
+        doc.setFillColor(27, 94, 32);
+        doc.rect(0, 0, 210, 30, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(18);
+        doc.text("SMART RESIDENT - LAPORAN LOT TANAH", 105, 20, { align: 'center' });
 
-    // Download Fail
-    doc.save(`Maklumat_Lot_${lotNo}.pdf`);
+        // Maklumat Teks
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'bold');
+        doc.text("MAKLUMAT PEMILIK & LOT", 20, 45);
+        
+        doc.setFont(undefined, 'normal');
+        doc.text(`Nombor Lot      : ${lotNo}`, 20, 55);
+        doc.text(`Nama Pemilik   : ${owner}`, 20, 65);
+        doc.text(`Keluasan Lot    : ${area}`, 20, 75);
+
+        // Masukkan Gambar Peta (Polygon)
+        doc.setFont(undefined, 'bold');
+        doc.text("VISUALISASI LOKASI (MAP VIEW):", 20, 95);
+        // addImage(data, format, x, y, width, height)
+        doc.addImage(imgData, 'PNG', 20, 100, 170, 100); 
+
+        // Footer
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        const today = new Date().toLocaleString();
+        doc.text(`Tarikh Cetakan: ${today}`, 20, 210);
+        doc.text("Dokumen ini adalah cetakan komputer dan tidak memerlukan tandatangan.", 20, 215);
+        doc.text("Hak Cipta Terpelihara 2026 © Myn", 105, 285, { align: 'center' });
+
+        doc.save(`Laporan_Lot_${lotNo}.pdf`);
+    } catch (error) {
+        console.error(error);
+        alert("Gagal menjana PDF. Sila cuba lagi.");
+    } finally {
+        btn.innerText = originalText;
+        btn.disabled = false;
+    }
 }
 
 L.control.layers(
