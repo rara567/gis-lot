@@ -22,7 +22,7 @@
         }
         #map { height:100vh; z-index: 1; }
 
-        /* ===== HEADER UTAMA (SAIZ BESAR & VIDEO) ===== */
+        /* ===== HEADER UTAMA (VIDEO & LOGO BESAR) ===== */
         #header {
             position:absolute;
             top:0;
@@ -54,14 +54,14 @@
         }
 
         #header img { 
-            height: 85px; /* Logo dibesarkan */
+            height: 85px; 
             position: relative;
             z-index: 2;
         }
 
         #header .custom-font {
             font-family: 'Dancing Script', cursive;
-            font-size: 52px; /* Font dibesarkan untuk impak */
+            font-size: 52px; 
             font-weight: 700;
             letter-spacing: 2px;
             position: relative;
@@ -69,10 +69,10 @@
             text-shadow: 3px 3px 8px rgba(0,0,0,0.7);
         }
 
-        /* ===== BUTANG MENU UTAMA (KEDUDUKAN RENDAH) ===== */
+        /* ===== BUTANG MENU UTAMA (BAWAH HEADER) ===== */
         #toggleBtn {
             position: absolute;
-            top: 150px; /* Diturunkan supaya tidak ganggu video header */
+            top: 145px; 
             left: 0;
             z-index: 1100;
             background-color: #1a4d1a;
@@ -97,14 +97,14 @@
         .bar { width: 30px; height: 4px; background-color: white; margin: 2px 0; border-radius: 2px; }
         .btn-label { font-size: 14px; font-weight: bold; text-align: center; }
 
-        /* ===== SIDEBAR MODEN ===== */
+        /* ===== SIDEBAR ===== */
         #sidebar {
             position:absolute;
             top:0;
             left:-340px; 
             width:320px;
             height:100%;
-            background:#1a1c23;
+            background:#242731;
             color: white;
             box-shadow:4px 0 20px rgba(0,0,0,0.6);
             padding:25px;
@@ -118,7 +118,7 @@
         .closeBtn { float:right; background:none; border:none; color:#ff5252; font-size:28px; cursor:pointer; }
         .sidebar-header { font-size: 22px; font-weight: bold; margin: 40px 0 20px 0; border-bottom: 2px solid #2e7d32; padding-bottom: 10px; color: #81c784; }
         
-        .widget { background: #242731; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
+        .widget { background: #1a1c23; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
         .widget h3 { font-size: 13px; color: #81c784; text-transform: uppercase; margin: 0 0 12px 0; }
         
         .layer-group { display: flex; gap: 8px; }
@@ -132,9 +132,9 @@
         .btn.primary { background:#2e7d32; color:white; }
         .btn.export { background:#0288d1; color:white; }
         
-        .box { background:#2d303d; padding:15px; border-radius:10px; margin-bottom:12px; border-left: 5px solid #2e7d32; }
+        .box { background:#1a1c23; padding:15px; border-radius:10px; margin-bottom:12px; border-left: 5px solid #2e7d32; }
         .box p { margin:0; font-size:11px; color:#aaa; text-transform: uppercase; }
-        .box span { font-size:17px; font-weight:bold; color:#fff; display: block; margin-top: 5px; word-wrap: break-word; }
+        .box span { font-size:16px; font-weight:bold; color:#81c784; display: block; margin-top: 5px; word-wrap: break-word; }
 
         /* Zoom Control Adjustment */
         .leaflet-top.leaflet-left { margin-top: 260px; }
@@ -193,10 +193,11 @@
         <button class="btn" style="background:#c62828; color:white;" onclick="resetMap()">Reset Peta</button>
     </div>
 
-    <div class="info-container">
-        <div class="box"><p>No Lot</p><span id="lotNo">-</span></div>
+    <div class="info">
+        <div class="box"><p>Total Lot</p><span id="totalLots">0</span></div>
+        <div class="box"><p>No Lot Dipilih</p><span id="lotNo">-</span></div>
         <div class="box"><p>Nama Pemilik</p><span id="ownerName">-</span></div>
-        <div class="box"><p>Keluasan</p><span id="selectedArea">-</span></div>
+        <div class="box"><p>Luas Lot</p><span id="selectedArea">-</span></div>
     </div>
     
     <button class="btn export" onclick="exportToPDF()">📄 Generate Laporan PDF</button>
@@ -209,12 +210,10 @@
 <script src="data/LOTFINAL_0.js"></script>
 
 <script>
-// Fungsi Sidebar
 function toggleSidebar(){
     document.getElementById("sidebar").classList.toggle("active");
 }
 
-// Inisialisasi Peta
 var map = L.map('map', {zoomControl: true, preferCanvas: true}).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
 
 var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: true});
@@ -232,42 +231,34 @@ function setBaseLayer(type) {
     }
 }
 
-// FUNGSI PINTAR: Cari Nama Pemilik dalam GeoJSON
-function findOwner(props) {
-    // Cari kolum yang mungkin berisi nama
-    const keys = ['PEMILIK', 'NAMA', 'OWNER', 'NAME', 'PROPRIETOR', 'Pemberi'];
-    for (let k of keys) {
-        if (props[k] && props[k].toString().trim().length > 2) return props[k];
-    }
-    // Jika tidak jumpa, cari mana-mana teks panjang dalam data
-    for (let key in props) {
-        if (typeof props[key] === 'string' && props[key].length > 8 && key !== 'NO_LOT') {
-            return props[key];
-        }
-    }
-    return "Maklumat Tidak Tersedia";
+// FUNGSI ASAL ANDA UNTUK NAMA PEMILIK (STRING TERPANJANG)
+function getOwnerName(props) {
+    let values = Object.values(props);
+    let longStrings = values.filter(v => typeof v === 'string' && v.length > 10);
+    return longStrings.length > 0 ? longStrings[longStrings.length - 1] : "Data Tidak Ditemui";
 }
 
 function updateSidebar(props) {
     document.getElementById("lotNo").innerText = props.NO_LOT || "Tiada Data";
-    document.getElementById("ownerName").innerText = findOwner(props);
+    document.getElementById("ownerName").innerText = getOwnerName(props);
     
-    // Cari luas (biasanya nombor besar atau kolum AREA/LUAS)
-    let area = props.AREA || props.LUAS || Object.values(props).find(v => typeof v === 'number' && v > 10) || "0";
+    let values = Object.values(props);
+    let area = values.find(v => typeof v === 'number' && v > 50) || "0";
     document.getElementById("selectedArea").innerText = area + " m²";
 }
 
 function styleLot(){
-    return { color:"#1b5e20", weight:1.5, fillColor:"#66bb6a", fillOpacity:0.7 };
+    return { color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 };
 }
 
-// Load Data Lot
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     style: styleLot,
     onEachFeature: function(feature, layer){
+        layer.bindPopup("<b>LOT " + feature.properties.NO_LOT + "</b>");
+        document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
+        
         layer.on('click', function() {
             updateSidebar(feature.properties);
-            layer.bindPopup("<b>LOT " + feature.properties.NO_LOT + "</b>").openPopup();
         });
     }
 }).addTo(map);
@@ -278,46 +269,44 @@ function searchLot(){
     
     lotLayer.eachLayer(function(layer){
         layer.setStyle(styleLot()); 
-        if(layer.feature.properties.NO_LOT && layer.feature.properties.NO_LOT.toString().toLowerCase() === input){
+        if(layer.feature.properties.NO_LOT.toString().toLowerCase() === input){
             found = true;
             map.fitBounds(layer.getBounds());
             layer.setStyle({ fillColor:"#ffeb3b", color:"#f57f17", fillOpacity: 0.9, weight: 3 });
+            layer.openPopup();
+            
             updateSidebar(layer.feature.properties);
-            layer.bindPopup("<b>LOT " + layer.feature.properties.NO_LOT + "</b>").openPopup();
+            
             if(!document.getElementById("sidebar").classList.contains("active")) toggleSidebar();
         }
     });
     
-    if(!found && input !== "") alert("No Lot " + input + " tidak dijumpai!");
+    if(!found && input !== "") alert("No Lot tidak dijumpai!");
 }
 
 function resetMap(){
+    document.getElementById("searchLot").value="";
+    document.getElementById("lotNo").innerText="-";
+    document.getElementById("ownerName").innerText="-";
+    document.getElementById("selectedArea").innerText="-";
     lotLayer.eachLayer(function(layer){ layer.setStyle(styleLot()); });
+    map.closePopup();
     map.fitBounds(lotLayer.getBounds());
-    document.getElementById("lotNo").innerText = "-";
-    document.getElementById("ownerName").innerText = "-";
-    document.getElementById("selectedArea").innerText = "-";
 }
 
 function updateOpacity(val) {
     lotLayer.setStyle({ fillOpacity: val });
 }
 
-// PDF Export
 async function exportToPDF() {
     const { jsPDF } = window.jspdf;
     const lot = document.getElementById("lotNo").innerText;
-    if(lot === "-" || lot === "Tiada Data") { alert("Sila pilih lot di peta dahulu!"); return; }
+    if(lot === "-") { alert("Pilih lot dahulu!"); return; }
     
     const canvas = await html2canvas(document.getElementById('map'), {useCORS: true});
     const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text("LAPORAN SMART RESIDENT", 105, 20, {align: 'center'});
-    doc.setFontSize(12);
-    doc.text("Nombor Lot: " + lot, 20, 35);
-    doc.text("Pemilik: " + document.getElementById("ownerName").innerText, 20, 42);
-    doc.text("Keluasan: " + document.getElementById("selectedArea").innerText, 20, 49);
-    doc.addImage(canvas.toDataURL('image/png'), 'PNG', 15, 60, 180, 100);
+    doc.text("Laporan Smart Resident - Lot " + lot, 20, 20);
+    doc.addImage(canvas.toDataURL('image/png'), 'PNG', 15, 40, 180, 100);
     doc.save("Laporan_Lot_"+lot+".pdf");
 }
 </script>
