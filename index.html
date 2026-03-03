@@ -22,30 +22,54 @@
         }
         #map { height:100vh; z-index: 1; }
 
-        /* ===== HEADER UTAMA ===== */
+        /* ===== HEADER UTAMA DENGAN VIDEO ===== */
         #header {
             position:absolute;
             top:0;
             left:0;
             right:0;
             height:70px;
-            background:#1b5e20;
+            background:#1b5e20; /* Fallback color */
             color:white;
             display:flex;
             justify-content:center;
             align-items:center;
             gap:12px;
             z-index:1000;
+            overflow: hidden; /* Pastikan video tidak keluar dari bar */
         }
+
+        /* Gaya Video Background dalam Header */
+        .header-bg-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: 1;
+            transform: translate(-50%, -50%);
+            opacity: 0.4; /* Video nampak samar-samar supaya teks jelas */
+            object-fit: cover;
+            pointer-events: none;
+        }
+
+        #header img, #header .custom-font {
+            position: relative;
+            z-index: 2; /* Letakkan teks & logo di atas video */
+        }
+
         #header img { height:45px; }
         #header .custom-font {
             font-family: 'Dancing Script', cursive;
             font-size: 32px;
             font-weight: 700;
             letter-spacing: 1px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* Bayang teks supaya senang baca */
         }
 
-        /* ===== BUTANG MENU UTAMA (SIDE TAB) ===== */
+        /* ===== BUTANG MENU UTAMA ===== */
         #toggleBtn {
             position: absolute;
             top: 100px; 
@@ -66,7 +90,6 @@
         }
 
         #toggleBtn:hover { background-color: #2e7d32; }
-
         .bar { width: 25px; height: 3px; background-color: white; margin: 2px 0; border-radius: 2px; }
         .btn-label { font-size: 13px; font-weight: 600; text-align: center; line-height: 1.2; }
 
@@ -87,11 +110,9 @@
             overflow-y: auto;
         }
         #sidebar.active { left:0; }
-
         .closeBtn { float:right; background:none; border:none; color:#888; font-size:24px; cursor:pointer; }
         .sidebar-header { font-size: 20px; font-weight: bold; margin: 40px 0 20px 0; border-bottom: 1px solid #3d414e; padding-bottom: 15px; }
         
-        /* Gaya Butang Layer dalam Sidebar */
         .layer-group { display: flex; gap: 8px; margin-bottom: 20px; }
         .layer-btn {
             flex: 1;
@@ -105,13 +126,8 @@
             font-weight: bold;
             transition: 0.3s;
         }
-        .layer-btn.active {
-            background: #2e7d32;
-            color: white;
-            border-color: #81c784;
-        }
+        .layer-btn.active { background: #2e7d32; color: white; border-color: #81c784; }
 
-        /* Sidebar Inputs & Buttons */
         #sidebar h3 { font-size: 14px; color: #81c784; text-transform: uppercase; margin-bottom: 10px; }
         #sidebar input { width:100%; padding:12px; margin-bottom:12px; border-radius:8px; border: 1px solid #444; background: #1a1c23; color: white; box-sizing: border-box; }
         .btn { width:100%; padding:12px; margin-bottom:10px; border:none; border-radius:8px; cursor:pointer; font-weight: bold; }
@@ -123,7 +139,6 @@
         .box p { margin:0; font-size:11px; color:#aaa; text-transform: uppercase; }
         .box span { font-size:16px; font-weight:bold; color:#81c784; }
 
-        /* Laraskan kedudukan Zoom Leaflet */
         .leaflet-top.leaflet-left { margin-top: 190px; }
 
         #footer {
@@ -144,6 +159,11 @@
 <body>
 
 <div id="header">
+    <video autoplay muted loop playsinline class="header-bg-video">
+        <source src="video-mapping.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
     <img src="puo.png" alt="Logo">
     <span class="custom-font">smart resident</span>
 </div>
@@ -191,13 +211,11 @@ function toggleSidebar(){
     document.getElementById("sidebar").classList.toggle("active");
 }
 
-// Inisialisasi Peta
 var map = L.map('map', {
     zoomControl: true,
     preferCanvas: true
 }).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
 
-// Definisi Layer
 var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
     maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: true
 });
@@ -206,7 +224,6 @@ var googleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&
     maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: true
 }).addTo(map);
 
-// Fungsi Tukar Layer (Manual)
 function setBaseLayer(type) {
     if(type === 'sat') {
         map.addLayer(googleSatellite);
