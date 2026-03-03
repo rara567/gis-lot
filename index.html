@@ -28,7 +28,7 @@
             top:0;
             left:0;
             right:0;
-            height: 120px; /* Saiz header dibesarkan */
+            height: 120px; 
             background:#1b5e20;
             color:white;
             display:flex;
@@ -54,30 +54,30 @@
         }
 
         #header img { 
-            height: 80px; /* Logo dibesarkan */
+            height: 85px; /* Logo dibesarkan */
             position: relative;
             z-index: 2;
         }
 
         #header .custom-font {
             font-family: 'Dancing Script', cursive;
-            font-size: 48px; /* Font dibesarkan */
+            font-size: 52px; /* Font dibesarkan untuk impak */
             font-weight: 700;
             letter-spacing: 2px;
             position: relative;
             z-index: 2;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.6);
+            text-shadow: 3px 3px 8px rgba(0,0,0,0.7);
         }
 
-        /* ===== BUTANG MENU UTAMA (KEDUDUKAN DIUBAH) ===== */
+        /* ===== BUTANG MENU UTAMA (KEDUDUKAN RENDAH) ===== */
         #toggleBtn {
             position: absolute;
-            top: 140px; /* Diturunkan supaya tidak ganggu header */
+            top: 150px; /* Diturunkan supaya tidak ganggu video header */
             left: 0;
             z-index: 1100;
             background-color: #1a4d1a;
             color: white;
-            padding: 15px 20px;
+            padding: 15px 22px;
             border: none;
             border-radius: 0 15px 15px 0;
             cursor: pointer;
@@ -91,13 +91,13 @@
 
         #toggleBtn:hover { 
             background-color: #2e7d32;
-            padding-left: 25px; /* Kesan hover sedikit ke kanan */
+            padding-left: 28px;
         }
 
         .bar { width: 30px; height: 4px; background-color: white; margin: 2px 0; border-radius: 2px; }
-        .btn-label { font-size: 14px; font-weight: bold; text-align: center; line-height: 1.2; }
+        .btn-label { font-size: 14px; font-weight: bold; text-align: center; }
 
-        /* ===== SIDEBAR ===== */
+        /* ===== SIDEBAR MODEN ===== */
         #sidebar {
             position:absolute;
             top:0;
@@ -118,16 +118,15 @@
         .closeBtn { float:right; background:none; border:none; color:#ff5252; font-size:28px; cursor:pointer; }
         .sidebar-header { font-size: 22px; font-weight: bold; margin: 40px 0 20px 0; border-bottom: 2px solid #2e7d32; padding-bottom: 10px; color: #81c784; }
         
-        /* Widget & Controls */
         .widget { background: #242731; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
-        .widget h3 { font-size: 13px; color: #81c784; text-transform: uppercase; margin-top: 0; margin-bottom: 12px; }
+        .widget h3 { font-size: 13px; color: #81c784; text-transform: uppercase; margin: 0 0 12px 0; }
         
         .layer-group { display: flex; gap: 8px; }
         .layer-btn { flex: 1; padding: 10px; border: 1px solid #444; border-radius: 8px; background: #111; color: #ccc; cursor: pointer; font-size: 12px; font-weight: bold; }
         .layer-btn.active { background: #2e7d32; color: white; border-color: #81c784; }
 
         input[type=range] { width: 100%; accent-color: #2e7d32; cursor: pointer; }
-        #sidebar input[type=text] { width:100%; padding:12px; border-radius:8px; border: 1px solid #444; background: #111; color: white; margin-bottom: 10px; }
+        #sidebar input[type=text] { width:100%; padding:12px; border-radius:8px; border: 1px solid #444; background: #111; color: white; margin-bottom: 10px; box-sizing: border-box; }
         
         .btn { width:100%; padding:12px; border:none; border-radius:8px; cursor:pointer; font-weight: bold; margin-bottom: 10px; }
         .btn.primary { background:#2e7d32; color:white; }
@@ -135,15 +134,14 @@
         
         .box { background:#2d303d; padding:15px; border-radius:10px; margin-bottom:12px; border-left: 5px solid #2e7d32; }
         .box p { margin:0; font-size:11px; color:#aaa; text-transform: uppercase; }
-        .box span { font-size:17px; font-weight:bold; color:#fff; display: block; margin-top: 5px; }
+        .box span { font-size:17px; font-weight:bold; color:#fff; display: block; margin-top: 5px; word-wrap: break-word; }
 
         /* Zoom Control Adjustment */
-        .leaflet-top.leaflet-left { margin-top: 250px; }
+        .leaflet-top.leaflet-left { margin-top: 260px; }
 
         #footer {
             position: fixed;
-            bottom: 0;
-            left: 0; right: 0;
+            bottom: 0; left: 0; right: 0;
             background: rgba(27, 94, 32, 0.95);
             color: white;
             text-align: center;
@@ -176,7 +174,7 @@
     <div class="sidebar-header">DASHBOARD GIS</div>
 
     <div class="widget">
-        <h3>🗺️ Jenis Paparan Peta</h3>
+        <h3>🗺️ Paparan Peta</h3>
         <div class="layer-group">
             <button id="btnSat" class="layer-btn active" onclick="setBaseLayer('sat')">Satelit</button>
             <button id="btnStreet" class="layer-btn" onclick="setBaseLayer('street')">Jalan</button>
@@ -211,10 +209,12 @@
 <script src="data/LOTFINAL_0.js"></script>
 
 <script>
+// Fungsi Sidebar
 function toggleSidebar(){
     document.getElementById("sidebar").classList.toggle("active");
 }
 
+// Inisialisasi Peta
 var map = L.map('map', {zoomControl: true, preferCanvas: true}).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
 
 var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: true});
@@ -232,21 +232,41 @@ function setBaseLayer(type) {
     }
 }
 
-function updateOpacity(val) {
-    if(lotLayer) lotLayer.setStyle({ fillOpacity: val });
+// FUNGSI PINTAR: Cari Nama Pemilik dalam GeoJSON
+function findOwner(props) {
+    // Cari kolum yang mungkin berisi nama
+    const keys = ['PEMILIK', 'NAMA', 'OWNER', 'NAME', 'PROPRIETOR', 'Pemberi'];
+    for (let k of keys) {
+        if (props[k] && props[k].toString().trim().length > 2) return props[k];
+    }
+    // Jika tidak jumpa, cari mana-mana teks panjang dalam data
+    for (let key in props) {
+        if (typeof props[key] === 'string' && props[key].length > 8 && key !== 'NO_LOT') {
+            return props[key];
+        }
+    }
+    return "Maklumat Tidak Tersedia";
+}
+
+function updateSidebar(props) {
+    document.getElementById("lotNo").innerText = props.NO_LOT || "Tiada Data";
+    document.getElementById("ownerName").innerText = findOwner(props);
+    
+    // Cari luas (biasanya nombor besar atau kolum AREA/LUAS)
+    let area = props.AREA || props.LUAS || Object.values(props).find(v => typeof v === 'number' && v > 10) || "0";
+    document.getElementById("selectedArea").innerText = area + " m²";
 }
 
 function styleLot(){
     return { color:"#1b5e20", weight:1.5, fillColor:"#66bb6a", fillOpacity:0.7 };
 }
 
+// Load Data Lot
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     style: styleLot,
     onEachFeature: function(feature, layer){
         layer.on('click', function() {
-            document.getElementById("lotNo").innerText = feature.properties.NO_LOT || "N/A";
-            document.getElementById("ownerName").innerText = "Sila semak pangkalan data";
-            document.getElementById("selectedArea").innerText = (feature.properties.AREA || "0") + " m²";
+            updateSidebar(feature.properties);
             layer.bindPopup("<b>LOT " + feature.properties.NO_LOT + "</b>").openPopup();
         });
     }
@@ -255,33 +275,49 @@ var lotLayer = L.geoJSON(json_LOTFINAL_0,{
 function searchLot(){
     var input = document.getElementById("searchLot").value.trim().toLowerCase();
     var found = false;
+    
     lotLayer.eachLayer(function(layer){
         layer.setStyle(styleLot()); 
-        if(layer.feature.properties.NO_LOT.toString().toLowerCase() === input){
+        if(layer.feature.properties.NO_LOT && layer.feature.properties.NO_LOT.toString().toLowerCase() === input){
             found = true;
             map.fitBounds(layer.getBounds());
             layer.setStyle({ fillColor:"#ffeb3b", color:"#f57f17", fillOpacity: 0.9, weight: 3 });
-            document.getElementById("lotNo").innerText = layer.feature.properties.NO_LOT;
-            document.getElementById("selectedArea").innerText = (layer.feature.properties.AREA || "0") + " m²";
+            updateSidebar(layer.feature.properties);
+            layer.bindPopup("<b>LOT " + layer.feature.properties.NO_LOT + "</b>").openPopup();
+            if(!document.getElementById("sidebar").classList.contains("active")) toggleSidebar();
         }
     });
-    if(!found && input !== "") alert("Lot tidak dijumpai!");
+    
+    if(!found && input !== "") alert("No Lot " + input + " tidak dijumpai!");
 }
 
 function resetMap(){
     lotLayer.eachLayer(function(layer){ layer.setStyle(styleLot()); });
     map.fitBounds(lotLayer.getBounds());
+    document.getElementById("lotNo").innerText = "-";
+    document.getElementById("ownerName").innerText = "-";
+    document.getElementById("selectedArea").innerText = "-";
 }
 
+function updateOpacity(val) {
+    lotLayer.setStyle({ fillOpacity: val });
+}
+
+// PDF Export
 async function exportToPDF() {
     const { jsPDF } = window.jspdf;
     const lot = document.getElementById("lotNo").innerText;
-    if(lot === "-") { alert("Pilih lot dahulu!"); return; }
+    if(lot === "-" || lot === "Tiada Data") { alert("Sila pilih lot di peta dahulu!"); return; }
     
     const canvas = await html2canvas(document.getElementById('map'), {useCORS: true});
     const doc = new jsPDF();
-    doc.text("Laporan Smart Resident - Lot " + lot, 20, 20);
-    doc.addImage(canvas.toDataURL('image/png'), 'PNG', 15, 40, 180, 100);
+    doc.setFontSize(16);
+    doc.text("LAPORAN SMART RESIDENT", 105, 20, {align: 'center'});
+    doc.setFontSize(12);
+    doc.text("Nombor Lot: " + lot, 20, 35);
+    doc.text("Pemilik: " + document.getElementById("ownerName").innerText, 20, 42);
+    doc.text("Keluasan: " + document.getElementById("selectedArea").innerText, 20, 49);
+    doc.addImage(canvas.toDataURL('image/png'), 'PNG', 15, 60, 180, 100);
     doc.save("Laporan_Lot_"+lot+".pdf");
 }
 </script>
