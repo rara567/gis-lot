@@ -6,7 +6,7 @@
     <title>VIRTUAL LOT - TAMAN PERUMAHAN</title>
 
     <link rel="stylesheet" href="css/leaflet.css">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -17,133 +17,203 @@
             margin:0;
             padding:0;
             height:100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
         }
-        #map { height:100vh; }
+        #map { height:100vh; z-index: 1; }
 
-        /* ===== HEADER UTAMA ===== */
+        /* ===== HEADER UTAMA (Gaya KFC: Putih & Minimalis) ===== */
         #header {
             position:absolute;
             top:0;
             left:0;
             right:0;
             height:70px;
-            background:#1b5e20;
-            color:white;
+            background:#ffffff;
+            color:#1b5e20;
             display:flex;
-            justify-content:center;
+            justify-content:space-between;
             align-items:center;
-            gap:12px;
+            padding: 0 25px;
             z-index:1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        #header img { height:45px; }
+        #header img { height:40px; }
         #header .custom-font {
             font-family: 'Dancing Script', cursive;
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
-            letter-spacing: 1px;
         }
 
-        /* ===== FOOTER ===== */
-        #footer {
+        /* ===== SIDEBAR (Gaya KFC: Clean White, Slide-in) ===== */
+        #sidebar {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(27, 94, 32, 0.9);
-            color: white;
-            text-align: center;
-            padding: 8px 0;
-            font-size: 12px;
-            z-index: 1000;
+            top: 0;
+            right: -380px; /* Lebar sedikit untuk ruang */
+            width: 380px;
+            height: 100%;
+            background: #ffffff;
+            color: #333;
+            box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1200;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+        #sidebar.active { right: 0; }
+
+        .sidebar-content {
+            padding: 30px;
+            overflow-y: auto;
+            flex-grow: 1;
         }
 
-        /* KEDUDUKAN KAWALAN PETA */
-        .leaflet-top.leaflet-left { margin-top: 85px; margin-left: 10px; }
-        .leaflet-top.leaflet-right { margin-top: 85px; margin-right: 10px; }
+        .sidebar-header-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .sidebar-header-title h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+            color: #e4002b; /* Warna merah KFC untuk aksen */
+        }
 
-        /* TEMA GELAP BUTANG */
-        .leaflet-bar, .leaflet-control-layers { border: 1px solid #444 !important; }
-        .leaflet-bar a, .leaflet-control-layers-toggle { background-color: #242731 !important; color: white !important; }
-
-        /* SIDEBAR */
-        #toggleBtn {
-            position:absolute;
-            top: 145px; 
-            right: 15px;
-            z-index: 1100;
-            width: 44px;
-            height: 44px;
+        .closeBtn { 
+            background: #f1f1f1; 
+            border: none; 
+            color: #333; 
+            font-size: 20px; 
+            cursor: pointer; 
+            width: 35px; 
+            height: 35px; 
+            border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 20px;
-            background: #242731;
-            color: white;
-            border: 1px solid #444;
-            border-radius: 4px;
-            cursor: pointer;
         }
 
-        #sidebar {
-            position:absolute;
-            top:0;
-            right:-320px;
-            width:320px;
-            height:100%;
-            background:#242731;
-            color: white;
-            box-shadow:-4px 0 15px rgba(0,0,0,0.5);
-            padding:20px;
-            transition: 0.3s;
-            z-index:1200;
+        /* Input & Button Styles */
+        h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #777; margin-bottom: 15px; }
+        
+        #sidebar input { 
+            width: 100%; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            border-radius: 8px; 
+            border: 1px solid #ddd; 
+            background: #fdfdfd; 
+            font-size: 16px;
             box-sizing: border-box;
-            overflow-y: auto;
+            outline: none;
         }
-        #sidebar.active { right:0; }
-        .closeBtn { float:right; background:none; border:none; color:#888; font-size:24px; cursor:pointer; }
-        .sidebar-header { font-size: 20px; font-weight: bold; margin: 40px 0 20px 0; border-bottom: 1px solid #3d414e; padding-bottom: 15px; }
-        #sidebar input { width:100%; padding:12px; margin-bottom:12px; border-radius:8px; border: 1px solid #444; background: #1a1c23; color: white; box-sizing: border-box; }
-        .btn { width:100%; padding:12px; margin-bottom:10px; border:none; border-radius:8px; cursor:pointer; font-weight: bold; }
-        .btn.primary { background:#2e7d32; color:white; }
-        .btn.danger { background:#c62828; color:white; }
-        .btn.export { background:#0288d1; color:white; margin-top: 5px; }
-        .box { background:#1a1c23; padding:15px; border-radius:10px; margin-bottom:12px; border-left: 4px solid #2e7d32; }
-        .box p { margin:0; font-size:11px; color:#aaa; text-transform: uppercase; }
-        .box span { font-size:16px; font-weight:bold; color:#81c784; }
+        #sidebar input:focus { border-color: #e4002b; }
+
+        .btn { 
+            width: 100%; 
+            padding: 14px; 
+            margin-bottom: 12px; 
+            border: none; 
+            border-radius: 50px; /* Round buttons like KFC */
+            cursor: pointer; 
+            font-weight: 700; 
+            font-size: 15px;
+            transition: 0.2s;
+        }
+        .btn.primary { background: #e4002b; color: white; }
+        .btn.primary:hover { background: #c20025; }
+        .btn.danger { background: #f4f4f4; color: #333; }
+        .btn.export { background: #000; color: white; }
+
+        /* Maklumat Box */
+        .info { margin-top: 25px; }
+        .box { 
+            background: #f8f9fa; 
+            padding: 18px; 
+            border-radius: 12px; 
+            margin-bottom: 15px; 
+            border: 1px solid #eee;
+        }
+        .box p { margin: 0 0 5px 0; font-size: 11px; color: #888; font-weight: 700; text-transform: uppercase; }
+        .box span { font-size: 17px; font-weight: 700; color: #222; }
+
+        /* Toggle Button */
+        #toggleBtn {
+            position:absolute;
+            top: 85px; 
+            right: 20px;
+            z-index: 1100;
+            width: 50px;
+            height: 50px;
+            background: #e4002b;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(228, 0, 43, 0.3);
+            font-size: 20px;
+        }
+
+        #footer {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: white;
+            color: #777;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 11px;
+            z-index: 1000;
+            border-top: 1px solid #eee;
+        }
+
+        .leaflet-top { margin-top: 80px; }
     </style>
 </head>
 
 <body>
 
 <div id="header">
-    <img src="puo.png" alt="Logo">
-    <span class="custom-font">smart resident</span>
+    <div style="display:flex; align-items:center; gap:15px;">
+        <img src="puo.png" alt="Logo">
+        <span class="custom-font">smart resident</span>
+    </div>
+    <div style="font-weight: 600; font-size: 14px; color: #666;">MAP EXPLORER</div>
 </div>
 
 <button id="toggleBtn" onclick="toggleSidebar()">☰</button>
 
 <div id="sidebar">
-    <button class="closeBtn" onclick="toggleSidebar()">«</button>
-    <div class="sidebar-header">⚙️ Tetapan Paparan</div>
+    <div class="sidebar-content">
+        <div class="sidebar-header-title">
+            <h2>Maklumat Lot</h2>
+            <button class="closeBtn" onclick="toggleSidebar()">✕</button>
+        </div>
 
-    <h3>🌍 Land Explorer</h3>
-    <input type="text" id="searchLot" placeholder="Masukkan No Lot">
-    <button class="btn primary" onclick="searchLot()">Cari Lot</button>
-    <button class="btn danger" onclick="resetMap()">Reset Peta</button>
-    
-    <button class="btn export" onclick="exportToPDF()">📄 Export Detail + Map (PDF)</button>
+        <h3>🌍 Carian Lot</h3>
+        <input type="text" id="searchLot" placeholder="Contoh: 1234">
+        <button class="btn primary" onclick="searchLot()">CARI SEKARANG</button>
+        <button class="btn danger" onclick="resetMap()">RESET PETA</button>
+        
+        <div style="border-top: 1px solid #eee; margin: 20px 0;"></div>
+        
+        <h3>📊 Detail Lot Dipilih</h3>
+        <div class="info">
+            <div class="box"><p>Total Lot Kawasan</p><span id="totalLots">0</span></div>
+            <div class="box"><p>No Lot</p><span id="lotNo">-</span></div>
+            <div class="box"><p>Nama Pemilik</p><span id="ownerName">-</span></div>
+            <div class="box"><p>Luas Tanah</p><span id="selectedArea">-</span></div>
+        </div>
 
-    <div class="info">
-        <div class="box"><p>Total Lot</p><span id="totalLots">0</span></div>
-        <div class="box"><p>No Lot Dipilih</p><span id="lotNo">-</span></div>
-        <div class="box"><p>Nama Pemilik</p><span id="ownerName">-</span></div>
-        <div class="box"><p>Luas Lot</p><span id="selectedArea">-</span></div>
+        <button class="btn export" onclick="exportToPDF()">📄 DOWNLOAD LAPORAN (PDF)</button>
     </div>
 </div>
 
 <div id="map"></div>
-<div id="footer">Hak Cipta Terpelihara 2026 © Hzrl</div>
+<div id="footer">Hak Cipta Terpelihara 2026 © Myn | Sistem Virtual Lot Perumahan</div>
 
 <script src="js/leaflet.js"></script>
 <script src="data/LOTFINAL_0.js"></script>
@@ -153,7 +223,6 @@ function toggleSidebar(){
     document.getElementById("sidebar").classList.toggle("active");
 }
 
-// Gunakan preferCanvas: true untuk memudahkan html2canvas menangkap polygon
 var map = L.map('map', {preferCanvas: true}).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
 
 var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
@@ -168,7 +237,7 @@ map.createPane('lotPane');
 map.getPane('lotPane').style.zIndex = 650;
 
 function styleLot(){
-    return { pane:'lotPane', color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 };
+    return { pane:'lotPane', color:"#e4002b", weight:1.5, fillColor:"#e4002b", fillOpacity:0.2 };
 }
 
 function getOwnerName(props) {
@@ -180,7 +249,6 @@ function getOwnerName(props) {
 function updateSidebar(props) {
     document.getElementById("lotNo").innerText = props.NO_LOT || "Tiada Data";
     document.getElementById("ownerName").innerText = getOwnerName(props);
-    
     let values = Object.values(props);
     let area = values.find(v => typeof v === 'number' && v > 50) || "0";
     document.getElementById("selectedArea").innerText = area + " m²";
@@ -191,7 +259,6 @@ var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     onEachFeature: function(feature, layer){
         layer.bindPopup("<b>LOT " + feature.properties.NO_LOT + "</b>");
         document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
-        
         layer.on('click', function() {
             updateSidebar(feature.properties);
         });
@@ -201,19 +268,17 @@ var lotLayer = L.geoJSON(json_LOTFINAL_0,{
 function searchLot(){
     var input = document.getElementById("searchLot").value.trim().toLowerCase();
     var found = false;
-
     lotLayer.eachLayer(function(layer){
         layer.setStyle(styleLot()); 
         if(layer.feature.properties.NO_LOT.toString().toLowerCase() === input){
             found = true;
             map.fitBounds(layer.getBounds());
-            layer.setStyle({ fillColor:"#ffeb3b", color:"#f57f17", fillOpacity: 0.9, weight: 3 });
+            layer.setStyle({ fillColor:"#000", color:"#000", fillOpacity: 0.4, weight: 3 });
             layer.openPopup();
             updateSidebar(layer.feature.properties);
             if(!document.getElementById("sidebar").classList.contains("active")) toggleSidebar();
         }
     });
-
     if(!found && input !== "") alert("No Lot tidak dijumpai!");
 }
 
@@ -227,7 +292,6 @@ function resetMap(){
     map.fitBounds(lotLayer.getBounds());
 }
 
-// FUNGSI EXPORT DENGAN GAMBAR POLYGON
 async function exportToPDF() {
     const { jsPDF } = window.jspdf;
     const lotNo = document.getElementById("lotNo").innerText;
@@ -235,67 +299,37 @@ async function exportToPDF() {
     const area = document.getElementById("selectedArea").innerText;
 
     if (lotNo === "-" || lotNo === "Tiada Data") {
-        alert("Sila pilih lot di peta terlebih dahulu!");
+        alert("Pilih lot terlebih dahulu.");
         return;
     }
 
-    // Paparkan loading ringkas (opsyenal)
     const btn = document.querySelector(".btn.export");
-    const originalText = btn.innerText;
-    btn.innerText = "Generating PDF...";
-    btn.disabled = true;
+    btn.innerText = "SILA TUNGGU...";
 
     try {
-        // Tangkap gambar peta menggunakan html2canvas
         const mapElement = document.getElementById('map');
-        const canvas = await html2canvas(mapElement, {
-            useCORS: true, // Penting untuk membolehkan tiles Google Map masuk
-            logging: false,
-            ignoreElements: (el) => el.classList.contains('leaflet-control-container') // Sorok butang zoom dlm PDF
-        });
+        const canvas = await html2canvas(mapElement, { useCORS: true });
         const imgData = canvas.toDataURL('image/png');
 
         const doc = new jsPDF();
-        
-        // Header
-        doc.setFillColor(27, 94, 32);
-        doc.rect(0, 0, 210, 30, 'F');
+        doc.setFillColor(228, 0, 43); // Merah KFC
+        doc.rect(0, 0, 210, 25, 'F');
         doc.setTextColor(255, 255, 255);
-        doc.setFontSize(18);
-        doc.text("SMART RESIDENT - LAPORAN LOT TANAH", 105, 20, { align: 'center' });
+        doc.setFontSize(16);
+        doc.text("LAPORAN RASMI SMART RESIDENT", 105, 16, { align: 'center' });
 
-        // Maklumat Teks
         doc.setTextColor(0, 0, 0);
         doc.setFontSize(12);
-        doc.setFont(undefined, 'bold');
-        doc.text("MAKLUMAT PEMILIK & LOT", 20, 45);
-        
-        doc.setFont(undefined, 'normal');
-        doc.text(`Nombor Lot      : ${lotNo}`, 20, 55);
-        doc.text(`Nama Pemilik   : ${owner}`, 20, 65);
-        doc.text(`Keluasan Lot    : ${area}`, 20, 75);
+        doc.text(`No. Lot: ${lotNo}`, 20, 40);
+        doc.text(`Pemilik: ${owner}`, 20, 50);
+        doc.text(`Luas: ${area}`, 20, 60);
 
-        // Masukkan Gambar Peta (Polygon)
-        doc.setFont(undefined, 'bold');
-        doc.text("VISUALISASI LOKASI (MAP VIEW):", 20, 95);
-        // addImage(data, format, x, y, width, height)
-        doc.addImage(imgData, 'PNG', 20, 100, 170, 100); 
-
-        // Footer
-        doc.setFontSize(10);
-        doc.setTextColor(100);
-        const today = new Date().toLocaleString();
-        doc.text(`Tarikh Cetakan: ${today}`, 20, 210);
-        doc.text("Dokumen ini adalah cetakan komputer dan tidak memerlukan tandatangan.", 20, 215);
-        doc.text("Hak Cipta Terpelihara 2026 © Myn", 105, 285, { align: 'center' });
-
-        doc.save(`Laporan_Lot_${lotNo}.pdf`);
-    } catch (error) {
-        console.error(error);
-        alert("Gagal menjana PDF. Sila cuba lagi.");
+        doc.addImage(imgData, 'PNG', 20, 70, 170, 95);
+        doc.save(`Lot_${lotNo}.pdf`);
+    } catch (e) {
+        alert("Ralat PDF.");
     } finally {
-        btn.innerText = originalText;
-        btn.disabled = false;
+        btn.innerText = "📄 DOWNLOAD LAPORAN (PDF)";
     }
 }
 
