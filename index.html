@@ -160,48 +160,48 @@
         <source src="video-mapping.mp4" type="video/mp4">
     </video>
     <img src="puo.png" alt="Logo">
-    <span class="custom-font">taman saujana putra smart resident</span>
+    <span class="custom-font">saujana putra smart resident</span>
 </div>
 
 <button id="toggleBtn" onclick="toggleSidebar()">
     <div class="bar"></div>
     <div class="bar"></div>
     <div class="bar"></div>
-    <div class="btn-label">Menu<br>Utama</div>
+    <div class="btn-label">Main</div>
 </button>
 
 <div id="sidebar">
     <button class="closeBtn" onclick="toggleSidebar()">✖</button>
-    <div class="sidebar-header">DASHBOARD GIS</div>
+    <div class="sidebar-header">DASHBOARD</div>
 
     <div class="widget">
-        <h3>🗺️ Paparan Peta</h3>
+        <h3>🗺️ Interface Layer</h3>
         <div class="layer-group">
-            <button id="btnSat" class="layer-btn active" onclick="setBaseLayer('sat')">Satelit</button>
-            <button id="btnStreet" class="layer-btn" onclick="setBaseLayer('street')">Jalan</button>
+            <button id="btnSat" class="layer-btn active" onclick="setBaseLayer('sat')">Satellite</button>
+            <button id="btnStreet" class="layer-btn" onclick="setBaseLayer('street')">Street</button>
         </div>
     </div>
 
     <div class="widget">
-        <h3>🔍 Ketelusan Lot (Opacity)</h3>
+        <h3>🔍 Lot Opacity</h3>
         <input type="range" min="0" max="1" step="0.1" value="0.7" oninput="updateOpacity(this.value)">
     </div>
 
     <div class="widget">
         <h3>🌍 Land Explorer</h3>
         <input type="text" id="searchLot" placeholder="Masukkan No Lot...">
-        <button class="btn primary" onclick="searchLot()">Cari Lot</button>
+        <button class="btn primary" onclick="searchLot()">Find Lot</button>
         <button class="btn" style="background:#c62828; color:white;" onclick="resetMap()">Reset Peta</button>
     </div>
 
     <div class="info">
         <div class="box"><p>Total Lot</p><span id="totalLots">0</span></div>
-        <div class="box"><p>No Lot Dipilih</p><span id="lotNo">-</span></div>
-        <div class="box"><p>Nama Pemilik</p><span id="ownerName">-</span></div>
-        <div class="box"><p>Luas Lot</p><span id="selectedArea">-</span></div>
+        <div class="box"><p>No Lot</p><span id="lotNo">-</span></div>
+        <div class="box"><p>Owner</p><span id="ownerName">-</span></div>
+        <div class="box"><p>Area</p><span id="selectedArea">-</span></div>
     </div>
     
-    <button class="btn export" onclick="exportToPDF()">📄 Generate Laporan PDF</button>
+    <button class="btn export" onclick="exportToPDF()">📄 Generate PDF Lot</button>
 </div>
 
 <div id="map"></div>
