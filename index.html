@@ -22,76 +22,80 @@
         }
         #map { height:100vh; z-index: 1; }
 
-        /* ===== HEADER UTAMA DENGAN VIDEO ===== */
+        /* ===== HEADER UTAMA (SAIZ BESAR & VIDEO) ===== */
         #header {
             position:absolute;
             top:0;
             left:0;
             right:0;
-            height:110px;
-            background:#1b5e20; /* Fallback color */
+            height: 120px; /* Saiz header dibesarkan */
+            background:#1b5e20;
             color:white;
             display:flex;
             justify-content:center;
             align-items:center;
-            gap:12px;
+            gap:20px;
             z-index:1000;
-            overflow: hidden; /* Pastikan video tidak keluar dari bar */
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
 
-        /* Gaya Video Background dalam Header */
         .header-bg-video {
             position: absolute;
             top: 50%;
             left: 50%;
             min-width: 100%;
             min-height: 100%;
-            width: auto;
-            height: auto;
             z-index: 1;
             transform: translate(-50%, -50%);
-            opacity: 0.4; /* Video nampak samar-samar supaya teks jelas */
+            opacity: 0.4;
             object-fit: cover;
             pointer-events: none;
         }
 
-        #header img, #header .custom-font {
+        #header img { 
+            height: 80px; /* Logo dibesarkan */
             position: relative;
-            z-index: 2; /* Letakkan teks & logo di atas video */
+            z-index: 2;
         }
 
-        #header img { height:45px; }
         #header .custom-font {
             font-family: 'Dancing Script', cursive;
-            font-size: 32px;
+            font-size: 48px; /* Font dibesarkan */
             font-weight: 700;
-            letter-spacing: 1px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); /* Bayang teks supaya senang baca */
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 2;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.6);
         }
 
-        /* ===== BUTANG MENU UTAMA ===== */
+        /* ===== BUTANG MENU UTAMA (KEDUDUKAN DIUBAH) ===== */
         #toggleBtn {
             position: absolute;
-            top: 100px; 
+            top: 140px; /* Diturunkan supaya tidak ganggu header */
             left: 0;
             z-index: 1100;
             background-color: #1a4d1a;
             color: white;
-            padding: 12px 18px;
+            padding: 15px 20px;
             border: none;
-            border-radius: 0 12px 12px 0;
+            border-radius: 0 15px 15px 0;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
-            box-shadow: 4px 0 8px rgba(0,0,0,0.3);
-            transition: 0.3s;
+            gap: 8px;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.3);
+            transition: 0.3s ease;
         }
 
-        #toggleBtn:hover { background-color: #2e7d32; }
-        .bar { width: 25px; height: 3px; background-color: white; margin: 2px 0; border-radius: 2px; }
-        .btn-label { font-size: 13px; font-weight: 600; text-align: center; line-height: 1.2; }
+        #toggleBtn:hover { 
+            background-color: #2e7d32;
+            padding-left: 25px; /* Kesan hover sedikit ke kanan */
+        }
+
+        .bar { width: 30px; height: 4px; background-color: white; margin: 2px 0; border-radius: 2px; }
+        .btn-label { font-size: 14px; font-weight: bold; text-align: center; line-height: 1.2; }
 
         /* ===== SIDEBAR ===== */
         #sidebar {
@@ -100,57 +104,51 @@
             left:-340px; 
             width:320px;
             height:100%;
-            background:#242731;
+            background:#1a1c23;
             color: white;
-            box-shadow:4px 0 15px rgba(0,0,0,0.5);
-            padding:20px;
+            box-shadow:4px 0 20px rgba(0,0,0,0.6);
+            padding:25px;
             transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index:1200;
             box-sizing: border-box;
             overflow-y: auto;
         }
         #sidebar.active { left:0; }
-        .closeBtn { float:right; background:none; border:none; color:#888; font-size:24px; cursor:pointer; }
-        .sidebar-header { font-size: 20px; font-weight: bold; margin: 40px 0 20px 0; border-bottom: 1px solid #3d414e; padding-bottom: 15px; }
+
+        .closeBtn { float:right; background:none; border:none; color:#ff5252; font-size:28px; cursor:pointer; }
+        .sidebar-header { font-size: 22px; font-weight: bold; margin: 40px 0 20px 0; border-bottom: 2px solid #2e7d32; padding-bottom: 10px; color: #81c784; }
         
-        .layer-group { display: flex; gap: 8px; margin-bottom: 20px; }
-        .layer-btn {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #444;
-            border-radius: 6px;
-            background: #1a1c23;
-            color: #ccc;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-            transition: 0.3s;
-        }
+        /* Widget & Controls */
+        .widget { background: #242731; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
+        .widget h3 { font-size: 13px; color: #81c784; text-transform: uppercase; margin-top: 0; margin-bottom: 12px; }
+        
+        .layer-group { display: flex; gap: 8px; }
+        .layer-btn { flex: 1; padding: 10px; border: 1px solid #444; border-radius: 8px; background: #111; color: #ccc; cursor: pointer; font-size: 12px; font-weight: bold; }
         .layer-btn.active { background: #2e7d32; color: white; border-color: #81c784; }
 
-        #sidebar h3 { font-size: 14px; color: #81c784; text-transform: uppercase; margin-bottom: 10px; }
-        #sidebar input { width:100%; padding:12px; margin-bottom:12px; border-radius:8px; border: 1px solid #444; background: #1a1c23; color: white; box-sizing: border-box; }
-        .btn { width:100%; padding:12px; margin-bottom:10px; border:none; border-radius:8px; cursor:pointer; font-weight: bold; }
-        .btn.primary { background:#2e7d32; color:white; }
-        .btn.danger { background:#c62828; color:white; }
-        .btn.export { background:#0288d1; color:white; margin-top: 5px; }
+        input[type=range] { width: 100%; accent-color: #2e7d32; cursor: pointer; }
+        #sidebar input[type=text] { width:100%; padding:12px; border-radius:8px; border: 1px solid #444; background: #111; color: white; margin-bottom: 10px; }
         
-        .box { background:#1a1c23; padding:15px; border-radius:10px; margin-bottom:12px; border-left: 4px solid #2e7d32; }
+        .btn { width:100%; padding:12px; border:none; border-radius:8px; cursor:pointer; font-weight: bold; margin-bottom: 10px; }
+        .btn.primary { background:#2e7d32; color:white; }
+        .btn.export { background:#0288d1; color:white; }
+        
+        .box { background:#2d303d; padding:15px; border-radius:10px; margin-bottom:12px; border-left: 5px solid #2e7d32; }
         .box p { margin:0; font-size:11px; color:#aaa; text-transform: uppercase; }
-        .box span { font-size:16px; font-weight:bold; color:#81c784; }
+        .box span { font-size:17px; font-weight:bold; color:#fff; display: block; margin-top: 5px; }
 
-        .leaflet-top.leaflet-left { margin-top: 190px; }
+        /* Zoom Control Adjustment */
+        .leaflet-top.leaflet-left { margin-top: 250px; }
 
         #footer {
             position: fixed;
             bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(27, 94, 32, 0.9);
+            left: 0; right: 0;
+            background: rgba(27, 94, 32, 0.95);
             color: white;
             text-align: center;
-            padding: 8px 0;
-            font-size: 12px;
+            padding: 10px 0;
+            font-size: 13px;
             z-index: 1000;
         }
     </style>
@@ -161,9 +159,7 @@
 <div id="header">
     <video autoplay muted loop playsinline class="header-bg-video">
         <source src="video-mapping.mp4" type="video/mp4">
-        Your browser does not support the video tag.
     </video>
-
     <img src="puo.png" alt="Logo">
     <span class="custom-font">smart resident</span>
 </div>
@@ -176,32 +172,40 @@
 </button>
 
 <div id="sidebar">
-    <button class="closeBtn" onclick="toggleSidebar()">«</button>
-    <div class="sidebar-header">⚙️ Tetapan Paparan</div>
+    <button class="closeBtn" onclick="toggleSidebar()">✖</button>
+    <div class="sidebar-header">DASHBOARD GIS</div>
 
-    <h3>🗺️ Jenis Paparan Peta</h3>
-    <div class="layer-group">
-        <button id="btnSat" class="layer-btn active" onclick="setBaseLayer('sat')">Satelit</button>
-        <button id="btnStreet" class="layer-btn" onclick="setBaseLayer('street')">Jalan</button>
+    <div class="widget">
+        <h3>🗺️ Jenis Paparan Peta</h3>
+        <div class="layer-group">
+            <button id="btnSat" class="layer-btn active" onclick="setBaseLayer('sat')">Satelit</button>
+            <button id="btnStreet" class="layer-btn" onclick="setBaseLayer('street')">Jalan</button>
+        </div>
     </div>
 
-    <h3>🌍 Land Explorer</h3>
-    <input type="text" id="searchLot" placeholder="Masukkan No Lot">
-    <button class="btn primary" onclick="searchLot()">Cari Lot</button>
-    <button class="btn danger" onclick="resetMap()">Reset Peta</button>
-    
-    <button class="btn export" onclick="exportToPDF()">📄 Export PDF</button>
+    <div class="widget">
+        <h3>🔍 Ketelusan Lot (Opacity)</h3>
+        <input type="range" min="0" max="1" step="0.1" value="0.7" oninput="updateOpacity(this.value)">
+    </div>
 
-    <div class="info">
-        <div class="box"><p>Total Lot</p><span id="totalLots">0</span></div>
-        <div class="box"><p>No Lot Dipilih</p><span id="lotNo">-</span></div>
+    <div class="widget">
+        <h3>🌍 Land Explorer</h3>
+        <input type="text" id="searchLot" placeholder="Masukkan No Lot...">
+        <button class="btn primary" onclick="searchLot()">Cari Lot</button>
+        <button class="btn" style="background:#c62828; color:white;" onclick="resetMap()">Reset Peta</button>
+    </div>
+
+    <div class="info-container">
+        <div class="box"><p>No Lot</p><span id="lotNo">-</span></div>
         <div class="box"><p>Nama Pemilik</p><span id="ownerName">-</span></div>
-        <div class="box"><p>Luas Lot</p><span id="selectedArea">-</span></div>
+        <div class="box"><p>Keluasan</p><span id="selectedArea">-</span></div>
     </div>
+    
+    <button class="btn export" onclick="exportToPDF()">📄 Generate Laporan PDF</button>
 </div>
 
 <div id="map"></div>
-<div id="footer">Hak Cipta Terpelihara 2026 © Hzrll</div>
+<div id="footer">Hak Cipta Terpelihara 2026 © Hzrll | Politeknik Ungku Omar</div>
 
 <script src="js/leaflet.js"></script>
 <script src="data/LOTFINAL_0.js"></script>
@@ -211,60 +215,40 @@ function toggleSidebar(){
     document.getElementById("sidebar").classList.toggle("active");
 }
 
-var map = L.map('map', {
-    zoomControl: true,
-    preferCanvas: true
-}).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
+var map = L.map('map', {zoomControl: true, preferCanvas: true}).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
 
-var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
-    maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: true
-});
-
-var googleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
-    maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: true
-}).addTo(map);
+var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: true});
+var googleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: true}).addTo(map);
 
 function setBaseLayer(type) {
     if(type === 'sat') {
-        map.addLayer(googleSatellite);
-        map.removeLayer(googleStreet);
+        map.addLayer(googleSatellite); map.removeLayer(googleStreet);
         document.getElementById('btnSat').classList.add('active');
         document.getElementById('btnStreet').classList.remove('active');
     } else {
-        map.addLayer(googleStreet);
-        map.removeLayer(googleSatellite);
+        map.addLayer(googleStreet); map.removeLayer(googleSatellite);
         document.getElementById('btnStreet').classList.add('active');
         document.getElementById('btnSat').classList.remove('active');
     }
 }
 
-map.createPane('lotPane');
-map.getPane('lotPane').style.zIndex = 650;
+function updateOpacity(val) {
+    if(lotLayer) lotLayer.setStyle({ fillOpacity: val });
+}
 
 function styleLot(){
-    return { pane:'lotPane', color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 };
-}
-
-function getOwnerName(props) {
-    let values = Object.values(props);
-    let longStrings = values.filter(v => typeof v === 'string' && v.length > 10);
-    return longStrings.length > 0 ? longStrings[longStrings.length - 1] : "Data Tidak Ditemui";
-}
-
-function updateSidebar(props) {
-    document.getElementById("lotNo").innerText = props.NO_LOT || "Tiada Data";
-    document.getElementById("ownerName").innerText = getOwnerName(props);
-    let values = Object.values(props);
-    let area = values.find(v => typeof v === 'number' && v > 50) || "0";
-    document.getElementById("selectedArea").innerText = area + " m²";
+    return { color:"#1b5e20", weight:1.5, fillColor:"#66bb6a", fillOpacity:0.7 };
 }
 
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     style: styleLot,
     onEachFeature: function(feature, layer){
-        layer.bindPopup("<b>LOT " + feature.properties.NO_LOT + "</b>");
-        document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
-        layer.on('click', function() { updateSidebar(feature.properties); });
+        layer.on('click', function() {
+            document.getElementById("lotNo").innerText = feature.properties.NO_LOT || "N/A";
+            document.getElementById("ownerName").innerText = "Sila semak pangkalan data";
+            document.getElementById("selectedArea").innerText = (feature.properties.AREA || "0") + " m²";
+            layer.bindPopup("<b>LOT " + feature.properties.NO_LOT + "</b>").openPopup();
+        });
     }
 }).addTo(map);
 
@@ -277,68 +261,28 @@ function searchLot(){
             found = true;
             map.fitBounds(layer.getBounds());
             layer.setStyle({ fillColor:"#ffeb3b", color:"#f57f17", fillOpacity: 0.9, weight: 3 });
-            layer.openPopup();
-            updateSidebar(layer.feature.properties);
-            if(!document.getElementById("sidebar").classList.contains("active")) toggleSidebar();
+            document.getElementById("lotNo").innerText = layer.feature.properties.NO_LOT;
+            document.getElementById("selectedArea").innerText = (layer.feature.properties.AREA || "0") + " m²";
         }
     });
-    if(!found && input !== "") alert("No Lot tidak dijumpai!");
+    if(!found && input !== "") alert("Lot tidak dijumpai!");
 }
 
 function resetMap(){
-    document.getElementById("searchLot").value="";
-    document.getElementById("lotNo").innerText="-";
-    document.getElementById("ownerName").innerText="-";
-    document.getElementById("selectedArea").innerText="-";
     lotLayer.eachLayer(function(layer){ layer.setStyle(styleLot()); });
-    map.closePopup();
     map.fitBounds(lotLayer.getBounds());
 }
 
 async function exportToPDF() {
     const { jsPDF } = window.jspdf;
-    const lotNo = document.getElementById("lotNo").innerText;
-    const owner = document.getElementById("ownerName").innerText;
-    const area = document.getElementById("selectedArea").innerText;
-
-    if (lotNo === "-" || lotNo === "Tiada Data") {
-        alert("Sila pilih lot di peta terlebih dahulu!");
-        return;
-    }
-
-    const btn = document.querySelector(".btn.export");
-    btn.innerText = "Generating PDF...";
-    btn.disabled = true;
-
-    try {
-        const mapElement = document.getElementById('map');
-        const canvas = await html2canvas(mapElement, {
-            useCORS: true, 
-            ignoreElements: (el) => el.classList.contains('leaflet-control-container')
-        });
-        const imgData = canvas.toDataURL('image/png');
-
-        const doc = new jsPDF();
-        doc.setFillColor(27, 94, 32);
-        doc.rect(0, 0, 210, 30, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(18);
-        doc.text("SMART RESIDENT - LAPORAN LOT TANAH", 105, 20, { align: 'center' });
-
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(12);
-        doc.text(`Nombor Lot: ${lotNo}`, 20, 50);
-        doc.text(`Nama Pemilik: ${owner}`, 20, 60);
-        doc.text(`Keluasan Lot: ${area}`, 20, 70);
-        doc.addImage(imgData, 'PNG', 20, 85, 170, 100); 
-
-        doc.save(`Laporan_Lot_${lotNo}.pdf`);
-    } catch (error) {
-        alert("Gagal menjana PDF.");
-    } finally {
-        btn.innerText = "📄 Export PDF";
-        btn.disabled = false;
-    }
+    const lot = document.getElementById("lotNo").innerText;
+    if(lot === "-") { alert("Pilih lot dahulu!"); return; }
+    
+    const canvas = await html2canvas(document.getElementById('map'), {useCORS: true});
+    const doc = new jsPDF();
+    doc.text("Laporan Smart Resident - Lot " + lot, 20, 20);
+    doc.addImage(canvas.toDataURL('image/png'), 'PNG', 15, 40, 180, 100);
+    doc.save("Laporan_Lot_"+lot+".pdf");
 }
 </script>
 </body>
