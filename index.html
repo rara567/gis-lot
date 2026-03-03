@@ -22,7 +22,7 @@
         }
         #map { height:100vh; z-index: 1; }
 
-        /* ===== HEADER UTAMA (VIDEO & LOGO BESAR) ===== */
+        /* ===== HEADER UTAMA (VIDEO & LOGO KE KIRI) ===== */
         #header {
             position:absolute;
             top:0;
@@ -32,9 +32,10 @@
             background:#1b5e20;
             color:white;
             display:flex;
-            justify-content:center;
+            justify-content: flex-start; /* Alihkan kandungan ke kiri */
             align-items:center;
-            gap:20px;
+            padding-left: 30px; /* Ruang dari tepi kiri skrin */
+            gap:25px; /* Jarak antara logo dan teks */
             z-index:1000;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.4);
@@ -231,7 +232,6 @@ function setBaseLayer(type) {
     }
 }
 
-// FUNGSI ASAL ANDA UNTUK NAMA PEMILIK (STRING TERPANJANG)
 function getOwnerName(props) {
     let values = Object.values(props);
     let longStrings = values.filter(v => typeof v === 'string' && v.length > 10);
