@@ -262,65 +262,106 @@ async function generateFinalPDF() {
 
     let nomorPA = (lotNo === "11487") ? "PA 143912" : "PA 143913";
 
-    // FRAME & LINE
-    doc.setLineWidth(0.8); doc.rect(10, 10, 400, 277); doc.line(85, 10, 85, 287); 
+    // 1. FRAME LUAR (KEMAS & TEBAL)
+    doc.setLineWidth(1.2);
+    doc.rect(10, 10, 400, 277); // Frame besar
+    
+    // 2. GARISAN PEMISAH SIDEBAR (TEGAK)
+    doc.setLineWidth(0.8);
+    doc.line(85, 10, 85, 287); 
 
-    // LOGO & HEADER
+    // 3. LOGO & HEADER INSTITUSI
     const logoImg = document.getElementById("logoPuo");
-    try { doc.addImage(logoImg, 'PNG', 32, 15, 20, 25); } catch (e) {}
-    doc.setFont("helvetica", "bold"); doc.setFontSize(11);
-    doc.text("POLITEKNIK UNGKU OMAR", 47, 45, {align: "center"});
-    doc.line(15, 48, 80, 48);
-
-    // LOKASI INFO
-    doc.setFontSize(14); doc.text("NEGERI JOHOR", 47, 58, {align: "center"});
-    doc.setTextColor(255, 0, 0); doc.text("TANGKAK", 47, 65, {align: "center"});
-    doc.setTextColor(0, 0, 0); doc.text("DAERAH LEDANG", 47, 72, {align: "center"});
-    doc.text("MUKIM KESANG", 47, 83, {align: "center"});
+    try { doc.addImage(logoImg, 'PNG', 32, 15, 20, 23); } catch (e) {}
     
-    doc.setFontSize(16); doc.text("LOT " + lotNo, 47, 98, {align: "center"});
-    doc.setFontSize(12); doc.text("SKALA 1 : 400", 47, 110, {align: "center"});
-
-    // ==========================================
-    // PENAMBAHBAIKAN: MAKLUMAT PEMILIK, LOT, LUAS
-    // ==========================================
-    doc.setDrawColor(200, 200, 200); doc.line(15, 120, 80, 120); // Garisan pemisah
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text("POLITEKNIK UNGKU OMAR", 47, 43, {align: "center"});
     
-    doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(100, 100, 100);
-    doc.text("NAMA PEMILIK:", 15, 130);
-    doc.setFontSize(12); doc.setTextColor(0, 0, 0);
-    doc.text(owner, 15, 137, {maxWidth: 65}); // Menggunakan maxWidth supaya text wrap jika panjang
+    doc.setLineWidth(0.5);
+    doc.line(15, 47, 80, 47); // Garisan bawah institusi
 
-    doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(100, 100, 100);
-    doc.text("NO. LOT:", 15, 155);
-    doc.setFontSize(14); doc.setTextColor(0, 0, 0);
-    doc.text(lotNo, 15, 162);
-
-    doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(100, 100, 100);
-    doc.text("LUAS LOT:", 15, 175);
-    doc.setFontSize(14); doc.setTextColor(0, 0, 0);
-    doc.text(area, 15, 182);
+    // 4. MAKLUMAT LOKASI (FONT SERIF UNTUK ELEGAN)
+    doc.setFont("times", "bold");
+    doc.setFontSize(14);
+    doc.text("NEGERI JOHOR", 47, 57, {align: "center"});
     
-    // MAKLUMAT TAMBAHAN (FAIL)
-    doc.setFontSize(9); doc.setTextColor(100, 100, 100);
-    doc.text("Fail Ukur: PUBLJ 121/2009", 15, 205);
-    doc.text("Fail Pej. Tanah: PTDM 3/8/83/02", 15, 212);
-    doc.text("Lembar Piawai: 30 D II", 15, 219);
-    doc.text("Tarikh: 4/3/2026", 15, 226);
-
-    // PENGESAHAN
+    doc.setTextColor(220, 0, 0); // Merah Tangkak
+    doc.text("TANGKAK", 47, 64, {align: "center"});
+    
     doc.setTextColor(0, 0, 0);
-    doc.setFontSize(10); doc.text("Disemak Oleh:", 15, 255);
-    doc.setFont("helvetica", "bold"); doc.setFontSize(12);
-    doc.text(accessor.toUpperCase(), 15, 262);
+    doc.text("DAERAH LEDANG", 47, 71, {align: "center"});
+    doc.text("MUKIM KESANG", 47, 82, {align: "center"});
     
-    // MAIN CONTENT (MAP & TITLE)
-    doc.setFontSize(24); doc.text("PELAN AKUI", 242, 25, {align: "center"});
-    doc.addImage(canvas.toDataURL('image/png'), 'PNG', 90, 35, 305, 200);
+    // 5. INFO LOT & SKALA
+    doc.setFontSize(18);
+    doc.text("LOT " + lotNo, 47, 96, {align: "center"});
     
-    doc.setFontSize(38); doc.text(nomorPA, 100, 265);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.text("SKALA 1 : 400", 47, 107, {align: "center"});
     
-    doc.setFontSize(8); doc.setFont("helvetica", "italic");
+    doc.setLineWidth(0.3);
+    doc.line(15, 115, 80, 115); // Garisan pemisah data
+
+    // 6. KEMASKINI MAKLUMAT PEMILIK, LOT, LUAS (DENGAN FONT PROFESIONAL)
+    // --- Nama Pemilik ---
+    doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(80, 80, 80);
+    doc.text("NAMA PEMILIK:", 15, 125);
+    
+    doc.setFont("times", "bold"); doc.setFontSize(13); doc.setTextColor(0, 0, 0);
+    const splitOwner = doc.splitTextToSize(owner.toUpperCase(), 65);
+    doc.text(splitOwner, 15, 132);
+
+    // --- No Lot ---
+    doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(80, 80, 80);
+    doc.text("NO. LOT:", 15, 152);
+    doc.setFont("times", "bold"); doc.setFontSize(16); doc.setTextColor(0, 0, 0);
+    doc.text(lotNo, 15, 160);
+
+    // --- Luas ---
+    doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(80, 80, 80);
+    doc.text("LUAS LOT:", 15, 175);
+    doc.setFont("times", "bold"); doc.setFontSize(16); doc.setTextColor(0, 0, 0);
+    doc.text(area, 15, 183);
+    
+    doc.line(15, 195, 80, 195); // Garisan pemisah bawah data
+
+    // 7. MAKLUMAT FAIL (KEMAS DI TENGAH SIDEBAR)
+    doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(100, 100, 100);
+    let fileY = 205;
+    doc.text("Fail Ukur: PUBLJ 121/2009", 15, fileY);
+    doc.text("Fail Pej. Tanah: PTDM 3/8/83/02", 15, fileY + 7);
+    doc.text("Lembar Piawai: 30 D II", 15, fileY + 14);
+    doc.text("Tarikh: 4/3/2026", 15, fileY + 21);
+
+    // 8. PENGESAHAN (DISUSUN RAPI)
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    doc.text("Disemak Oleh:", 15, 255);
+    
+    doc.setFont("times", "bold");
+    doc.setFontSize(13);
+    doc.text(accessor.toUpperCase(), 15, 263);
+    doc.line(15, 265, 80, 265); // Garisan tanda tangan
+
+    // 9. KANDUNGAN UTAMA (MAP & TAJUK)
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(26);
+    doc.text("PELAN AKUI", 242, 25, {align: "center"});
+    
+    // Frame untuk Peta (Biar nampak kemas)
+    doc.setLineWidth(0.5);
+    doc.rect(90, 35, 305, 200); 
+    doc.addImage(canvas.toDataURL('image/png'), 'PNG', 91, 36, 303, 198);
+    
+    // 10. NO PA BESAR (FOOTER)
+    doc.setFont("times", "bold");
+    doc.setFontSize(42);
+    doc.text(nomorPA, 100, 268);
+    
+    // Watermark/Nota kaki halus
+    doc.setFont("helvetica", "italic"); doc.setFontSize(8); doc.setTextColor(150, 150, 150);
     doc.text("Dokumen ini dijana secara digital melalui Sistem Saujana Putra Smart Resident", 242, 282, {align: "center"});
 
     doc.save("PA_Lot_" + lotNo + ".pdf");
