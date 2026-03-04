@@ -186,8 +186,8 @@
 <div id="pdfModal" class="modal">
     <div class="modal-content">
         <h3 style="color:#81c784;">📄 Penjanaan Laporan</h3>
-        <p>Sila masukkan nama anda:</p>
-        <input type="text" id="accessorName" placeholder="Nama Penuh...">
+        <p>Please fill the form</p>
+        <input type="text" id="accessorName" placeholder="Full Name">
         <button class="btn primary" onclick="generateFinalPDF()">Muat Turun PDF</button>
         <button class="btn" style="background:#444;" onclick="closeModal()">Batal</button>
     </div>
@@ -315,7 +315,6 @@ function resetMap(){
 }
 
 function openPdfModal() {
-    // Sekatan alert dibuang supaya modal boleh dibuka bila-bila masa
     document.getElementById("pdfModal").style.display = "flex";
 }
 
@@ -335,7 +334,6 @@ async function generateFinalPDF() {
 
     closeModal();
     
-    // Jika tiada lot dipilih, zoom out untuk tunjuk keseluruhan kawasan
     if(lotNo === "-") {
         map.fitBounds(lotLayer.getBounds());
     }
@@ -358,7 +356,6 @@ async function generateFinalPDF() {
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(14);
     
-    // Logik paparan maklumat berdasarkan pilihan lot
     if (lotNo === "-") {
         doc.text("RINGKASAN KESELURUHAN KAWASAN", 15, 55);
         doc.line(15, 57, 100, 57);
@@ -374,11 +371,13 @@ async function generateFinalPDF() {
         doc.text("Luas Lot    : " + area, 15, 84);
     }
 
-    doc.text("Diakses Oleh : " + accessor, 15, 95);
-    doc.text("Tarikh       : " + new Date().toLocaleDateString('ms-MY'), 15, 103);
+    // Kedudukan Dilihat Oleh dan Tarikh dikemaskan
+    doc.text("Dilihat Oleh : " + accessor, 15, 96);
+    doc.text("Tarikh       : " + new Date().toLocaleDateString('ms-MY'), 15, 104);
 
-    doc.text("PELAN LOKASI:", 15, 115);
-    doc.addImage(canvas.toDataURL('image/png'), 'PNG', 15, 120, 180, 100);
+    doc.setFontSize(12);
+    doc.text("PELAN LOKASI:", 15, 118);
+    doc.addImage(canvas.toDataURL('image/png'), 'PNG', 15, 122, 180, 100);
 
     doc.setFontSize(9);
     doc.setTextColor(150, 150, 150);
