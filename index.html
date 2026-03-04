@@ -12,6 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
+        /* CSS GLOBAL */
         html, body {
             margin:0; padding:0; height:100%;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -19,6 +20,7 @@
         }
         #map { height:100vh; z-index: 1; }
 
+        /* HEADER */
         #header {
             position:absolute; top:0; left:0; right:0; height: 120px; 
             background:#1b5e20; color:white; display:flex;
@@ -41,6 +43,7 @@
             z-index: 2; text-shadow: 3px 3px 8px rgba(0,0,0,0.7);
         }
 
+        /* MENU BUTTON */
         #toggleBtn {
             position: absolute; top: 145px; left: 0; z-index: 1100;
             background-color: #1a4d1a; color: white; padding: 15px 22px;
@@ -49,6 +52,9 @@
             box-shadow: 4px 0 10px rgba(0,0,0,0.3); transition: 0.3s ease;
         }
 
+        .bar { width: 30px; height: 4px; background-color: white; margin: 2px 0; border-radius: 2px; }
+
+        /* SIDEBAR */
         #sidebar {
             position:absolute; top:0; left:-340px; width:320px; height:100%;
             background:#242731; color: white; box-shadow:4px 0 20px rgba(0,0,0,0.6);
@@ -64,25 +70,27 @@
         .layer-btn { flex: 1; padding: 10px; border: 1px solid #444; border-radius: 8px; background: #111; color: #ccc; cursor: pointer; font-size: 12px; font-weight: bold; }
         .layer-btn.active { background: #2e7d32; color: white; border-color: #81c784; }
 
-        .switch { position: relative; display: inline-block; width: 60px; height: 30px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #2e7d32; }
-        input:checked + .slider:before { transform: translateX(30px); }
-
         .btn { width:100%; padding:12px; border:none; border-radius:8px; cursor:pointer; font-weight: bold; margin-bottom: 10px; }
         .btn.primary { background:#2e7d32; color:white; }
         .btn.export { background:#0288d1; color:white; }
         
         .box { background:#1a1c23; padding:15px; border-radius:10px; margin-bottom:12px; border-left: 5px solid #2e7d32; }
         .box p { margin:0; font-size:11px; color:#aaa; text-transform: uppercase; }
-        .box span { font-size:16px; font-weight:bold; color:#81c784; display: block; margin-top: 5px; }
+        .box span { font-size:16px; font-weight:bold; color:#81c784; display: block; margin-top: 5px; word-wrap: break-word; }
 
-        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); align-items: center; justify-content: center; }
-        .modal-content { background: #242731; padding: 30px; border-radius: 15px; width: 350px; text-align: center; border: 2px solid #2e7d32; color: white; }
-        .modal-content input { width: 100%; padding: 12px; margin: 20px 0; border-radius: 8px; border: 1px solid #444; background: #111; color: white; box-sizing: border-box; }
+        /* MODAL */
+        .modal {
+            display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.8); align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: #242731; padding: 30px; border-radius: 15px; width: 350px; text-align: center; border: 2px solid #2e7d32; color: white;
+        }
+        .modal-content input {
+            width: 100%; padding: 12px; margin: 20px 0; border-radius: 8px; border: 1px solid #444; background: #111; color: white; box-sizing: border-box;
+        }
 
+        /* ZOOM CONTROLS */
         .custom-zoom-container { position: absolute; bottom: 50px; right: 20px; z-index: 1500; display: flex; flex-direction: column; gap: 10px; }
         .zoom-btn { width: 50px; height: 50px; background-color: #1b5e20; color: white; border: 2px solid #81c784; border-radius: 10px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
@@ -101,9 +109,7 @@
 </div>
 
 <button id="toggleBtn" onclick="toggleSidebar()">
-    <div style="width: 30px; height: 4px; background: white; margin: 4px 0;"></div>
-    <div style="width: 30px; height: 4px; background: white; margin: 4px 0;"></div>
-    <div style="width: 30px; height: 4px; background: white; margin: 4px 0;"></div>
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
     <span style="font-size: 10px;">Menu</span>
 </button>
 
@@ -116,16 +122,6 @@
         <div style="display:flex; gap:8px;">
             <button id="btnSat" class="layer-btn active" onclick="setBaseLayer('sat')">Satellite</button>
             <button id="btnStreet" class="layer-btn" onclick="setBaseLayer('street')">Street</button>
-        </div>
-    </div>
-
-    <div class="widget">
-        <div style="display:flex; justify-content: space-between; align-items: center;">
-            <h3 style="margin:0;">🏘️ Lot Visibility</h3>
-            <label class="switch">
-                <input type="checkbox" id="lotToggle" checked onchange="toggleLotLayer(this.checked)">
-                <span class="slider"></span>
-            </label>
         </div>
     </div>
 
@@ -170,171 +166,127 @@
 <script>
 var lastClickedLayer = null; 
 
-function toggleSidebar(){
-    document.getElementById("sidebar").classList.toggle("active");
-}
+var map = L.map('map', {zoomControl: false, preferCanvas: true}).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
 
-var map = L.map('map', {zoomControl: false}).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
+var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: "anonymous"});
+var googleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: "anonymous"}).addTo(map);
 
-var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: true});
-var googleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: true}).addTo(map);
+function toggleSidebar(){ document.getElementById("sidebar").classList.toggle("active"); }
 
 function setBaseLayer(type) {
-    if(type === 'sat') {
-        map.addLayer(googleSatellite); map.removeLayer(googleStreet);
-        document.getElementById('btnSat').classList.add('active');
-        document.getElementById('btnStreet').classList.remove('active');
-    } else {
-        map.addLayer(googleStreet); map.removeLayer(googleSatellite);
-        document.getElementById('btnStreet').classList.add('active');
-        document.getElementById('btnSat').classList.remove('active');
-    }
+    if(type === 'sat') { map.addLayer(googleSatellite); map.removeLayer(googleStreet); document.getElementById('btnSat').classList.add('active'); document.getElementById('btnStreet').classList.remove('active'); }
+    else { map.addLayer(googleStreet); map.removeLayer(googleSatellite); document.getElementById('btnStreet').classList.add('active'); document.getElementById('btnSat').classList.remove('active'); }
 }
 
-// Fungsi Kemas Kini Sidebar yang dibetulkan
+// LOGIK PEMILIK DARIPADA KOD LAMA ANDA
+function getOwnerName(props) {
+    let values = Object.values(props);
+    let longStrings = values.filter(v => typeof v === 'string' && v.length > 10);
+    return longStrings.length > 0 ? longStrings[longStrings.length - 1] : "Data Tidak Ditemui";
+}
+
 function updateSidebar(props) {
-    document.getElementById("lotNo").innerText = props.NO_LOT || "-";
-    // Memastikan nama pemilik dicari daripada atribut yang betul dalam JSON anda
-    document.getElementById("ownerName").innerText = props.OWNER || props.PEMILIK || props.Owner || "Data Tiada";
-    document.getElementById("selectedArea").innerText = (props.KELUASAN || props.AREA || "0") + " m²";
+    document.getElementById("lotNo").innerText = props.NO_LOT || props.no_lot || "Tiada Data";
+    document.getElementById("ownerName").innerText = getOwnerName(props);
+    let values = Object.values(props);
+    let area = values.find(v => typeof v === 'number' && v > 50) || "0";
+    document.getElementById("selectedArea").innerText = area + " m²";
+}
+
+function highlightFeature(layer) {
+    if (lastClickedLayer) lotLayer.resetStyle(lastClickedLayer); 
+    layer.setStyle({ fillColor: "#ffeb3b", color: "#f57f17", fillOpacity: 0.9, weight: 3 });
+    lastClickedLayer = layer;
+    layer.bringToFront();
 }
 
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
-    style: function(){ return { color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.5 }; },
+    style: function() { return { color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 }; },
     onEachFeature: function(feature, layer){
         document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
         layer.on('click', function() {
-            if (lastClickedLayer) lotLayer.resetStyle(lastClickedLayer);
-            
-            // Highlight polygon dikekalkan
-            layer.setStyle({fillColor: "#ffeb3b", color: "#f57f17", fillOpacity: 0.8, weight: 3});
-            lastClickedLayer = layer;
-            
+            highlightFeature(layer); 
             updateSidebar(feature.properties);
-            
-            // Pastikan sidebar terbuka jika belum
-            if(!document.getElementById("sidebar").classList.contains("active")) toggleSidebar();
         });
     }
 }).addTo(map);
 
-function toggleLotLayer(isVisible) {
-    if (isVisible) map.addLayer(lotLayer); else map.removeLayer(lotLayer);
-}
-
 function searchLot(){
-    var input = document.getElementById("searchLot").value.trim();
+    var input = document.getElementById("searchLot").value.trim().toLowerCase();
     var found = false;
     lotLayer.eachLayer(function(layer){
-        // Membandingkan No Lot (String/Number)
-        if(layer.feature.properties.NO_LOT.toString() === input){
+        let lotVal = (layer.feature.properties.NO_LOT || layer.feature.properties.no_lot || "").toString().toLowerCase();
+        if(lotVal === input){
             found = true;
-            map.fitBounds(layer.getBounds());
-            // Mencetuskan event klik untuk highlight & update sidebar
-            layer.fire('click');
+            map.setView(layer.getBounds().getCenter(), 19);
+            setTimeout(() => { 
+                highlightFeature(layer);
+                updateSidebar(layer.feature.properties);
+            }, 300);
+            if(!document.getElementById("sidebar").classList.contains("active")) toggleSidebar();
         }
     });
-    if(!found) alert("No Lot " + input + " tidak dijumpai!");
+    if(!found && input !== "") alert("No Lot tidak dijumpai!");
 }
 
 function resetMap(){
     if(lastClickedLayer) lotLayer.resetStyle(lastClickedLayer);
     lastClickedLayer = null;
-    document.getElementById("lotNo").innerText = "-";
-    document.getElementById("ownerName").innerText = "-";
-    document.getElementById("selectedArea").innerText = "-";
+    document.getElementById("lotNo").innerText="-";
+    document.getElementById("ownerName").innerText="-";
+    document.getElementById("selectedArea").innerText="-";
     map.fitBounds(lotLayer.getBounds());
 }
 
-function openPdfModal() { 
-    if(document.getElementById("lotNo").innerText === "-") {
-        alert("Sila pilih lot dahulu!");
-        return;
-    }
-    document.getElementById("pdfModal").style.display = "flex"; 
+function openPdfModal() {
+    if(document.getElementById("lotNo").innerText === "-") { alert("Sila pilih lot dahulu!"); return; }
+    document.getElementById("pdfModal").style.display = "flex";
 }
 function closeModal() { document.getElementById("pdfModal").style.display = "none"; }
 
 async function generateFinalPDF() {
     const accessor = document.getElementById("accessorName").value;
     if(!accessor) { alert("Sila isi nama!"); return; }
-
-    const { jsPDF } = window.jspdf;
     const lotNo = document.getElementById("lotNo").innerText;
     closeModal();
-    
-    // Memberi masa kecil untuk rendering highlight polygon sebelum screenshot
-    const canvas = await html2canvas(document.getElementById('map'), {useCORS: true, scale: 2});
+
+    // PEMBETULAN: Memastikan peta stabil & polygon statik sebelum screenshot
+    map.invalidateSize();
+    await new Promise(resolve => setTimeout(resolve, 1000)); 
+
+    const canvas = await html2canvas(document.getElementById('map'), { useCORS: true, scale: 2 });
+    const { jsPDF } = window.jspdf;
     const doc = new jsPDF('l', 'mm', 'a3');
 
-    // LOGIK PENENTUAN NO PA DINAMIK
-    let nomorPA = "PA 143913"; 
-    if (lotNo === "11487") {
-        nomorPA = "PA 143912";
-    } else if (lotNo === "11532") {
-        nomorPA = "PA 143913";
-    }
+    let nomorPA = (lotNo === "11487") ? "PA 143912" : "PA 143913";
 
     // FRAME
-    doc.setLineWidth(0.8);
-    doc.rect(10, 10, 400, 277); 
-    doc.line(85, 10, 85, 287); 
+    doc.setLineWidth(0.8); doc.rect(10, 10, 400, 277); doc.line(85, 10, 85, 287); 
 
-    // HEADER LOGO & NAMA POLITEKNIK (SIDEBAR KIRI)
+    // LEFT SIDEBAR INFO
     const logoImg = document.getElementById("logoPuo");
     try { doc.addImage(logoImg, 'PNG', 32, 15, 20, 25); } catch (e) {}
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold"); doc.setFontSize(10);
     doc.text("POLITEKNIK UNGKU OMAR", 47, 45, {align: "center"});
     doc.line(15, 48, 80, 48);
 
-    // BUTIRAN PA
-    doc.setFontSize(14);
-    doc.text("NEGERI JOHOR", 47, 60, {align: "center"});
-    doc.setTextColor(255, 0, 0);
-    doc.text("TANGKAK", 47, 67, {align: "center"});
-    doc.setTextColor(0, 0, 0);
-    doc.text("DAERAH LEDANG", 47, 74, {align: "center"});
+    doc.setFontSize(14); doc.text("NEGERI JOHOR", 47, 60, {align: "center"});
+    doc.setTextColor(255, 0, 0); doc.text("TANGKAK", 47, 67, {align: "center"});
+    doc.setTextColor(0, 0, 0); doc.text("DAERAH LEDANG", 47, 74, {align: "center"});
     doc.text("MUKIM KESANG", 47, 85, {align: "center"});
-    
-    doc.setFontSize(16);
-    doc.text("LOT " + lotNo, 47, 100, {align: "center"});
-    doc.setFontSize(12);
-    doc.text("SKALA 1 : 400", 47, 115, {align: "center"});
-    
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    doc.text("Fail Ukur: PUBLJ 121/2009", 15, 150);
-    doc.text("Fail Pej. Tanah: PTDM 3/8/83/02", 15, 158);
-    doc.text("Lembar Piawai: 30 D II", 15, 166);
-    doc.text("Tarikh: 4/3/2026", 15, 174);
-    
-    doc.setFont("helvetica", "bold");
-    doc.text("ABDUL RAHMAN BIN BAHRI", 47, 210, {align: "center"});
-    doc.line(22, 212, 72, 212);
-    doc.setFontSize(8);
-    doc.text("Jurukur Tanah Berlesen (Akta 458)", 47, 217, {align: "center"});
+    doc.setFontSize(16); doc.text("LOT " + lotNo, 47, 100, {align: "center"});
 
-    // Penukaran label kepada Disemak Oleh
+    // TUKAR: "Disemak Oleh"
     doc.setFontSize(10);
     doc.text("Disemak Oleh:", 15, 245);
+    doc.setFont("helvetica", "bold");
     doc.text(accessor, 15, 252);
     
-    // CONTENT
-    doc.setFontSize(22);
-    doc.text("PELAN AKUI", 242, 25, {align: "center"});
+    // MAIN PLAN
+    doc.setFontSize(22); doc.text("PELAN AKUI", 242, 25, {align: "center"});
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 90, 35, 305, 200);
     
-    // NOMBOR PA DINAMIK
-    doc.setFontSize(35);
-    doc.setFont("helvetica", "bold");
-    doc.text(nomorPA, 100, 265);
-
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "italic");
-    doc.setTextColor(100, 100, 100);
-    doc.text("Dokumen ini dijana secara digital melalui Sistem Saujana Putra Smart Resident.", 242, 282, {align: "center"});
-
+    doc.setFontSize(35); doc.text(nomorPA, 100, 265);
     doc.save("PA_Lot_" + lotNo + ".pdf");
 }
 </script>
