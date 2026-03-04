@@ -94,6 +94,34 @@
             border: 1px solid #444; background: #111; color: white; box-sizing: border-box;
         }
 
+        /* CUSTOM ZOOM CONTROLS */
+        .custom-zoom-container {
+            position: absolute;
+            bottom: 50px;
+            right: 20px;
+            z-index: 1500;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .zoom-btn {
+            width: 50px;
+            height: 50px;
+            background-color: #1b5e20;
+            color: white;
+            border: 2px solid #81c784;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .zoom-btn:hover { background-color: #2e7d32; transform: scale(1.05); }
+
         #footer {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: rgba(27, 94, 32, 0.95); color: white;
@@ -161,6 +189,11 @@
     </div>
 </div>
 
+<div class="custom-zoom-container">
+    <button class="zoom-btn" onclick="map.zoomIn()">+</button>
+    <button class="zoom-btn" onclick="map.zoomOut()">−</button>
+</div>
+
 <div id="map"></div>
 <div id="footer">Hak Cipta Terpelihara 2026 © Hzrul | Politeknik Ungku Omar</div>
 
@@ -168,13 +201,14 @@
 <script src="data/LOTFINAL_0.js"></script>
 
 <script>
-var lastClickedLayer = null; // Menyimpan rujukan lot yang diklik
+var lastClickedLayer = null; 
 
 function toggleSidebar(){
     document.getElementById("sidebar").classList.toggle("active");
 }
 
-var map = L.map('map', {zoomControl: true, preferCanvas: true}).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
+/* Sembunyikan zoom asal Leaflet untuk gunakan butang kustom sendiri */
+var map = L.map('map', {zoomControl: false, preferCanvas: true}).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
 
 var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: true});
 var googleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: true}).addTo(map);
@@ -209,13 +243,12 @@ function styleLot(){
     return { color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 };
 }
 
-// Fungsi untuk menyerlahkan lot (Highlight)
 function highlightFeature(layer) {
     if (lastClickedLayer) {
-        lotLayer.resetStyle(lastClickedLayer); // Padam warna lot sebelumnya
+        lotLayer.resetStyle(lastClickedLayer); 
     }
     layer.setStyle({
-        fillColor: "#ffeb3b", // Warna kuning
+        fillColor: "#ffeb3b", 
         color: "#f57f17",
         fillOpacity: 0.9,
         weight: 3
@@ -229,7 +262,7 @@ var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     onEachFeature: function(feature, layer){
         document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
         layer.on('click', function() {
-            highlightFeature(layer); // Aktifkan highlight apabila ditekan
+            highlightFeature(layer); 
             updateSidebar(feature.properties);
             layer.bindPopup("<b>LOT " + feature.properties.NO_LOT + "</b>").openPopup();
         });
@@ -267,7 +300,6 @@ function updateOpacity(val) {
     lotLayer.setStyle({ fillOpacity: val });
 }
 
-// PDF FUNCTIONS
 function openPdfModal() {
     const lot = document.getElementById("lotNo").innerText;
     if(lot === "-") { alert("Pilih lot dahulu!"); return; }
@@ -291,22 +323,18 @@ async function generateFinalPDF() {
     const canvas = await html2canvas(document.getElementById('map'), {useCORS: true});
     const doc = new jsPDF();
     
-    // Header Hijau
     doc.setFillColor(27, 94, 32);
     doc.rect(0, 0, 210, 40, 'F');
     
-    // Logo PUO (diambil dari elemen img)
     const logoImg = document.getElementById("logoPuo");
     try { doc.addImage(logoImg, 'PNG', 15, 5, 25, 30); } catch (e) {}
 
-    // Teks Header
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(20);
     doc.text("LAPORAN SMART RESIDENT", 115, 20, {align: 'center'});
     doc.setFontSize(10);
     doc.text("POLITEKNIK UNGKU OMAR", 115, 28, {align: 'center'});
 
-    // Butiran Hartanah
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(14);
     doc.text("BUTIRAN HARTANAH", 15, 55);
@@ -319,7 +347,6 @@ async function generateFinalPDF() {
     doc.text("Diakses Oleh: " + accessor, 15, 92);
     doc.text("Tarikh      : " + new Date().toLocaleDateString('ms-MY'), 15, 100);
 
-    // Gambar Peta
     doc.text("PELAN LOKASI:", 15, 115);
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 15, 120, 180, 100);
 
