@@ -191,10 +191,12 @@ function setBaseLayer(type) {
     }
 }
 
+// Fungsi Kemas Kini Sidebar yang dibetulkan
 function updateSidebar(props) {
     document.getElementById("lotNo").innerText = props.NO_LOT || "-";
-    document.getElementById("ownerName").innerText = props.PEMILIK || "Data Tiada";
-    document.getElementById("selectedArea").innerText = (props.KELUASAN || "0") + " m²";
+    // Memastikan nama pemilik dicari daripada atribut yang betul dalam JSON anda
+    document.getElementById("ownerName").innerText = props.OWNER || props.PEMILIK || props.Owner || "Data Tiada";
+    document.getElementById("selectedArea").innerText = (props.KELUASAN || props.AREA || "0") + " m²";
 }
 
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
@@ -203,9 +205,15 @@ var lotLayer = L.geoJSON(json_LOTFINAL_0,{
         document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
         layer.on('click', function() {
             if (lastClickedLayer) lotLayer.resetStyle(lastClickedLayer);
+            
+            // Highlight polygon dikekalkan
             layer.setStyle({fillColor: "#ffeb3b", color: "#f57f17", fillOpacity: 0.8, weight: 3});
             lastClickedLayer = layer;
+            
             updateSidebar(feature.properties);
+            
+            // Pastikan sidebar terbuka jika belum
+            if(!document.getElementById("sidebar").classList.contains("active")) toggleSidebar();
         });
     }
 }).addTo(map);
@@ -218,22 +226,33 @@ function searchLot(){
     var input = document.getElementById("searchLot").value.trim();
     var found = false;
     lotLayer.eachLayer(function(layer){
+        // Membandingkan No Lot (String/Number)
         if(layer.feature.properties.NO_LOT.toString() === input){
             found = true;
             map.fitBounds(layer.getBounds());
+            // Mencetuskan event klik untuk highlight & update sidebar
             layer.fire('click');
         }
     });
-    if(!found) alert("No Lot tidak dijumpai!");
+    if(!found) alert("No Lot " + input + " tidak dijumpai!");
 }
 
 function resetMap(){
     if(lastClickedLayer) lotLayer.resetStyle(lastClickedLayer);
     lastClickedLayer = null;
+    document.getElementById("lotNo").innerText = "-";
+    document.getElementById("ownerName").innerText = "-";
+    document.getElementById("selectedArea").innerText = "-";
     map.fitBounds(lotLayer.getBounds());
 }
 
-function openPdfModal() { document.getElementById("pdfModal").style.display = "flex"; }
+function openPdfModal() { 
+    if(document.getElementById("lotNo").innerText === "-") {
+        alert("Sila pilih lot dahulu!");
+        return;
+    }
+    document.getElementById("pdfModal").style.display = "flex"; 
+}
 function closeModal() { document.getElementById("pdfModal").style.display = "none"; }
 
 async function generateFinalPDF() {
@@ -244,11 +263,12 @@ async function generateFinalPDF() {
     const lotNo = document.getElementById("lotNo").innerText;
     closeModal();
     
+    // Memberi masa kecil untuk rendering highlight polygon sebelum screenshot
     const canvas = await html2canvas(document.getElementById('map'), {useCORS: true, scale: 2});
     const doc = new jsPDF('l', 'mm', 'a3');
 
     // LOGIK PENENTUAN NO PA DINAMIK
-    let nomorPA = "PA 143913"; // Default
+    let nomorPA = "PA 143913"; 
     if (lotNo === "11487") {
         nomorPA = "PA 143912";
     } else if (lotNo === "11532") {
@@ -295,8 +315,9 @@ async function generateFinalPDF() {
     doc.setFontSize(8);
     doc.text("Jurukur Tanah Berlesen (Akta 458)", 47, 217, {align: "center"});
 
+    // Penukaran label kepada Disemak Oleh
     doc.setFontSize(10);
-    doc.text("Dilihat Oleh:", 15, 245);
+    doc.text("Disemak Oleh:", 15, 245);
     doc.text(accessor, 15, 252);
     
     // CONTENT
@@ -304,7 +325,7 @@ async function generateFinalPDF() {
     doc.text("PELAN AKUI", 242, 25, {align: "center"});
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 90, 35, 305, 200);
     
-    // NOMBOR PA DINAMIK DI BAWAH PELAN
+    // NOMBOR PA DINAMIK
     doc.setFontSize(35);
     doc.setFont("helvetica", "bold");
     doc.text(nomorPA, 100, 265);
