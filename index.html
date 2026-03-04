@@ -12,10 +12,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
-        /* CSS ASAL ANDA */
-        html, body { margin:0; padding:0; height:100%; font-family: 'Segoe UI', sans-serif; background-color: #f5e6be; }
+        /* CSS GLOBAL */
+        html, body {
+            margin:0; padding:0; height:100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5e6be;
+        }
         #map { height:100vh; z-index: 1; }
 
+        /* HEADER */
         #header {
             position:absolute; top:0; left:0; right:0; height: 120px; 
             background:#1b5e20; color:white; display:flex;
@@ -31,39 +36,50 @@
         }
 
         #header img { height: 85px; position: relative; z-index: 2; }
+
         #header .custom-font {
             font-family: 'Dancing Script', cursive; font-size: 52px; 
-            font-weight: 700; position: relative; z-index: 2;
-            text-shadow: 3px 3px 8px rgba(0,0,0,0.7);
+            font-weight: 700; letter-spacing: 2px; position: relative;
+            z-index: 2; text-shadow: 3px 3px 8px rgba(0,0,0,0.7);
         }
 
+        /* MENU BUTTON */
         #toggleBtn {
             position: absolute; top: 145px; left: 0; z-index: 1100;
             background-color: #1a4d1a; color: white; padding: 15px 22px;
             border: none; border-radius: 0 15px 15px 0; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; gap: 8px;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.3); transition: 0.3s ease;
         }
 
+        #toggleBtn:hover { background-color: #2e7d32; padding-left: 28px; }
+        .bar { width: 30px; height: 4px; background-color: white; margin: 2px 0; border-radius: 2px; }
+
+        /* SIDEBAR */
         #sidebar {
             position:absolute; top:0; left:-340px; width:320px; height:100%;
-            background:#242731; color: white; padding:25px;
-            transition: 0.4s; z-index:1200; box-sizing: border-box; overflow-y: auto;
+            background:#242731; color: white; box-shadow:4px 0 20px rgba(0,0,0,0.6);
+            padding:25px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index:1200; box-sizing: border-box; overflow-y: auto;
         }
         #sidebar.active { left:0; }
 
-        .sidebar-header { font-size: 22px; font-weight: bold; margin: 40px 0 20px 0; border-bottom: 2px solid #2e7d32; color: #81c784; }
+        .sidebar-header { font-size: 22px; font-weight: bold; margin: 40px 0 20px 0; border-bottom: 2px solid #2e7d32; padding-bottom: 10px; color: #81c784; }
         .widget { background: #1a1c23; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
-        .layer-btn { flex: 1; padding: 10px; border-radius: 8px; background: #111; color: #ccc; cursor: pointer; }
-        .layer-btn.active { background: #2e7d32; color: white; }
+        .widget h3 { font-size: 13px; color: #81c784; text-transform: uppercase; margin: 0 0 12px 0; }
         
+        .layer-btn { flex: 1; padding: 10px; border: 1px solid #444; border-radius: 8px; background: #111; color: #ccc; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .layer-btn.active { background: #2e7d32; color: white; border-color: #81c784; }
+
         .btn { width:100%; padding:12px; border:none; border-radius:8px; cursor:pointer; font-weight: bold; margin-bottom: 10px; }
         .btn.primary { background:#2e7d32; color:white; }
         .btn.export { background:#0288d1; color:white; }
-
+        
         .box { background:#1a1c23; padding:15px; border-radius:10px; margin-bottom:12px; border-left: 5px solid #2e7d32; }
-        .box span { font-size:16px; font-weight:bold; color:#81c784; display: block; }
+        .box p { margin:0; font-size:11px; color:#aaa; text-transform: uppercase; }
+        .box span { font-size:16px; font-weight:bold; color:#81c784; display: block; margin-top: 5px; word-wrap: break-word; }
 
-        /* ===== CSS TAMBAHAN UNTUK MODAL ===== */
+        /* MODAL STYLE */
         .modal {
             display: none; position: fixed; z-index: 3000;
             left: 0; top: 0; width: 100%; height: 100%;
@@ -78,7 +94,11 @@
             border: 1px solid #444; background: #111; color: white; box-sizing: border-box;
         }
 
-        #footer { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(27, 94, 32, 0.95); color: white; text-align: center; padding: 10px 0; z-index: 1000; }
+        #footer {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(27, 94, 32, 0.95); color: white;
+            text-align: center; padding: 10px 0; font-size: 13px; z-index: 1000;
+        }
     </style>
 </head>
 
@@ -98,12 +118,12 @@
 </button>
 
 <div id="sidebar">
-    <button style="float:right; background:none; border:none; color:red; font-size:20px; cursor:pointer;" onclick="toggleSidebar()">✖</button>
+    <button style="float:right; background:none; border:none; color:#ff5252; font-size:28px; cursor:pointer;" onclick="toggleSidebar()">✖</button>
     <div class="sidebar-header">DASHBOARD</div>
 
     <div class="widget">
         <h3>🗺️ Interface Layer</h3>
-        <div style="display:flex; gap:5px;">
+        <div style="display:flex; gap:8px;">
             <button id="btnSat" class="layer-btn active" onclick="setBaseLayer('sat')">Satellite</button>
             <button id="btnStreet" class="layer-btn" onclick="setBaseLayer('street')">Street</button>
         </div>
@@ -111,20 +131,21 @@
 
     <div class="widget">
         <h3>🔍 Lot Opacity</h3>
-        <input type="range" min="0" max="1" step="0.1" value="0.7" oninput="updateOpacity(this.value)">
+        <input type="range" min="0" max="1" step="0.1" value="0.7" oninput="updateOpacity(this.value)" style="width:100%; accent-color:#2e7d32;">
     </div>
 
     <div class="widget">
         <h3>🌍 Land Explorer</h3>
-        <input type="text" id="searchLot" placeholder="Insert No Lot..." style="width:100%; padding:10px; margin-bottom:10px; border-radius:5px; background:#111; color:white; border:1px solid #444;">
+        <input type="text" id="searchLot" placeholder="Insert No Lot..." style="width:100%; padding:12px; border-radius:8px; border:1px solid #444; background:#111; color:white; margin-bottom:10px; box-sizing:border-box;">
         <button class="btn primary" onclick="searchLot()">Find Lot</button>
         <button class="btn" style="background:#c62828; color:white;" onclick="resetMap()">Reset Lot</button>
     </div>
 
     <div class="info">
-        <div class="box"><p style="font-size:10px; margin:0; color:#aaa;">No Lot</p><span id="lotNo">-</span></div>
-        <div class="box"><p style="font-size:10px; margin:0; color:#aaa;">Owner</p><span id="ownerName">-</span></div>
-        <div class="box"><p style="font-size:10px; margin:0; color:#aaa;">Area</p><span id="selectedArea">-</span></div>
+        <div class="box"><p>Total Lot</p><span id="totalLots">0</span></div>
+        <div class="box"><p>No Lot</p><span id="lotNo">-</span></div>
+        <div class="box"><p>Owner</p><span id="ownerName">-</span></div>
+        <div class="box"><p>Area</p><span id="selectedArea">-</span></div>
     </div>
     
     <button class="btn export" onclick="openPdfModal()">📄 Generate PDF Lot</button>
@@ -132,11 +153,11 @@
 
 <div id="pdfModal" class="modal">
     <div class="modal-content">
-        <h3 style="margin-top:0; color:#81c784;">Laporan PDF</h3>
-        <p>Sila masukkan nama pengakses:</p>
-        <input type="text" id="accessorName" placeholder="Nama Anda...">
-        <button class="btn primary" onclick="generateFinalPDF()">Sahkan & Muat Turun</button>
-        <button class="btn" style="background:#555; color:white;" onclick="closeModal()">Batal</button>
+        <h3 style="color:#81c784;">📄 Penjanaan Laporan</h3>
+        <p>Sila masukkan nama anda:</p>
+        <input type="text" id="accessorName" placeholder="Nama Penuh...">
+        <button class="btn primary" onclick="generateFinalPDF()">Muat Turun PDF</button>
+        <button class="btn" style="background:#444;" onclick="closeModal()">Batal</button>
     </div>
 </div>
 
@@ -147,7 +168,7 @@
 <script src="data/LOTFINAL_0.js"></script>
 
 <script>
-var lastClickedLayer = null; // Untuk simpan lot yang diklik sebelumnya
+var lastClickedLayer = null; // Menyimpan rujukan lot yang diklik
 
 function toggleSidebar(){
     document.getElementById("sidebar").classList.toggle("active");
@@ -188,26 +209,27 @@ function styleLot(){
     return { color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 };
 }
 
+// Fungsi untuk menyerlahkan lot (Highlight)
 function highlightFeature(layer) {
-    // Reset lot sebelumnya jika ada
     if (lastClickedLayer) {
-        lotLayer.resetStyle(lastClickedLayer);
+        lotLayer.resetStyle(lastClickedLayer); // Padam warna lot sebelumnya
     }
-    // Highlight lot baru
     layer.setStyle({
-        fillColor: "#ffeb3b",
+        fillColor: "#ffeb3b", // Warna kuning
         color: "#f57f17",
         fillOpacity: 0.9,
         weight: 3
     });
     lastClickedLayer = layer;
+    layer.bringToFront();
 }
 
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     style: styleLot,
     onEachFeature: function(feature, layer){
+        document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
         layer.on('click', function() {
-            highlightFeature(layer);
+            highlightFeature(layer); // Aktifkan highlight apabila ditekan
             updateSidebar(feature.properties);
             layer.bindPopup("<b>LOT " + feature.properties.NO_LOT + "</b>").openPopup();
         });
@@ -223,6 +245,7 @@ function searchLot(){
             map.fitBounds(layer.getBounds());
             highlightFeature(layer);
             updateSidebar(layer.feature.properties);
+            layer.openPopup();
             if(!document.getElementById("sidebar").classList.contains("active")) toggleSidebar();
         }
     });
@@ -232,9 +255,11 @@ function searchLot(){
 function resetMap(){
     if(lastClickedLayer) lotLayer.resetStyle(lastClickedLayer);
     lastClickedLayer = null;
+    document.getElementById("searchLot").value="";
     document.getElementById("lotNo").innerText="-";
     document.getElementById("ownerName").innerText="-";
     document.getElementById("selectedArea").innerText="-";
+    map.closePopup();
     map.fitBounds(lotLayer.getBounds());
 }
 
@@ -242,11 +267,10 @@ function updateOpacity(val) {
     lotLayer.setStyle({ fillOpacity: val });
 }
 
-// ===== FUNGSI PDF DENGAN MODAL & FORM =====
-
+// PDF FUNCTIONS
 function openPdfModal() {
     const lot = document.getElementById("lotNo").innerText;
-    if(lot === "-") { alert("Sila pilih lot di atas peta terlebih dahulu!"); return; }
+    if(lot === "-") { alert("Pilih lot dahulu!"); return; }
     document.getElementById("pdfModal").style.display = "flex";
 }
 
@@ -256,7 +280,7 @@ function closeModal() {
 
 async function generateFinalPDF() {
     const accessor = document.getElementById("accessorName").value;
-    if(!accessor) { alert("Sila isi nama anda!"); return; }
+    if(!accessor) { alert("Sila isi nama!"); return; }
 
     const { jsPDF } = window.jspdf;
     const lotNo = document.getElementById("lotNo").innerText;
@@ -264,25 +288,25 @@ async function generateFinalPDF() {
     const area = document.getElementById("selectedArea").innerText;
 
     closeModal();
-    
-    // Tangkap gambar peta
     const canvas = await html2canvas(document.getElementById('map'), {useCORS: true});
-    const imgData = canvas.toDataURL('image/png');
-
     const doc = new jsPDF();
     
     // Header Hijau
     doc.setFillColor(27, 94, 32);
     doc.rect(0, 0, 210, 40, 'F');
     
+    // Logo PUO (diambil dari elemen img)
+    const logoImg = document.getElementById("logoPuo");
+    try { doc.addImage(logoImg, 'PNG', 15, 5, 25, 30); } catch (e) {}
+
     // Teks Header
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(22);
-    doc.text("LAPORAN SMART RESIDENT", 105, 20, {align: 'center'});
-    doc.setFontSize(12);
-    doc.text("POLITEKNIK UNGKU OMAR", 105, 30, {align: 'center'});
+    doc.setFontSize(20);
+    doc.text("LAPORAN SMART RESIDENT", 115, 20, {align: 'center'});
+    doc.setFontSize(10);
+    doc.text("POLITEKNIK UNGKU OMAR", 115, 28, {align: 'center'});
 
-    // Maklumat Lot
+    // Butiran Hartanah
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(14);
     doc.text("BUTIRAN HARTANAH", 15, 55);
@@ -295,14 +319,13 @@ async function generateFinalPDF() {
     doc.text("Diakses Oleh: " + accessor, 15, 92);
     doc.text("Tarikh      : " + new Date().toLocaleDateString('ms-MY'), 15, 100);
 
-    // Masukkan Gambar Lot/Peta
+    // Gambar Peta
     doc.text("PELAN LOKASI:", 15, 115);
-    doc.addImage(imgData, 'PNG', 15, 120, 180, 100);
+    doc.addImage(canvas.toDataURL('image/png'), 'PNG', 15, 120, 180, 100);
 
-    // Footer
     doc.setFontSize(9);
     doc.setTextColor(150, 150, 150);
-    doc.text("Dokumen ini dijana secara digital melalui Sistem Virtual Lot Saujana Putra.", 105, 285, {align: 'center'});
+    doc.text("Dokumen dijana melalui Sistem Virtual Lot Saujana Putra.", 105, 285, {align: 'center'});
 
     doc.save("Laporan_Lot_" + lotNo + ".pdf");
 }
