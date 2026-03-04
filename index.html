@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>VIRTUAL LOT - TAMAN PERUMAHAN</title>
+    <title>VIRTUAL LOT - PROFESSIONAL PA REPORT</title>
 
     <link rel="stylesheet" href="css/leaflet.css">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
@@ -272,7 +272,6 @@ var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     }
 }).addTo(map);
 
-/* FUNGSI ON/OFF LAYER */
 function toggleLotLayer(isVisible) {
     if (isVisible) {
         map.addLayer(lotLayer);
@@ -330,60 +329,88 @@ async function generateFinalPDF() {
     const lotNo = document.getElementById("lotNo").innerText;
     const owner = document.getElementById("ownerName").innerText;
     const area = document.getElementById("selectedArea").innerText;
-    const totalLots = document.getElementById("totalLots").innerText;
 
     closeModal();
     
-    if(lotNo === "-") {
+    // Set map to view for screenshot
+    if(lotNo !== "-") {
+        // High zoom to look like a surveyed plan
+        map.setZoom(19);
+    } else {
         map.fitBounds(lotLayer.getBounds());
     }
 
-    const canvas = await html2canvas(document.getElementById('map'), {useCORS: true});
-    const doc = new jsPDF();
+    // Capture Map
+    const canvas = await html2canvas(document.getElementById('map'), {useCORS: true, scale: 2});
     
-    doc.setFillColor(27, 94, 32);
-    doc.rect(0, 0, 210, 40, 'F');
+    // A3 Size: 420mm x 297mm (Landscape)
+    const doc = new jsPDF('l', 'mm', 'a3');
     
-    const logoImg = document.getElementById("logoPuo");
-    try { doc.addImage(logoImg, 'PNG', 15, 5, 25, 30); } catch (e) {}
-
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(20);
-    doc.text("LAPORAN SMART RESIDENT", 115, 20, {align: 'center'});
-    doc.setFontSize(10);
-    doc.text("POLITEKNIK UNGKU OMAR", 115, 28, {align: 'center'});
-
-    doc.setTextColor(0, 0, 0);
+    // --- PA FRAME DESIGN ---
+    doc.setLineWidth(0.8);
+    doc.rect(10, 10, 400, 277); // Outer border
+    doc.line(80, 10, 80, 287); // Left sidebar divider
+    
+    // --- LEFT SIDEBAR (Butiran PA) ---
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
+    doc.text("NEGERI JOHOR", 45, 25, {align: "center"});
+    doc.setTextColor(255, 0, 0);
+    doc.text("TANGKAK", 45, 32, {align: "center"});
+    doc.setTextColor(0, 0, 0);
+    doc.text("DAERAH LEDANG", 45, 39, {align: "center"});
     
-    if (lotNo === "-") {
-        doc.text("RINGKASAN KESELURUHAN KAWASAN", 15, 55);
-        doc.line(15, 57, 100, 57);
-        doc.setFontSize(11);
-        doc.text("Jumlah Lot Berdaftar : " + totalLots + " Lot", 15, 68);
-        doc.text("Status Laporan       : Keseluruhan Kawasan", 15, 76);
-    } else {
-        doc.text("BUTIRAN HARTANAH", 15, 55);
-        doc.line(15, 57, 65, 57);
-        doc.setFontSize(11);
-        doc.text("No. Lot      : " + lotNo, 15, 68);
-        doc.text("Pemilik     : " + owner, 15, 76);
-        doc.text("Luas Lot    : " + area, 15, 84);
-    }
-
-    // Kedudukan Dilihat Oleh dan Tarikh dikemaskan
-    doc.text("Dilihat Oleh : " + accessor, 15, 96);
-    doc.text("Tarikh       : " + new Date().toLocaleDateString('ms-MY'), 15, 104);
-
+    doc.text("MUKIM KESANG", 45, 55, {align: "center"});
+    
+    doc.setFontSize(16);
+    doc.text("LOT " + (lotNo !== "-" ? lotNo : "KESELURUHAN"), 45, 75, {align: "center"});
+    
     doc.setFontSize(12);
-    doc.text("PELAN LOKASI:", 15, 118);
-    doc.addImage(canvas.toDataURL('image/png'), 'PNG', 15, 122, 180, 100);
-
+    doc.text("SKALA 1 : 400", 45, 100, {align: "center"});
+    
+    // Technical Info Section
     doc.setFontSize(9);
-    doc.setTextColor(150, 150, 150);
-    doc.text("Dokumen dijana melalui Sistem Virtual Lot Saujana Putra.", 105, 285, {align: 'center'});
+    doc.setFont("helvetica", "normal");
+    const techY = 150;
+    doc.text("Fail Ukur: PUBLJ 121/2009", 15, techY);
+    doc.text("Fail Pej. Tanah: PTDM 3/8/83/02", 15, techY + 8);
+    doc.text("Lembar Piawai: 30 D II", 15, techY + 16);
+    doc.text("Tarikh: " + new Date().toLocaleDateString('ms-MY'), 15, techY + 24);
+    
+    // Signature Section (Jurukur)
+    doc.setFont("helvetica", "bold");
+    doc.text("ABDUL RAHMAN BIN BAHRI", 45, 210, {align: "center"});
+    doc.line(20, 212, 70, 212);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text("Jurukur Tanah Berlesen", 45, 216, {align: "center"});
+    doc.text("(Akta 458)", 45, 220, {align: "center"});
 
-    const saveName = (lotNo === "-") ? "Laporan_Keseluruhan.pdf" : "Laporan_Lot_" + lotNo + ".pdf";
+    // Footer Info
+    doc.setFontSize(10);
+    doc.text("Dilihat Oleh:", 15, 250);
+    doc.setFont("helvetica", "bold");
+    doc.text(accessor, 15, 256);
+    
+    // --- MAIN CONTENT AREA (The Plan) ---
+    doc.setFontSize(22);
+    doc.text("PELAN AKUI", 240, 25, {align: "center"});
+    
+    // Add Captured Map Image
+    doc.addImage(canvas.toDataURL('image/png'), 'PNG', 85, 35, 310, 200);
+    
+    // PA Number Label at Bottom Left of Plan
+    doc.setFontSize(35);
+    doc.setFont("helvetica", "bold");
+    doc.text("PA 143913", 95, 265);
+
+    // Metadata Footer
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "italic");
+    doc.setTextColor(100, 100, 100);
+    doc.text("Dokumen ini dijana secara digital melalui Sistem Saujana Putra Smart Resident.", 240, 282, {align: "center"});
+
+    const saveName = (lotNo === "-") ? "PA_Keseluruhan.pdf" : "PA_Lot_" + lotNo + ".pdf";
     doc.save(saveName);
 }
 </script>
