@@ -285,7 +285,6 @@ function searchLot(){
     var input = document.getElementById("searchLot").value.trim().toLowerCase();
     var found = false;
     
-    // Pastikan layer di-ON kan jika sedang OFF semasa mencari
     if(!map.hasLayer(lotLayer)) {
         document.getElementById('lotToggle').checked = true;
         toggleLotLayer(true);
@@ -316,8 +315,7 @@ function resetMap(){
 }
 
 function openPdfModal() {
-    const lot = document.getElementById("lotNo").innerText;
-    if(lot === "-") { alert("Pilih lot dahulu!"); return; }
+    // Sekatan alert dibuang supaya modal boleh dibuka bila-bila masa
     document.getElementById("pdfModal").style.display = "flex";
 }
 
@@ -333,8 +331,15 @@ async function generateFinalPDF() {
     const lotNo = document.getElementById("lotNo").innerText;
     const owner = document.getElementById("ownerName").innerText;
     const area = document.getElementById("selectedArea").innerText;
+    const totalLots = document.getElementById("totalLots").innerText;
 
     closeModal();
+    
+    // Jika tiada lot dipilih, zoom out untuk tunjuk keseluruhan kawasan
+    if(lotNo === "-") {
+        map.fitBounds(lotLayer.getBounds());
+    }
+
     const canvas = await html2canvas(document.getElementById('map'), {useCORS: true});
     const doc = new jsPDF();
     
@@ -352,15 +357,25 @@ async function generateFinalPDF() {
 
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(14);
-    doc.text("BUTIRAN HARTANAH", 15, 55);
-    doc.line(15, 57, 65, 57);
+    
+    // Logik paparan maklumat berdasarkan pilihan lot
+    if (lotNo === "-") {
+        doc.text("RINGKASAN KESELURUHAN KAWASAN", 15, 55);
+        doc.line(15, 57, 100, 57);
+        doc.setFontSize(11);
+        doc.text("Jumlah Lot Berdaftar : " + totalLots + " Lot", 15, 68);
+        doc.text("Status Laporan       : Keseluruhan Kawasan", 15, 76);
+    } else {
+        doc.text("BUTIRAN HARTANAH", 15, 55);
+        doc.line(15, 57, 65, 57);
+        doc.setFontSize(11);
+        doc.text("No. Lot      : " + lotNo, 15, 68);
+        doc.text("Pemilik     : " + owner, 15, 76);
+        doc.text("Luas Lot    : " + area, 15, 84);
+    }
 
-    doc.setFontSize(11);
-    doc.text("No. Lot      : " + lotNo, 15, 68);
-    doc.text("Pemilik     : " + owner, 15, 76);
-    doc.text("Luas Lot    : " + area, 15, 84);
-    doc.text("Diakses Oleh: " + accessor, 15, 92);
-    doc.text("Tarikh      : " + new Date().toLocaleDateString('ms-MY'), 15, 100);
+    doc.text("Diakses Oleh : " + accessor, 15, 95);
+    doc.text("Tarikh       : " + new Date().toLocaleDateString('ms-MY'), 15, 103);
 
     doc.text("PELAN LOKASI:", 15, 115);
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 15, 120, 180, 100);
@@ -369,7 +384,8 @@ async function generateFinalPDF() {
     doc.setTextColor(150, 150, 150);
     doc.text("Dokumen dijana melalui Sistem Virtual Lot Saujana Putra.", 105, 285, {align: 'center'});
 
-    doc.save("Laporan_Lot_" + lotNo + ".pdf");
+    const saveName = (lotNo === "-") ? "Laporan_Keseluruhan.pdf" : "Laporan_Lot_" + lotNo + ".pdf";
+    doc.save(saveName);
 }
 </script>
 </body>
