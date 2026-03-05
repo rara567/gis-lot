@@ -20,7 +20,93 @@
         }
         #map { height:100vh; z-index: 1; }
 
-        /* HEADER */
+        /* --- SISTEM LOGIN OVERLAY --- */
+        #loginOverlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: #0f111a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .login-card {
+            background: #1a1c23;
+            padding: 40px;
+            border-radius: 15px;
+            width: 380px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+            border: 1px solid #333;
+        }
+
+        .login-card h2 {
+            color: white;
+            margin-bottom: 30px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            color: #aaa;
+            font-size: 13px;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #242731;
+            color: white;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .input-group input:focus { border-color: #2e7d32; }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            background: #1b5e20;
+            border-color: #81c784;
+        }
+
+        .forgot-pw {
+            color: #ff5252;
+            display: block;
+            margin-top: 25px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        /* --- KOD ASAL ANDA (TIDAK BERUBAH) --- */
         #header {
             position:absolute; top:0; left:0; right:0; height: 120px; 
             background:#1b5e20; color:white; display:flex;
@@ -43,7 +129,6 @@
             z-index: 2; text-shadow: 3px 3px 8px rgba(0,0,0,0.7);
         }
 
-        /* MENU BUTTON */
         #toggleBtn {
             position: absolute; top: 145px; left: 0; z-index: 1100;
             background-color: #1a4d1a; color: white; padding: 15px 22px;
@@ -54,7 +139,6 @@
 
         .bar { width: 30px; height: 4px; background-color: white; margin: 2px 0; border-radius: 2px; }
 
-        /* SIDEBAR */
         #sidebar {
             position:absolute; top:0; left:-340px; width:320px; height:100%;
             background:#242731; color: white; box-shadow:4px 0 20px rgba(0,0,0,0.6);
@@ -78,7 +162,6 @@
         .box p { margin:0; font-size:11px; color:#aaa; text-transform: uppercase; }
         .box span { font-size:16px; font-weight:bold; color:#81c784; display: block; margin-top: 5px; word-wrap: break-word; }
 
-        /* MODAL */
         .modal {
             display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%;
             background-color: rgba(0,0,0,0.8); align-items: center; justify-content: center;
@@ -90,7 +173,6 @@
             width: 100%; padding: 12px; margin: 20px 0; border-radius: 8px; border: 1px solid #444; background: #111; color: white; box-sizing: border-box;
         }
 
-        /* ZOOM CONTROLS */
         .custom-zoom-container { position: absolute; bottom: 50px; right: 20px; z-index: 1500; display: flex; flex-direction: column; gap: 10px; }
         .zoom-btn { width: 50px; height: 50px; background-color: #1b5e20; color: white; border: 2px solid #81c784; border-radius: 10px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
@@ -99,6 +181,26 @@
 </head>
 
 <body>
+
+<div id="loginOverlay">
+    <div class="login-card">
+        <h2><span style="background:#ffeb3b; border-radius: 6px; padding: 2px 8px; color: #000;">🔐</span> Sistem Survey Lot PUO</h2>
+        
+        <div class="input-group">
+            <label>👤 Masukkan ID:</label>
+            <input type="text" id="userId" placeholder="Contoh: admin">
+        </div>
+
+        <div class="input-group">
+            <label>🔑 Masukkan Kata Laluan:</label>
+            <input type="password" id="userPass" placeholder="••••••••">
+        </div>
+
+        <button class="btn-login" onclick="checkLogin()">Log Masuk</button>
+
+        <a href="#" class="forgot-pw" onclick="alert('Sila hubungi pentadbir sistem (Hzrul) untuk set semula kata laluan.')">❓ Lupa Kata Laluan?</a>
+    </div>
+</div>
 
 <div id="header">
     <video autoplay muted loop playsinline class="header-bg-video">
@@ -164,6 +266,33 @@
 <script src="data/LOTFINAL_0.js"></script>
 
 <script>
+// --- LOGIK LOGIN ---
+function checkLogin() {
+    var id = document.getElementById("userId").value;
+    var pass = document.getElementById("userPass").value;
+
+    // Sila tukar ID dan Password di bawah mengikut keperluan anda
+    if (id === "admin" && pass === "puo123") {
+        var overlay = document.getElementById("loginOverlay");
+        overlay.style.opacity = "0";
+        setTimeout(function() {
+            overlay.style.display = "none";
+        }, 500);
+    } else {
+        alert("ID atau Kata Laluan Salah! Sila cuba lagi.");
+    }
+}
+
+// Benarkan login dengan menekan butang 'Enter'
+document.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        if(document.getElementById("loginOverlay").style.display !== "none") {
+            checkLogin();
+        }
+    }
+});
+
+// --- LOGIK ASAL SISTEM (TIDAK BERUBAH) ---
 var lastClickedLayer = null; 
 
 var map = L.map('map', {zoomControl: false, preferCanvas: true}).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
@@ -262,15 +391,12 @@ async function generateFinalPDF() {
 
     let nomorPA = (lotNo === "11487") ? "PA 143912" : "PA 143913";
 
-    // 1. FRAME LUAR (KEMAS & TEBAL)
     doc.setLineWidth(1.2);
-    doc.rect(10, 10, 400, 277); // Frame besar
+    doc.rect(10, 10, 400, 277); 
     
-    // 2. GARISAN PEMISAH SIDEBAR (TEGAK)
     doc.setLineWidth(0.8);
     doc.line(85, 10, 85, 287); 
 
-    // 3. LOGO & HEADER INSTITUSI
     const logoImg = document.getElementById("logoPuo");
     try { doc.addImage(logoImg, 'PNG', 32, 15, 20, 23); } catch (e) {}
     
@@ -279,21 +405,19 @@ async function generateFinalPDF() {
     doc.text("POLITEKNIK UNGKU OMAR", 47, 43, {align: "center"});
     
     doc.setLineWidth(0.5);
-    doc.line(15, 47, 80, 47); // Garisan bawah institusi
+    doc.line(15, 47, 80, 47);
 
-    // 4. MAKLUMAT LOKASI (FONT SERIF UNTUK ELEGAN)
     doc.setFont("times", "bold");
     doc.setFontSize(14);
     doc.text("NEGERI JOHOR", 47, 57, {align: "center"});
     
-    doc.setTextColor(220, 0, 0); // Merah Tangkak
+    doc.setTextColor(220, 0, 0); 
     doc.text("TANGKAK", 47, 64, {align: "center"});
     
     doc.setTextColor(0, 0, 0);
     doc.text("DAERAH LEDANG", 47, 71, {align: "center"});
     doc.text("MUKIM KESANG", 47, 82, {align: "center"});
     
-    // 5. INFO LOT & SKALA
     doc.setFontSize(18);
     doc.text("LOT " + lotNo, 47, 96, {align: "center"});
     
@@ -302,10 +426,8 @@ async function generateFinalPDF() {
     doc.text("SKALA 1 : 400", 47, 107, {align: "center"});
     
     doc.setLineWidth(0.3);
-    doc.line(15, 115, 80, 115); // Garisan pemisah data
+    doc.line(15, 115, 80, 115);
 
-    // 6. KEMASKINI MAKLUMAT PEMILIK, LOT, LUAS (DENGAN FONT PROFESIONAL)
-    // --- Nama Pemilik ---
     doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(80, 80, 80);
     doc.text("NAMA PEMILIK:", 15, 125);
     
@@ -313,21 +435,18 @@ async function generateFinalPDF() {
     const splitOwner = doc.splitTextToSize(owner.toUpperCase(), 65);
     doc.text(splitOwner, 15, 132);
 
-    // --- No Lot ---
     doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(80, 80, 80);
     doc.text("NO. LOT:", 15, 152);
     doc.setFont("times", "bold"); doc.setFontSize(16); doc.setTextColor(0, 0, 0);
     doc.text(lotNo, 15, 160);
 
-    // --- Luas ---
     doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(80, 80, 80);
     doc.text("LUAS LOT:", 15, 175);
     doc.setFont("times", "bold"); doc.setFontSize(16); doc.setTextColor(0, 0, 0);
     doc.text(area, 15, 183);
     
-    doc.line(15, 195, 80, 195); // Garisan pemisah bawah data
+    doc.line(15, 195, 80, 195);
 
-    // 7. MAKLUMAT FAIL (KEMAS DI TENGAH SIDEBAR)
     doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(100, 100, 100);
     let fileY = 205;
     doc.text("Fail Ukur: PUBLJ 121/2009", 15, fileY);
@@ -335,7 +454,6 @@ async function generateFinalPDF() {
     doc.text("Lembar Piawai: 30 D II", 15, fileY + 14);
     doc.text("Tarikh: 4/3/2026", 15, fileY + 21);
 
-    // 8. PENGESAHAN (DISUSUN RAPI)
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(10);
     doc.text("Disemak Oleh:", 15, 255);
@@ -343,24 +461,20 @@ async function generateFinalPDF() {
     doc.setFont("times", "bold");
     doc.setFontSize(13);
     doc.text(accessor.toUpperCase(), 15, 263);
-    doc.line(15, 265, 80, 265); // Garisan tanda tangan
+    doc.line(15, 265, 80, 265);
 
-    // 9. KANDUNGAN UTAMA (MAP & TAJUK)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(26);
     doc.text("PELAN AKUI", 242, 25, {align: "center"});
     
-    // Frame untuk Peta (Biar nampak kemas)
     doc.setLineWidth(0.5);
     doc.rect(90, 35, 305, 200); 
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 91, 36, 303, 198);
     
-    // 10. NO PA BESAR (FOOTER)
     doc.setFont("times", "bold");
     doc.setFontSize(42);
     doc.text(nomorPA, 100, 268);
     
-    // Watermark/Nota kaki halus
     doc.setFont("helvetica", "italic"); doc.setFontSize(8); doc.setTextColor(150, 150, 150);
     doc.text("Dokumen ini dijana secara digital melalui Sistem Saujana Putra Smart Resident", 242, 282, {align: "center"});
 
