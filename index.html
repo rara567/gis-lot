@@ -328,30 +328,50 @@
 <script src="data/LOTFINAL_0.js"></script>
 
 <script>
-// --- LOGIK LOGIN & KEMASKINI ---
-let currentStoredId = "admin";
-let currentStoredPass = "puo123";
+// --- LOGIK LOGIN DENGAN STORAGE KEKAL ---
+const DEFAULT_ID = "admin";
+const DEFAULT_PASS = "puo123";
+
+// Fungsi untuk ambil password terkini dari localStorage
+function getStoredPass() {
+    return localStorage.getItem("userPassword") || DEFAULT_PASS;
+}
 
 function checkLogin() {
-    var id = document.getElementById("userId").value;
-    var pass = document.getElementById("userPass").value;
-    if (id === currentStoredId && pass === currentStoredPass) {
+    var idInput = document.getElementById("userId").value;
+    var passInput = document.getElementById("userPass").value;
+    
+    if (idInput === DEFAULT_ID && passInput === getStoredPass()) {
         var overlay = document.getElementById("loginOverlay");
         overlay.style.opacity = "0";
         setTimeout(function() { overlay.style.display = "none"; }, 500);
-    } else { alert("ID atau Kata Laluan Salah!"); }
+    } else { 
+        alert("ID atau Kata Laluan Salah!"); 
+    }
 }
 
-function toggleForgotModal(show) { document.getElementById("forgotModal").style.display = show ? "flex" : "none"; }
+function toggleForgotModal(show) { 
+    document.getElementById("forgotModal").style.display = show ? "flex" : "none"; 
+}
 
 function saveNewPassword() {
     let confirmId = document.getElementById("confirmId").value;
     let newP = document.getElementById("newPass").value;
     let confirmP = document.getElementById("confirmNewPass").value;
-    if (confirmId !== currentStoredId) { alert("ID Pengguna tidak sah!"); return; }
-    if (newP === "" || newP !== confirmP) { alert("Kata laluan tidak padan atau kosong!"); return; }
-    currentStoredPass = newP;
-    alert("Kata laluan telah berjaya dikemaskini!");
+
+    if (confirmId !== DEFAULT_ID) { 
+        alert("ID Pengguna tidak sah!"); 
+        return; 
+    }
+    if (newP === "" || newP !== confirmP) { 
+        alert("Kata laluan tidak padan atau kosong!"); 
+        return; 
+    }
+
+    // SIMPAN KE STORAGE KEKAL (LocalStorage)
+    localStorage.setItem("userPassword", newP);
+    
+    alert("Kata laluan telah berjaya dikemaskini dan disimpan!");
     toggleForgotModal(false);
 }
 
@@ -430,9 +450,8 @@ function resetMap(){
     map.fitBounds(lotLayer.getBounds());
 }
 
-// --- MODIFIED PDF LOGIC ---
+// --- LOGIK PDF DIPERBAIKI ---
 function openPdfModal() {
-    // Check if lot is selected to change modal title
     const lotNo = document.getElementById("lotNo").innerText;
     if(lotNo === "-") {
         document.getElementById("pdfModalTitle").innerText = "📄 Laporan Keseluruhan";
@@ -455,7 +474,6 @@ async function generateFinalPDF() {
     closeModal();
     map.invalidateSize();
     
-    // Jika tiada lot dipilih, zoom out untuk nampak semua sebelum capture
     if(lotNo === "-") {
         map.fitBounds(lotLayer.getBounds());
         await new Promise(resolve => setTimeout(resolve, 800)); 
@@ -466,7 +484,6 @@ async function generateFinalPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('l', 'mm', 'a3');
 
-    // Layout PDF
     doc.setLineWidth(1.2); doc.rect(10, 10, 400, 277); 
     doc.setLineWidth(0.8); doc.line(85, 10, 85, 287); 
     
@@ -483,7 +500,6 @@ async function generateFinalPDF() {
     doc.setTextColor(0, 0, 0); doc.text("DAERAH LEDANG", 47, 71, {align: "center"});
     doc.text("MUKIM KESANG", 47, 82, {align: "center"});
 
-    // Heading Laporan
     if(lotNo !== "-") {
         doc.setFontSize(18); doc.text("LOT " + lotNo, 47, 96, {align: "center"});
     } else {
@@ -493,7 +509,6 @@ async function generateFinalPDF() {
     doc.setFont("helvetica", "normal"); doc.setFontSize(12); doc.text("SKALA 1 : 400", 47, 107, {align: "center"});
     doc.setLineWidth(0.3); doc.line(15, 115, 80, 115);
 
-    // Data Details (Akan kosong jika Pelan Keseluruhan)
     doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(80, 80, 80);
     doc.text("NAMA PEMILIK:", 15, 125);
     doc.setFont("times", "bold"); doc.setFontSize(13); doc.setTextColor(0, 0, 0);
@@ -525,13 +540,24 @@ async function generateFinalPDF() {
     doc.text(accessor.toUpperCase(), 15, 263);
     doc.line(15, 265, 80, 265);
 
-    // Title & Map
     doc.setFont("helvetica", "bold"); doc.setFontSize(26);
     doc.text("PELAN AKUI", 242, 25, {align: "center"});
     doc.setLineWidth(0.5); doc.rect(90, 35, 305, 200); 
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 91, 36, 303, 198);
 
-    let nomorPA = (lotNo === "11487") ? "PA 143912" : (lotNo === "-" ? "PA GENERAL" : "PA 143913");
+    // LOGIK PA NUMBER DIPERBAIKI
+    let nomorPA = "";
+    if (lotNo === "11487") {
+        nomorPA = "PA 143912";
+    } else if (lotNo === "11488") { // Contoh lot lain
+        nomorPA = "PA 143913";
+    } else if (lotNo === "-") {
+        // Paparkan kedua-dua PA untuk pelan keseluruhan
+        nomorPA = "PA 413912 & PA 413913";
+    } else {
+        nomorPA = "PA 413913";
+    }
+
     doc.setFont("times", "bold"); doc.setFontSize(42); doc.text(nomorPA, 100, 268);
 
     doc.setFont("helvetica", "italic"); doc.setFontSize(8); doc.setTextColor(150, 150, 150);
