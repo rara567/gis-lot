@@ -22,123 +22,35 @@
 
         /* --- SISTEM LOGIN OVERLAY --- */
         #loginOverlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: #0f111a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #0f111a; display: flex; justify-content: center;
+            align-items: center; z-index: 9999; transition: opacity 0.5s ease;
         }
 
         .login-card {
-            background: #1a1c23;
-            padding: 40px;
-            border-radius: 15px;
-            width: 380px;
-            text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
-            border: 1px solid #333;
-            position: relative;
+            background: #1a1c23; padding: 40px; border-radius: 15px; width: 380px;
+            text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+            border: 1px solid #333; position: relative;
         }
 
-        .login-card h2 {
-            color: white;
-            margin-bottom: 30px;
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
+        .login-card h2 { color: white; margin-bottom: 30px; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 12px; }
 
         /* --- MODAL FORGOT PASSWORD --- */
         #forgotModal {
-            display: none; 
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: #12141d;
-            border-radius: 15px;
-            padding: 30px;
-            box-sizing: border-box;
-            z-index: 10000;
-            flex-direction: column;
-            text-align: left;
-            border: 1px solid #333;
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #12141d; border-radius: 15px; padding: 30px; box-sizing: border-box;
+            z-index: 10000; flex-direction: column; text-align: left; border: 1px solid #333;
         }
 
-        .forgot-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: white;
-            margin-bottom: 15px;
-        }
+        .forgot-header { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 15px; }
+        .alert-box { background: rgba(30, 58, 138, 0.3); border: 1px solid #1e40af; color: #60a5fa; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; }
+        .input-group { text-align: left; margin-bottom: 15px; }
+        .input-group label { color: #aaa; font-size: 13px; display: block; margin-bottom: 6px; font-weight: bold; }
+        .input-group input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #242731; color: white; box-sizing: border-box; outline: none; }
 
-        .alert-box {
-            background: rgba(30, 58, 138, 0.3);
-            border: 1px solid #1e40af;
-            color: #60a5fa;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-bottom: 20px;
-        }
-
-        .input-group {
-            text-align: left;
-            margin-bottom: 15px;
-        }
-
-        .input-group label {
-            color: #aaa;
-            font-size: 13px;
-            display: block;
-            margin-bottom: 6px;
-            font-weight: bold;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            background: #242731;
-            color: white;
-            box-sizing: border-box;
-            outline: none;
-        }
-
-        .btn-login, .btn-save {
-            width: 100%;
-            padding: 14px;
-            background: transparent;
-            border: 1px solid #444;
-            color: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: 0.3s;
-            margin-top: 10px;
-        }
-
-        .btn-login:hover, .btn-save:hover {
-            background: #1b5e20;
-            border-color: #81c784;
-        }
-
-        .forgot-pw {
-            color: #ff5252;
-            display: block;
-            margin-top: 25px;
-            text-decoration: none;
-            font-size: 14px;
-            cursor: pointer;
-        }
+        .btn-login, .btn-save { width: 100%; padding: 14px; background: transparent; border: 1px solid #444; color: white; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; margin-top: 10px; }
+        .btn-login:hover, .btn-save:hover { background: #1b5e20; border-color: #81c784; }
+        .forgot-pw { color: #ff5252; display: block; margin-top: 25px; text-decoration: none; font-size: 14px; cursor: pointer; }
 
         /* --- HEADER & SIDEBAR --- */
         #header {
@@ -149,19 +61,9 @@
             overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
 
-        .header-bg-video {
-            position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%;
-            z-index: 1; transform: translate(-50%, -50%); opacity: 0.4;
-            object-fit: cover; pointer-events: none;
-        }
-
+        .header-bg-video { position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%; z-index: 1; transform: translate(-50%, -50%); opacity: 0.4; object-fit: cover; pointer-events: none; }
         #header img { height: 85px; position: relative; z-index: 2; }
-
-        #header .custom-font {
-            font-family: 'Dancing Script', cursive; font-size: 52px; 
-            font-weight: 700; letter-spacing: 2px; position: relative;
-            z-index: 2; text-shadow: 3px 3px 8px rgba(0,0,0,0.7);
-        }
+        #header .custom-font { font-family: 'Dancing Script', cursive; font-size: 52px; font-weight: 700; letter-spacing: 2px; position: relative; z-index: 2; text-shadow: 3px 3px 8px rgba(0,0,0,0.7); }
 
         #toggleBtn {
             position: absolute; top: 145px; left: 0; z-index: 1100;
@@ -196,16 +98,9 @@
         .box p { margin:0; font-size:11px; color:#aaa; text-transform: uppercase; }
         .box span { font-size:16px; font-weight:bold; color:#81c784; display: block; margin-top: 5px; word-wrap: break-word; }
 
-        .modal {
-            display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.8); align-items: center; justify-content: center;
-        }
-        .modal-content {
-            background: #242731; padding: 30px; border-radius: 15px; width: 350px; text-align: center; border: 2px solid #2e7d32; color: white;
-        }
-        .modal-content input {
-            width: 100%; padding: 12px; margin: 20px 0; border-radius: 8px; border: 1px solid #444; background: #111; color: white; box-sizing: border-box;
-        }
+        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); align-items: center; justify-content: center; }
+        .modal-content { background: #242731; padding: 30px; border-radius: 15px; width: 350px; text-align: center; border: 2px solid #2e7d32; color: white; }
+        .modal-content input { width: 100%; padding: 12px; margin: 20px 0; border-radius: 8px; border: 1px solid #444; background: #111; color: white; box-sizing: border-box; }
 
         .custom-zoom-container { position: absolute; bottom: 50px; right: 20px; z-index: 1500; display: flex; flex-direction: column; gap: 10px; }
         .zoom-btn { width: 50px; height: 50px; background-color: #1b5e20; color: white; border: 2px solid #81c784; border-radius: 10px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -219,17 +114,14 @@
 <div id="loginOverlay">
     <div class="login-card">
         <h2><span style="background:#ffeb3b; border-radius: 6px; padding: 2px 8px; color: #000;">🔐</span> Sistem Survey Lot PUO</h2>
-        
         <div class="input-group">
             <label>👤 Masukkan ID:</label>
             <input type="text" id="userId" placeholder="ID Pengguna">
         </div>
-
         <div class="input-group">
             <label>🔑 Masukkan Kata Laluan:</label>
             <input type="password" id="userPass" placeholder="••••••••">
         </div>
-
         <button class="btn-login" onclick="checkLogin()">Log Masuk</button>
         <span class="forgot-pw" onclick="toggleForgotModal(true)">❓ Lupa Kata Laluan?</span>
 
@@ -241,7 +133,7 @@
             <div class="alert-box">Sila sahkan ID untuk menetapkan semula kata laluan.</div>
             <div class="input-group">
                 <label>Sahkan ID Pengguna:</label>
-                <input type="text" id="confirmId" style="border:1px solid #7f1d1d;">
+                <input type="text" id="confirmId">
             </div>
             <div class="input-group">
                 <label>Kata Laluan Baharu:</label>
@@ -324,9 +216,7 @@
 const DEFAULT_ID = "admin";
 const DEFAULT_PASS = "puo123";
 
-function getStoredPass() {
-    return localStorage.getItem("userPassword") || DEFAULT_PASS;
-}
+function getStoredPass() { return localStorage.getItem("userPassword") || DEFAULT_PASS; }
 
 function checkLogin() {
     var idInput = document.getElementById("userId").value;
@@ -346,7 +236,7 @@ function saveNewPassword() {
     if (confirmId !== DEFAULT_ID) { alert("ID tidak sah!"); return; }
     if (newP === "" || newP !== confirmP) { alert("Kata laluan tidak sepadan!"); return; }
     localStorage.setItem("userPassword", newP);
-    alert("Berjaya disimpan!");
+    alert("Berjaya disimpan! Anda kini boleh login dengan kata laluan baharu.");
     toggleForgotModal(false);
 }
 
@@ -395,13 +285,11 @@ var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     }
 }).addTo(map);
 
-// FIX: Carian untuk Lot Berkembar (seperti 11492)
 function searchLot(){
     var input = document.getElementById("searchLot").value.trim().toLowerCase();
     var found = false;
     var bounds = L.latLngBounds([]);
     clearHighlight();
-
     lotLayer.eachLayer(function(layer){
         let lotVal = (layer.feature.properties.NO_LOT || layer.feature.properties.no_lot || "").toString().toLowerCase();
         if(lotVal === input){
@@ -411,7 +299,6 @@ function searchLot(){
             bounds.extend(layer.getBounds());
         }
     });
-
     if(found){
         map.fitBounds(bounds, {padding: [50, 50], maxZoom: 19});
         if(!document.getElementById("sidebar").classList.contains("active")) toggleSidebar();
@@ -444,13 +331,13 @@ async function generateFinalPDF() {
     
     closeModal();
     if(lotNo === "-") map.fitBounds(lotLayer.getBounds());
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise(r => setTimeout(r, 1200));
     
     const canvas = await html2canvas(document.getElementById('map'), { useCORS: true, scale: 2 });
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('l', 'mm', 'a3');
 
-    // Drawing Borders & Layout
+    // Borders & Layout
     doc.setLineWidth(1.2); doc.rect(10, 10, 400, 277); 
     doc.setLineWidth(0.8); doc.line(85, 10, 85, 287); 
     try { doc.addImage(document.getElementById("logoPuo"), 'PNG', 32, 15, 20, 23); } catch(e){}
@@ -469,7 +356,6 @@ async function generateFinalPDF() {
     doc.text(lotNo !== "-" ? "LOT " + lotNo : "PELAN KESELURUHAN", 47, 96, {align: "center"});
     doc.setFont("helvetica", "normal"); doc.setFontSize(12); doc.text("SKALA 1 : 400", 47, 107, {align: "center"});
 
-    // Info Section
     doc.setFontSize(9); doc.setTextColor(80, 80, 80); doc.text("NAMA PEMILIK:", 15, 125);
     doc.setFont("times", "bold"); doc.setFontSize(13); doc.setTextColor(0, 0, 0);
     doc.text(doc.splitTextToSize((lotNo !== "-" ? owner : "PELAN UMUM").toUpperCase(), 65), 15, 132);
@@ -477,22 +363,28 @@ async function generateFinalPDF() {
     doc.setFontSize(9); doc.setTextColor(80, 80, 80); doc.text("NO. LOT:", 15, 152);
     doc.setFont("times", "bold"); doc.setFontSize(16); doc.setTextColor(0, 0, 0);
     doc.text(lotNo !== "-" ? lotNo : "SEMUA LOT", 15, 160);
-
     doc.text("LUAS LOT:", 15, 175); doc.text(lotNo !== "-" ? area : "-", 15, 183);
 
-    // Footer Info
     doc.setFontSize(9); doc.text("Tarikh: 4/3/2026", 15, 226);
     doc.text("Disemak Oleh:", 15, 255);
     doc.setFontSize(13); doc.text(accessor.toUpperCase(), 15, 263);
 
-    // Map Area
     doc.setFontSize(26); doc.text("PELAN AKUI", 242, 25, {align: "center"});
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 91, 36, 303, 198);
 
-    // FIX: PA Number Logic
-    let paNum = (lotNo === "-") ? "PA 413912 & PA 413913" : (lotNo === "11487" ? "PA 413912" : "PA 413913");
-    doc.setFontSize(42); doc.text(paNum, 100, 268);
+    // FIX: LOGIK SEMAKAN PA NUMBER MENGIKUT LOT
+    let paNum = "";
+    const PA_413912_LOTS = ["11487", "11492"]; // Senaraikan lot di bawah PA 413912 di sini
 
+    if (lotNo === "-") {
+        paNum = "PA 413912 & PA 413913";
+    } else if (PA_413912_LOTS.includes(lotNo)) {
+        paNum = "PA 413912";
+    } else {
+        paNum = "PA 413913";
+    }
+
+    doc.setFontSize(42); doc.text(paNum, 100, 268);
     doc.save((lotNo !== "-" ? "PA_Lot_" + lotNo : "Pelan_Keseluruhan") + ".pdf");
 }
 </script>
