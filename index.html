@@ -6,16 +6,16 @@
     <title>VIRTUAL LOT - PROFESSIONAL PA REPORT</title>
 
     <link rel="stylesheet" href="css/leaflet.css">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
-        /* CSS GLOBAL */
+        /* CSS GLOBAL - KEKAL ASAL */
         html, body {
             margin:0; padding:0; height:100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Roboto', sans-serif;
             background-color: #f5e6be;
         }
         #map { height:100vh; z-index: 1; }
@@ -35,7 +35,6 @@
 
         .login-card h2 { color: white; margin-bottom: 30px; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 12px; }
 
-        /* --- MODAL FORGOT PASSWORD --- */
         #forgotModal {
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #12141d; border-radius: 15px; padding: 30px; box-sizing: border-box;
@@ -313,13 +312,8 @@ function resetMap(){
     map.fitBounds(lotLayer.getBounds());
 }
 
-// --- LOGIK PDF ---
-function openPdfModal() {
-    const lotNo = document.getElementById("lotNo").innerText;
-    document.getElementById("pdfModalTitle").innerText = (lotNo === "-") ? "📄 Laporan Keseluruhan" : "📄 Laporan Lot " + lotNo;
-    document.getElementById("pdfModal").style.display = "flex";
-}
-
+// --- LOGIK PDF TERKINI (PRO-ORGANIZED) ---
+function openPdfModal() { document.getElementById("pdfModal").style.display = "flex"; }
 function closeModal() { document.getElementById("pdfModal").style.display = "none"; }
 
 async function generateFinalPDF() {
@@ -337,65 +331,73 @@ async function generateFinalPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('l', 'mm', 'a3');
 
-    // Borders & Layout
-    doc.setLineWidth(1.2); doc.rect(10, 10, 400, 277); 
-    doc.setLineWidth(0.8); doc.line(85, 10, 85, 287); 
-    try { doc.addImage(document.getElementById("logoPuo"), 'PNG', 32, 15, 20, 23); } catch(e){}
+    // 1. Double Border Profesional
+    doc.setLineWidth(1.2); doc.rect(10, 10, 400, 277);
+    doc.setLineWidth(0.3); doc.rect(12, 12, 396, 273);
 
-    doc.setFont("helvetica", "bold"); doc.setFontSize(11);
-    doc.text("POLITEKNIK UNGKU OMAR", 47, 43, {align: "center"});
-    doc.line(15, 47, 80, 47);
+    // 2. Sidebar Laporan
+    doc.setLineWidth(0.8); doc.line(95, 10, 95, 287);
 
+    // 3. Header Rasmi (Times New Roman)
+    try { doc.addImage(document.getElementById("logoPuo"), 'PNG', 35, 18, 25, 28); } catch(e){}
     doc.setFont("times", "bold"); doc.setFontSize(14);
-    doc.text("NEGERI JOHOR", 47, 57, {align: "center"});
-    doc.setTextColor(220, 0, 0); doc.text("TANGKAK", 47, 64, {align: "center"});
-    doc.setTextColor(0, 0, 0); doc.text("DAERAH LEDANG", 47, 71, {align: "center"});
-    doc.text("MUKIM KESANG", 47, 82, {align: "center"});
+    doc.text("POLITEKNIK UNGKU OMAR", 47.5, 55, {align: "center"});
+    doc.setLineWidth(0.5); doc.line(18, 58, 87, 58);
 
-    doc.setFontSize(lotNo !== "-" ? 18 : 16);
-    doc.text(lotNo !== "-" ? "LOT " + lotNo : "PELAN KESELURUHAN", 47, 96, {align: "center"});
-    doc.setFont("helvetica", "normal"); doc.setFontSize(12); doc.text("SKALA 1 : 400", 47, 107, {align: "center"});
+    doc.setFontSize(11); doc.setFont("times", "normal");
+    doc.text("NEGERI JOHOR", 47.5, 68, {align: "center"});
+    doc.setFont("times", "bold"); doc.setTextColor(180, 0, 0);
+    doc.text("DAERAH TANGKAK", 47.5, 75, {align: "center"});
+    doc.setTextColor(0); doc.text("MUKIM KESANG", 47.5, 82, {align: "center"});
 
-    doc.setFontSize(9); doc.setTextColor(80, 80, 80); doc.text("NAMA PEMILIK:", 15, 125);
-    doc.setFont("times", "bold"); doc.setFontSize(13); doc.setTextColor(0, 0, 0);
-    doc.text(doc.splitTextToSize((lotNo !== "-" ? owner : "PELAN UMUM").toUpperCase(), 65), 15, 132);
+    // 4. Maklumat Data Lot (Organized Section)
+    doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.setTextColor(100);
+    doc.text("INFORMASI LOT", 18, 100);
+    doc.setDrawColor(200); doc.line(18, 102, 87, 102);
 
-    doc.setFontSize(9); doc.setTextColor(80, 80, 80); doc.text("NO. LOT:", 15, 152);
-    doc.setFont("times", "bold"); doc.setFontSize(16); doc.setTextColor(0, 0, 0);
-    doc.text(lotNo !== "-" ? lotNo : "SEMUA LOT", 15, 160);
-    doc.text("LUAS LOT:", 15, 175); doc.text(lotNo !== "-" ? area : "-", 15, 183);
-
-    doc.setFontSize(9); doc.text("Tarikh: 4/3/2026", 15, 226);
-    doc.text("Disemak Oleh:", 15, 255);
-    doc.setFontSize(13); doc.text(accessor.toUpperCase(), 15, 263);
-
-    doc.setFontSize(26); doc.text("PELAN AKUI", 242, 25, {align: "center"});
-    doc.addImage(canvas.toDataURL('image/png'), 'PNG', 91, 36, 303, 198);
-
-    // --- LOGIK PENENTUAN PA BERDASARKAN SENARAI LOT ---
-    let paNum = "";
+    const labels = ["NO. LOT:", "NAMA PEMILIK:", "KELUASAN:"];
+    const values = [lotNo === "-" ? "SEMUA LOT" : lotNo, (lotNo === "-" ? "PELAN UMUM" : owner).toUpperCase(), area];
     
-    // Siri Lot PA 413912 (11462 hingga 11487)
-    const LOTS_PA_413912 = [
-        "11462", "11463", "11464", "11465", "11466", "11467", "11468", "11469", "11470", 
-        "11471", "11472", "11473", "11474", "11475", "11476", "11477", "11478", "11479", 
-        "11480", "11481", "11482", "11483", "11484", "11485", "11486", "11487"
-    ];
-
-    let lotInt = parseInt(lotNo);
-
-    if (lotNo === "-") {
-        paNum = "PA 413912 & PA 413913";
-    } else if (LOTS_PA_413912.includes(lotNo)) {
-        paNum = "PA 413912";
-    } else if (lotInt >= 11488 && lotInt <= 11544) {
-        paNum = "PA 413913";
-    } else {
-        paNum = "PA 413913"; // Default jika tiada dalam senarai 413912
+    let currentY = 112;
+    for(let i=0; i<3; i++){
+        doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(120);
+        doc.text(labels[i], 18, currentY);
+        doc.setFont("times", "bold"); doc.setFontSize(12); doc.setTextColor(0);
+        let wrappedVal = doc.splitTextToSize(values[i], 68);
+        doc.text(wrappedVal, 18, currentY + 7);
+        currentY += 22;
     }
 
-    doc.setFontSize(42); doc.text(paNum, 100, 268);
-    doc.save((lotNo !== "-" ? "PA_Lot_" + lotNo : "Pelan_Keseluruhan") + ".pdf");
+    // 5. Penentuan PA Number (Auto-Detection)
+    let paNum = "";
+    const LOTS_PA_413912 = ["11462", "11463", "11464", "11465", "11466", "11467", "11468", "11469", "11470", "11471", "11472", "11473", "11474", "11475", "11476", "11477", "11478", "11479", "11480", "11481", "11482", "11483", "11484", "11485", "11486", "11487"];
+    let lotInt = parseInt(lotNo);
+    if (lotNo === "-") paNum = "PA 413912 & PA 413913";
+    else if (LOTS_PA_413912.includes(lotNo)) paNum = "PA 413912";
+    else paNum = "PA 413913";
+
+    doc.setFontSize(45); doc.setFont("times", "bold");
+    doc.text(paNum, 105, 270);
+
+    // 6. Pengesahan
+    doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.setTextColor(100);
+    doc.text("TARIKH CETAKAN: 8/3/2026", 18, 230);
+    doc.text("DISEMAK OLEH:", 18, 255);
+    doc.setFont("times", "bold"); doc.setFontSize(13); doc.setTextColor(0);
+    doc.text(accessor.toUpperCase(), 18, 263);
+    doc.line(18, 265, 87, 265);
+
+    // 7. Peta & Tajuk Utama
+    doc.setFontSize(26); doc.text("PELAN AKUI", 247, 25, {align: "center"});
+    doc.addImage(canvas.toDataURL('image/png'), 'PNG', 100, 35, 295, 205);
+
+    // 8. Watermark & Footer
+    doc.setTextColor(235); doc.setFontSize(40); doc.setFont("helvetica", "bold");
+    doc.text("DOKUMEN RASMI", 247, 140, {align:"center", angle: 45});
+    doc.setTextColor(150); doc.setFontSize(8); doc.setFont("helvetica", "italic");
+    doc.text("Dokumen ini dijana secara digital melalui Sistem Saujana Putra Smart Resident.", 247, 283, {align: "center"});
+
+    doc.save((lotNo !== "-" ? "Laporan_Lot_" + lotNo : "Pelan_Keseluruhan") + ".pdf");
 }
 </script>
 </body>
