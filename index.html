@@ -112,8 +112,6 @@
             outline: none;
         }
 
-        .input-group input:focus { border-color: #2e7d32; }
-
         .btn-login, .btn-save {
             width: 100%;
             padding: 14px;
@@ -247,17 +245,11 @@
             </div>
             <div class="input-group">
                 <label>Kata Laluan Baharu:</label>
-                <div style="position:relative;">
-                    <input type="password" id="newPass">
-                    <span style="position:absolute; right:10px; top:12px; cursor:pointer; color:#aaa;">👁️</span>
-                </div>
+                <input type="password" id="newPass">
             </div>
             <div class="input-group">
                 <label>Sahkan Kata Laluan Baharu:</label>
-                <div style="position:relative;">
-                    <input type="password" id="confirmNewPass">
-                    <span style="position:absolute; right:10px; top:12px; cursor:pointer; color:#aaa;">👁️</span>
-                </div>
+                <input type="password" id="confirmNewPass">
             </div>
             <button class="btn-save" onclick="saveNewPassword()">Simpan Kata Laluan</button>
         </div>
@@ -328,11 +320,10 @@
 <script src="data/LOTFINAL_0.js"></script>
 
 <script>
-// --- LOGIK LOGIN DENGAN STORAGE KEKAL ---
+// --- LOGIK LOGIN & STORAGE ---
 const DEFAULT_ID = "admin";
 const DEFAULT_PASS = "puo123";
 
-// Fungsi untuk ambil password terkini dari localStorage
 function getStoredPass() {
     return localStorage.getItem("userPassword") || DEFAULT_PASS;
 }
@@ -340,49 +331,27 @@ function getStoredPass() {
 function checkLogin() {
     var idInput = document.getElementById("userId").value;
     var passInput = document.getElementById("userPass").value;
-    
     if (idInput === DEFAULT_ID && passInput === getStoredPass()) {
-        var overlay = document.getElementById("loginOverlay");
-        overlay.style.opacity = "0";
-        setTimeout(function() { overlay.style.display = "none"; }, 500);
-    } else { 
-        alert("ID atau Kata Laluan Salah!"); 
-    }
+        document.getElementById("loginOverlay").style.opacity = "0";
+        setTimeout(() => { document.getElementById("loginOverlay").style.display = "none"; }, 500);
+    } else { alert("ID atau Kata Laluan Salah!"); }
 }
 
-function toggleForgotModal(show) { 
-    document.getElementById("forgotModal").style.display = show ? "flex" : "none"; 
-}
+function toggleForgotModal(show) { document.getElementById("forgotModal").style.display = show ? "flex" : "none"; }
 
 function saveNewPassword() {
     let confirmId = document.getElementById("confirmId").value;
     let newP = document.getElementById("newPass").value;
     let confirmP = document.getElementById("confirmNewPass").value;
-
-    if (confirmId !== DEFAULT_ID) { 
-        alert("ID Pengguna tidak sah!"); 
-        return; 
-    }
-    if (newP === "" || newP !== confirmP) { 
-        alert("Kata laluan tidak padan atau kosong!"); 
-        return; 
-    }
-
-    // SIMPAN KE STORAGE KEKAL (LocalStorage)
+    if (confirmId !== DEFAULT_ID) { alert("ID tidak sah!"); return; }
+    if (newP === "" || newP !== confirmP) { alert("Kata laluan tidak sepadan!"); return; }
     localStorage.setItem("userPassword", newP);
-    
-    alert("Kata laluan telah berjaya dikemaskini dan disimpan!");
+    alert("Berjaya disimpan!");
     toggleForgotModal(false);
 }
 
-document.addEventListener('keypress', function (e) {
-    if (e.key === 'Enter' && document.getElementById("loginOverlay").style.display !== "none") {
-        if(document.getElementById("forgotModal").style.display === "flex") { saveNewPassword(); } else { checkLogin(); }
-    }
-});
-
 // --- LOGIK MAP & GIS ---
-var lastClickedLayer = null; 
+var highlightedLayers = []; 
 var map = L.map('map', {zoomControl: false, preferCanvas: true}).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
 var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: "anonymous"});
 var googleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: "anonymous"}).addTo(map);
@@ -394,25 +363,24 @@ function setBaseLayer(type) {
     else { map.addLayer(googleStreet); map.removeLayer(googleSatellite); document.getElementById('btnStreet').classList.add('active'); document.getElementById('btnSat').classList.remove('active'); }
 }
 
-function getOwnerName(props) {
-    let values = Object.values(props);
-    let longStrings = values.filter(v => typeof v === 'string' && v.length > 10);
-    return longStrings.length > 0 ? longStrings[longStrings.length - 1] : "Data Tidak Ditemui";
-}
-
-function updateSidebar(props) {
-    document.getElementById("lotNo").innerText = props.NO_LOT || props.no_lot || "Tiada Data";
-    document.getElementById("ownerName").innerText = getOwnerName(props);
-    let values = Object.values(props);
-    let area = values.find(v => typeof v === 'number' && v > 50) || "0";
-    document.getElementById("selectedArea").innerText = area + " m²";
+function clearHighlight() {
+    highlightedLayers.forEach(l => lotLayer.resetStyle(l));
+    highlightedLayers = [];
 }
 
 function highlightFeature(layer) {
-    if (lastClickedLayer) lotLayer.resetStyle(lastClickedLayer); 
     layer.setStyle({ fillColor: "#ffeb3b", color: "#f57f17", fillOpacity: 0.9, weight: 3 });
-    lastClickedLayer = layer;
+    highlightedLayers.push(layer);
     layer.bringToFront();
+}
+
+function updateSidebar(props) {
+    document.getElementById("lotNo").innerText = props.NO_LOT || props.no_lot || "-";
+    let values = Object.values(props);
+    let longStrings = values.filter(v => typeof v === 'string' && v.length > 10);
+    document.getElementById("ownerName").innerText = longStrings.length > 0 ? longStrings[longStrings.length - 1] : "Data Tidak Ditemui";
+    let area = values.find(v => typeof v === 'number' && v > 50) || "0";
+    document.getElementById("selectedArea").innerText = area + " m²";
 }
 
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
@@ -420,44 +388,48 @@ var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     onEachFeature: function(feature, layer){
         document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
         layer.on('click', function() {
+            clearHighlight();
             highlightFeature(layer); 
             updateSidebar(feature.properties);
         });
     }
 }).addTo(map);
 
+// FIX: Carian untuk Lot Berkembar (seperti 11492)
 function searchLot(){
     var input = document.getElementById("searchLot").value.trim().toLowerCase();
     var found = false;
+    var bounds = L.latLngBounds([]);
+    clearHighlight();
+
     lotLayer.eachLayer(function(layer){
         let lotVal = (layer.feature.properties.NO_LOT || layer.feature.properties.no_lot || "").toString().toLowerCase();
         if(lotVal === input){
             found = true;
-            map.setView(layer.getBounds().getCenter(), 19);
-            setTimeout(() => { highlightFeature(layer); updateSidebar(layer.feature.properties); }, 300);
-            if(!document.getElementById("sidebar").classList.contains("active")) toggleSidebar();
+            highlightFeature(layer);
+            updateSidebar(layer.feature.properties);
+            bounds.extend(layer.getBounds());
         }
     });
-    if(!found && input !== "") alert("No Lot tidak dijumpai!");
+
+    if(found){
+        map.fitBounds(bounds, {padding: [50, 50], maxZoom: 19});
+        if(!document.getElementById("sidebar").classList.contains("active")) toggleSidebar();
+    } else if(input !== "") alert("No Lot tidak dijumpai!");
 }
 
 function resetMap(){
-    if(lastClickedLayer) lotLayer.resetStyle(lastClickedLayer);
-    lastClickedLayer = null;
+    clearHighlight();
     document.getElementById("lotNo").innerText="-";
     document.getElementById("ownerName").innerText="-";
     document.getElementById("selectedArea").innerText="-";
     map.fitBounds(lotLayer.getBounds());
 }
 
-// --- LOGIK PDF DIPERBAIKI ---
+// --- LOGIK PDF ---
 function openPdfModal() {
     const lotNo = document.getElementById("lotNo").innerText;
-    if(lotNo === "-") {
-        document.getElementById("pdfModalTitle").innerText = "📄 Laporan Keseluruhan";
-    } else {
-        document.getElementById("pdfModalTitle").innerText = "📄 Laporan Lot " + lotNo;
-    }
+    document.getElementById("pdfModalTitle").innerText = (lotNo === "-") ? "📄 Laporan Keseluruhan" : "📄 Laporan Lot " + lotNo;
     document.getElementById("pdfModal").style.display = "flex";
 }
 
@@ -466,33 +438,26 @@ function closeModal() { document.getElementById("pdfModal").style.display = "non
 async function generateFinalPDF() {
     const accessor = document.getElementById("accessorName").value;
     if(!accessor) { alert("Sila isi nama!"); return; }
-    
     const lotNo = document.getElementById("lotNo").innerText;
     const owner = document.getElementById("ownerName").innerText;
     const area = document.getElementById("selectedArea").innerText;
     
     closeModal();
-    map.invalidateSize();
+    if(lotNo === "-") map.fitBounds(lotLayer.getBounds());
+    await new Promise(r => setTimeout(r, 1000));
     
-    if(lotNo === "-") {
-        map.fitBounds(lotLayer.getBounds());
-        await new Promise(resolve => setTimeout(resolve, 800)); 
-    }
-
-    await new Promise(resolve => setTimeout(resolve, 1000)); 
     const canvas = await html2canvas(document.getElementById('map'), { useCORS: true, scale: 2 });
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('l', 'mm', 'a3');
 
+    // Drawing Borders & Layout
     doc.setLineWidth(1.2); doc.rect(10, 10, 400, 277); 
     doc.setLineWidth(0.8); doc.line(85, 10, 85, 287); 
-    
-    const logoImg = document.getElementById("logoPuo");
-    try { doc.addImage(logoImg, 'PNG', 32, 15, 20, 23); } catch (e) {}
+    try { doc.addImage(document.getElementById("logoPuo"), 'PNG', 32, 15, 20, 23); } catch(e){}
 
     doc.setFont("helvetica", "bold"); doc.setFontSize(11);
     doc.text("POLITEKNIK UNGKU OMAR", 47, 43, {align: "center"});
-    doc.setLineWidth(0.5); doc.line(15, 47, 80, 47);
+    doc.line(15, 47, 80, 47);
 
     doc.setFont("times", "bold"); doc.setFontSize(14);
     doc.text("NEGERI JOHOR", 47, 57, {align: "center"});
@@ -500,71 +465,35 @@ async function generateFinalPDF() {
     doc.setTextColor(0, 0, 0); doc.text("DAERAH LEDANG", 47, 71, {align: "center"});
     doc.text("MUKIM KESANG", 47, 82, {align: "center"});
 
-    if(lotNo !== "-") {
-        doc.setFontSize(18); doc.text("LOT " + lotNo, 47, 96, {align: "center"});
-    } else {
-        doc.setFontSize(16); doc.text("PELAN KESELURUHAN", 47, 96, {align: "center"});
-    }
-
+    doc.setFontSize(lotNo !== "-" ? 18 : 16);
+    doc.text(lotNo !== "-" ? "LOT " + lotNo : "PELAN KESELURUHAN", 47, 96, {align: "center"});
     doc.setFont("helvetica", "normal"); doc.setFontSize(12); doc.text("SKALA 1 : 400", 47, 107, {align: "center"});
-    doc.setLineWidth(0.3); doc.line(15, 115, 80, 115);
 
-    doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(80, 80, 80);
-    doc.text("NAMA PEMILIK:", 15, 125);
+    // Info Section
+    doc.setFontSize(9); doc.setTextColor(80, 80, 80); doc.text("NAMA PEMILIK:", 15, 125);
     doc.setFont("times", "bold"); doc.setFontSize(13); doc.setTextColor(0, 0, 0);
-    const ownerDisplay = (lotNo !== "-") ? owner.toUpperCase() : "PELAN UMUM";
-    const splitOwner = doc.splitTextToSize(ownerDisplay, 65);
-    doc.text(splitOwner, 15, 132);
+    doc.text(doc.splitTextToSize((lotNo !== "-" ? owner : "PELAN UMUM").toUpperCase(), 65), 15, 132);
 
-    doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(80, 80, 80);
-    doc.text("NO. LOT:", 15, 152);
+    doc.setFontSize(9); doc.setTextColor(80, 80, 80); doc.text("NO. LOT:", 15, 152);
     doc.setFont("times", "bold"); doc.setFontSize(16); doc.setTextColor(0, 0, 0);
-    doc.text((lotNo !== "-") ? lotNo : "SEMUA LOT", 15, 160);
+    doc.text(lotNo !== "-" ? lotNo : "SEMUA LOT", 15, 160);
 
-    doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(80, 80, 80);
-    doc.text("LUAS LOT:", 15, 175);
-    doc.setFont("times", "bold"); doc.setFontSize(16); doc.setTextColor(0, 0, 0);
-    doc.text((lotNo !== "-") ? area : "-", 15, 183);
+    doc.text("LUAS LOT:", 15, 175); doc.text(lotNo !== "-" ? area : "-", 15, 183);
 
-    doc.line(15, 195, 80, 195);
-    let fileY = 205;
-    doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(100, 100, 100);
-    doc.text("Fail Ukur: PUBLJ 121/2009", 15, fileY);
-    doc.text("Fail Pej. Tanah: PTDM 3/8/83/02", 15, fileY + 7);
-    doc.text("Lembar Piawai: 30 D II", 15, fileY + 14);
-    doc.text("Tarikh: 4/3/2026", 15, fileY + 21);
-
-    doc.setTextColor(0, 0, 0); doc.setFontSize(10);
+    // Footer Info
+    doc.setFontSize(9); doc.text("Tarikh: 4/3/2026", 15, 226);
     doc.text("Disemak Oleh:", 15, 255);
-    doc.setFont("times", "bold"); doc.setFontSize(13);
-    doc.text(accessor.toUpperCase(), 15, 263);
-    doc.line(15, 265, 80, 265);
+    doc.setFontSize(13); doc.text(accessor.toUpperCase(), 15, 263);
 
-    doc.setFont("helvetica", "bold"); doc.setFontSize(26);
-    doc.text("PELAN AKUI", 242, 25, {align: "center"});
-    doc.setLineWidth(0.5); doc.rect(90, 35, 305, 200); 
+    // Map Area
+    doc.setFontSize(26); doc.text("PELAN AKUI", 242, 25, {align: "center"});
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 91, 36, 303, 198);
 
-    // LOGIK PA NUMBER DIPERBAIKI
-    let nomorPA = "";
-    if (lotNo === "11487") {
-        nomorPA = "PA 143912";
-    } else if (lotNo === "11488") { // Contoh lot lain
-        nomorPA = "PA 143913";
-    } else if (lotNo === "-") {
-        // Paparkan kedua-dua PA untuk pelan keseluruhan
-        nomorPA = "PA 413912 & PA 413913";
-    } else {
-        nomorPA = "PA 413913";
-    }
+    // FIX: PA Number Logic
+    let paNum = (lotNo === "-") ? "PA 413912 & PA 413913" : (lotNo === "11487" ? "PA 413912" : "PA 413913");
+    doc.setFontSize(42); doc.text(paNum, 100, 268);
 
-    doc.setFont("times", "bold"); doc.setFontSize(42); doc.text(nomorPA, 100, 268);
-
-    doc.setFont("helvetica", "italic"); doc.setFontSize(8); doc.setTextColor(150, 150, 150);
-    doc.text("Dokumen ini dijana secara digital melalui Sistem Saujana Putra Smart Resident", 242, 282, {align: "center"});
-    
-    const fileName = (lotNo !== "-") ? "PA_Lot_" + lotNo : "Pelan_Keseluruhan_Saujana";
-    doc.save(fileName + ".pdf");
+    doc.save((lotNo !== "-" ? "PA_Lot_" + lotNo : "Pelan_Keseluruhan") + ".pdf");
 }
 </script>
 </body>
