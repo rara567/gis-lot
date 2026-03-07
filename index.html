@@ -235,7 +235,7 @@ function saveNewPassword() {
     if (confirmId !== DEFAULT_ID) { alert("ID tidak sah!"); return; }
     if (newP === "" || newP !== confirmP) { alert("Kata laluan tidak sepadan!"); return; }
     localStorage.setItem("userPassword", newP);
-    alert("Berjaya disimpan! Anda kini boleh login dengan kata laluan baharu.");
+    alert("Berjaya disimpan!");
     toggleForgotModal(false);
 }
 
@@ -248,8 +248,8 @@ var googleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&
 function toggleSidebar(){ document.getElementById("sidebar").classList.toggle("active"); }
 
 function setBaseLayer(type) {
-    if(type === 'sat') { map.addLayer(googleSatellite); map.removeLayer(googleStreet); document.getElementById('btnSat').classList.add('active'); document.getElementById('btnStreet').classList.remove('active'); }
-    else { map.addLayer(googleStreet); map.removeLayer(googleSatellite); document.getElementById('btnStreet').classList.add('active'); document.getElementById('btnSat').classList.remove('active'); }
+    if(type === 'sat') { map.addLayer(googleSatellite); map.removeLayer(googleStreet); }
+    else { map.addLayer(googleStreet); map.removeLayer(googleSatellite); }
 }
 
 function clearHighlight() {
@@ -287,7 +287,6 @@ var lotLayer = L.geoJSON(json_LOTFINAL_0,{
 function searchLot(){
     var input = document.getElementById("searchLot").value.trim().toLowerCase();
     var found = false;
-    var bounds = L.latLngBounds([]);
     clearHighlight();
     lotLayer.eachLayer(function(layer){
         let lotVal = (layer.feature.properties.NO_LOT || layer.feature.properties.no_lot || "").toString().toLowerCase();
@@ -295,13 +294,10 @@ function searchLot(){
             found = true;
             highlightFeature(layer);
             updateSidebar(layer.feature.properties);
-            bounds.extend(layer.getBounds());
+            map.fitBounds(layer.getBounds(), {padding: [50, 50]});
         }
     });
-    if(found){
-        map.fitBounds(bounds, {padding: [50, 50], maxZoom: 19});
-        if(!document.getElementById("sidebar").classList.contains("active")) toggleSidebar();
-    } else if(input !== "") alert("No Lot tidak dijumpai!");
+    if(!found && input !== "") alert("No Lot tidak dijumpai!");
 }
 
 function resetMap(){
@@ -312,7 +308,7 @@ function resetMap(){
     map.fitBounds(lotLayer.getBounds());
 }
 
-// --- LOGIK PDF TERKINI (PRO-ORGANIZED) ---
+// --- LOGIK PDF TERKINI (DOKUMEN RASMI REMOVED) ---
 function openPdfModal() { document.getElementById("pdfModal").style.display = "flex"; }
 function closeModal() { document.getElementById("pdfModal").style.display = "none"; }
 
@@ -324,14 +320,13 @@ async function generateFinalPDF() {
     const area = document.getElementById("selectedArea").innerText;
     
     closeModal();
-    if(lotNo === "-") map.fitBounds(lotLayer.getBounds());
     await new Promise(r => setTimeout(r, 1200));
     
     const canvas = await html2canvas(document.getElementById('map'), { useCORS: true, scale: 2 });
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('l', 'mm', 'a3');
 
-    // 1. Double Border Profesional
+    // 1. Double Border
     doc.setLineWidth(1.2); doc.rect(10, 10, 400, 277);
     doc.setLineWidth(0.3); doc.rect(12, 12, 396, 273);
 
@@ -350,7 +345,7 @@ async function generateFinalPDF() {
     doc.text("DAERAH TANGKAK", 47.5, 75, {align: "center"});
     doc.setTextColor(0); doc.text("MUKIM KESANG", 47.5, 82, {align: "center"});
 
-    // 4. Maklumat Data Lot (Organized Section)
+    // 4. Maklumat Data Lot
     doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.setTextColor(100);
     doc.text("INFORMASI LOT", 18, 100);
     doc.setDrawColor(200); doc.line(18, 102, 87, 102);
@@ -368,10 +363,9 @@ async function generateFinalPDF() {
         currentY += 22;
     }
 
-    // 5. Penentuan PA Number (Auto-Detection)
+    // 5. Penentuan PA Number
     let paNum = "";
     const LOTS_PA_413912 = ["11462", "11463", "11464", "11465", "11466", "11467", "11468", "11469", "11470", "11471", "11472", "11473", "11474", "11475", "11476", "11477", "11478", "11479", "11480", "11481", "11482", "11483", "11484", "11485", "11486", "11487"];
-    let lotInt = parseInt(lotNo);
     if (lotNo === "-") paNum = "PA 413912 & PA 413913";
     else if (LOTS_PA_413912.includes(lotNo)) paNum = "PA 413912";
     else paNum = "PA 413913";
@@ -381,19 +375,18 @@ async function generateFinalPDF() {
 
     // 6. Pengesahan
     doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.setTextColor(100);
-    doc.text("TARIKH CETAKAN: 8/3/2026", 18, 230);
+    doc.text("TARIKH CETAKAN: " + new Date().toLocaleDateString(), 18, 230);
     doc.text("DISEMAK OLEH:", 18, 255);
     doc.setFont("times", "bold"); doc.setFontSize(13); doc.setTextColor(0);
     doc.text(accessor.toUpperCase(), 18, 263);
     doc.line(18, 265, 87, 265);
 
     // 7. Peta & Tajuk Utama
-    doc.setFontSize(26); doc.text("PELAN AKUI", 247, 25, {align: "center"});
+    doc.setFontSize(26); doc.setTextColor(0);
+    doc.text("PELAN AKUI", 247, 25, {align: "center"});
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 100, 35, 295, 205);
 
-    // 8. Watermark & Footer
-    doc.setTextColor(235); doc.setFontSize(40); doc.setFont("helvetica", "bold");
-    doc.text("DOKUMEN RASMI", 247, 140, {align:"center", angle: 45});
+    // 8. Footer (Watermark Dibuang)
     doc.setTextColor(150); doc.setFontSize(8); doc.setFont("helvetica", "italic");
     doc.text("Dokumen ini dijana secara digital melalui Sistem Saujana Putra Smart Resident.", 247, 283, {align: "center"});
 
