@@ -12,12 +12,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
-        /* CSS GLOBAL - KEKAL ASAL */
-        html, body {
-            margin:0; padding:0; height:100%;
-            font-family: 'Roboto', sans-serif;
-            background-color: #f5e6be;
-        }
+        /* CSS GLOBAL */
+        html, body { margin:0; padding:0; height:100%; font-family: 'Roboto', sans-serif; background-color: #f5e6be; }
         #map { height:100vh; z-index: 1; }
 
         /* --- SISTEM LOGIN OVERLAY --- */
@@ -32,6 +28,21 @@
             border: 1px solid #333; position: relative;
         }
         .login-card h2 { color: white; margin-bottom: 30px; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+
+        #forgotModal {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #12141d; border-radius: 15px; padding: 30px; box-sizing: border-box;
+            z-index: 10000; flex-direction: column; text-align: left; border: 1px solid #333;
+        }
+        .forgot-header { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 15px; }
+        .alert-box { background: rgba(30, 58, 138, 0.3); border: 1px solid #1e40af; color: #60a5fa; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; }
+        .input-group { text-align: left; margin-bottom: 15px; }
+        .input-group label { color: #aaa; font-size: 13px; display: block; margin-bottom: 6px; font-weight: bold; }
+        .input-group input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #242731; color: white; box-sizing: border-box; outline: none; }
+
+        .btn-login, .btn-save { width: 100%; padding: 14px; background: transparent; border: 1px solid #444; color: white; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; margin-top: 10px; }
+        .btn-login:hover, .btn-save:hover { background: #1b5e20; border-color: #81c784; }
+        .forgot-pw { color: #ff5252; display: block; margin-top: 25px; text-decoration: none; font-size: 14px; cursor: pointer; }
 
         /* --- HEADER & SIDEBAR --- */
         #header {
@@ -62,35 +73,35 @@
         }
         #sidebar.active { left:0; }
 
+        .sidebar-header { font-size: 22px; font-weight: bold; margin: 40px 0 20px 0; border-bottom: 2px solid #2e7d32; padding-bottom: 10px; color: #81c784; }
         .widget { background: #1a1c23; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
         .widget h3 { font-size: 11px; color: #81c784; text-transform: uppercase; margin: 0 0 12px 0; letter-spacing: 1px; }
         
-        /* NEW: Statistik Visual Styles */
-        .stat-container { margin-top: 10px; }
-        .stat-label { display: flex; justify-content: space-between; font-size: 10px; color: #aaa; margin-bottom: 4px; }
-        .stat-bar { background: #111; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
+        /* Statistik Visual */
+        .stat-bar { background: #111; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 8px; margin-top: 4px; }
         .stat-fill { height: 100%; width: 0%; transition: width 1s ease-in-out; }
 
+        .layer-btn { flex: 1; padding: 10px; border: 1px solid #444; border-radius: 8px; background: #111; color: #ccc; cursor: pointer; font-size: 11px; font-weight: bold; }
+        .layer-btn.active { background: #2e7d32; color: white; border-color: #81c784; }
+
+        .btn { width:100%; padding:12px; border:none; border-radius:8px; cursor:pointer; font-weight: bold; margin-bottom: 10px; }
+        .btn.primary { background:#2e7d32; color:white; }
+        .btn.export { background:#0288d1; color:white; }
+        
         .box { background:#1a1c23; padding:15px; border-radius:10px; margin-bottom:12px; border-left: 5px solid #2e7d32; }
         .box p { margin:0; font-size:11px; color:#aaa; text-transform: uppercase; }
         .box span { font-size:16px; font-weight:bold; color:#81c784; display: block; margin-top: 5px; word-wrap: break-word; }
 
-        /* HOVER TOOLTIP STYLE */
+        /* Tooltip */
         .leaflet-tooltip-own {
             background: #1a1c23 !important; border: 1px solid #81c784 !important; color: white !important;
-            border-radius: 6px; padding: 10px; font-size: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-left: 4px solid #81c784 !important;
+            padding: 8px; font-size: 12px; border-left: 4px solid #81c784 !important;
         }
 
-        .btn { width:100%; padding:12px; border:none; border-radius:8px; cursor:pointer; font-weight: bold; margin-bottom: 10px; transition: 0.2s; }
-        .btn.primary { background:#2e7d32; color:white; }
-        .btn.export { background:#0288d1; color:white; }
-        
         .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); align-items: center; justify-content: center; }
         .modal-content { background: #242731; padding: 30px; border-radius: 15px; width: 350px; text-align: center; border: 2px solid #2e7d32; color: white; }
         .modal-content input { width: 100%; padding: 12px; margin: 20px 0; border-radius: 8px; border: 1px solid #444; background: #111; color: white; box-sizing: border-box; }
 
-        .custom-zoom-container { position: absolute; bottom: 50px; right: 20px; z-index: 1500; display: flex; flex-direction: column; gap: 10px; }
-        .zoom-btn { width: 50px; height: 50px; background-color: #1b5e20; color: white; border: 2px solid #81c784; border-radius: 10px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         #footer { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(27, 94, 32, 0.95); color: white; text-align: center; padding: 10px 0; font-size: 13px; z-index: 1000; }
     </style>
 </head>
@@ -100,15 +111,37 @@
 <div id="loginOverlay">
     <div class="login-card">
         <h2><span style="background:#ffeb3b; border-radius: 6px; padding: 2px 8px; color: #000;">🔐</span> Sistem Survey Lot PUO</h2>
-        <div style="text-align: left; margin-bottom: 15px;">
-            <label style="color:#aaa; font-size: 13px;">ID Pengguna:</label>
-            <input type="text" id="userId" placeholder="admin" style="width:100%; padding:12px; border-radius:8px; border:1px solid #333; background:#242731; color:white; box-sizing:border-box;">
+        <div class="input-group">
+            <label>👤 Masukkan ID:</label>
+            <input type="text" id="userId" placeholder="ID Pengguna">
         </div>
-        <div style="text-align: left; margin-bottom: 15px;">
-            <label style="color:#aaa; font-size: 13px;">Kata Laluan:</label>
-            <input type="password" id="userPass" placeholder="••••••••" style="width:100%; padding:12px; border-radius:8px; border:1px solid #333; background:#242731; color:white; box-sizing:border-box;">
+        <div class="input-group">
+            <label>🔑 Masukkan Kata Laluan:</label>
+            <input type="password" id="userPass" placeholder="••••••••">
         </div>
-        <button class="btn primary" onclick="checkLogin()">Log Masuk</button>
+        <button class="btn-login" onclick="checkLogin()">Log Masuk</button>
+        <span class="forgot-pw" onclick="toggleForgotModal(true)">❓ Lupa Kata Laluan?</span>
+
+        <div id="forgotModal">
+            <div class="forgot-header">
+                <h3 style="margin:0;"><span style="color:#ffeb3b;">🔑</span> Kemaskini Kata Laluan</h3>
+                <span style="cursor:pointer; font-size:20px;" onclick="toggleForgotModal(false)">×</span>
+            </div>
+            <div class="alert-box">Sahkan ID untuk menetapkan semula kata laluan.</div>
+            <div class="input-group">
+                <label>Sahkan ID Pengguna:</label>
+                <input type="text" id="confirmId">
+            </div>
+            <div class="input-group">
+                <label>Kata Laluan Baharu:</label>
+                <input type="password" id="newPass">
+            </div>
+            <div class="input-group">
+                <label>Sahkan Kata Laluan Baharu:</label>
+                <input type="password" id="confirmNewPass">
+            </div>
+            <button class="btn-save" onclick="saveNewPassword()">Simpan Kata Laluan</button>
+        </div>
     </div>
 </div>
 
@@ -120,27 +153,34 @@
 
 <button id="toggleBtn" onclick="toggleSidebar()">
     <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    <span style="font-size: 10px;">Menu</span>
 </button>
 
 <div id="sidebar">
     <button style="float:right; background:none; border:none; color:#ff5252; font-size:28px; cursor:pointer;" onclick="toggleSidebar()">✖</button>
-    <div style="font-size: 22px; font-weight: bold; margin: 40px 0 20px 0; border-bottom: 2px solid #2e7d32; padding-bottom: 10px; color: #81c784;">DASHBOARD</div>
+    <div class="sidebar-header">DASHBOARD</div>
 
     <div class="widget">
         <h3>📊 Statistik Keluasan</h3>
-        <div class="stat-container">
-            <div class="stat-label"><span>Kecil (< 250m²)</span><span id="txtSmall">0%</span></div>
-            <div class="stat-bar"><div id="barSmall" class="stat-fill" style="background: #81c784;"></div></div>
-            <div class="stat-label"><span>Besar (> 250m²)</span><span id="txtLarge">0%</span></div>
-            <div class="stat-bar"><div id="barLarge" class="stat-fill" style="background: #0288d1;"></div></div>
+        <div style="font-size:10px; color:#aaa; display:flex; justify-content:space-between;"><span>Kecil (< 250m²)</span><span id="txtSmall">0%</span></div>
+        <div class="stat-bar"><div id="barSmall" class="stat-fill" style="background: #81c784;"></div></div>
+        <div style="font-size:10px; color:#aaa; display:flex; justify-content:space-between;"><span>Besar (> 250m²)</span><span id="txtLarge">0%</span></div>
+        <div class="stat-bar"><div id="barLarge" class="stat-fill" style="background: #0288d1;"></div></div>
+    </div>
+
+    <div class="widget">
+        <h3>🗺️ Interface Layer</h3>
+        <div style="display:flex; gap:8px;">
+            <button id="btnSat" class="layer-btn active" onclick="setBaseLayer('sat')">Satellite</button>
+            <button id="btnStreet" class="layer-btn" onclick="setBaseLayer('street')">Street</button>
         </div>
     </div>
 
     <div class="widget">
         <h3>🌍 Land Explorer</h3>
-        <input type="text" id="searchLot" placeholder="No Lot..." style="width:100%; padding:12px; border-radius:8px; border:1px solid #444; background:#111; color:white; margin-bottom:10px; box-sizing:border-box;">
-        <button class="btn primary" onclick="searchLot()">Cari Lot</button>
-        <button class="btn" style="background:#c62828; color:white;" onclick="resetMap()">Reset</button>
+        <input type="text" id="searchLot" placeholder="Insert No Lot..." style="width:100%; padding:12px; border-radius:8px; border:1px solid #444; background:#111; color:white; margin-bottom:10px; box-sizing:border-box;">
+        <button class="btn primary" onclick="searchLot()">Find Lot</button>
+        <button class="btn" style="background:#c62828; color:white;" onclick="resetMap()">Reset Lot</button>
     </div>
 
     <div class="info">
@@ -155,16 +195,12 @@
 
 <div id="pdfModal" class="modal">
     <div class="modal-content">
-        <h3 style="color:#81c784;">📄 Nama Pemeriksa</h3>
-        <input type="text" id="accessorName" placeholder="Masukkan Nama Anda...">
+        <h3>📄 Penjanaan Laporan</h3>
+        <p>Sila masukkan nama pemeriksa:</p>
+        <input type="text" id="accessorName" placeholder="Nama Penuh...">
         <button class="btn primary" onclick="generateFinalPDF()">Muat Turun PDF</button>
         <button class="btn" style="background:#444;" onclick="closeModal()">Batal</button>
     </div>
-</div>
-
-<div class="custom-zoom-container">
-    <button class="zoom-btn" onclick="map.zoomIn()">+</button>
-    <button class="zoom-btn" onclick="map.zoomOut()">−</button>
 </div>
 
 <div id="map"></div>
@@ -174,124 +210,181 @@
 <script src="data/LOTFINAL_0.js"></script>
 
 <script>
-// --- LOGIK LOGIN ---
+// --- LOGIN & STORAGE ---
+const DEFAULT_ID = "admin";
+const DEFAULT_PASS = "puo123";
+function getStoredPass() { return localStorage.getItem("userPassword") || DEFAULT_PASS; }
+
 function checkLogin() {
-    var id = document.getElementById("userId").value;
-    var pass = document.getElementById("userPass").value;
-    if (id === "admin" && pass === "puo123") {
-        document.getElementById("loginOverlay").style.display = "none";
-        calculateStats(); // Jalankan statistik selepas login
+    var idInput = document.getElementById("userId").value;
+    var passInput = document.getElementById("userPass").value;
+    if (idInput === DEFAULT_ID && passInput === getStoredPass()) {
+        document.getElementById("loginOverlay").style.opacity = "0";
+        setTimeout(() => { document.getElementById("loginOverlay").style.display = "none"; calculateStats(); }, 500);
     } else { alert("ID atau Kata Laluan Salah!"); }
 }
 
-// --- LOGIK MAP & GIS ---
-var highlightedLayers = [];
-var map = L.map('map', {zoomControl: false, preferCanvas: true}).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
-L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3']}).addTo(map);
-
-function toggleSidebar(){ document.getElementById("sidebar").classList.toggle("active"); }
-
-// Fungsi Helper Ambil Data
-function extractData(props) {
-    let lot = props.NO_LOT || props.no_lot || "-";
-    let values = Object.values(props);
-    let owner = values.filter(v => typeof v === 'string' && v.length > 10).pop() || "Data Tidak Dijumpai";
-    let area = values.find(v => typeof v === 'number' && v > 50) || 0;
-    return { lot, owner, area };
+function toggleForgotModal(show) { document.getElementById("forgotModal").style.display = show ? "flex" : "none"; }
+function saveNewPassword() {
+    let confirmId = document.getElementById("confirmId").value;
+    let newP = document.getElementById("newPass").value;
+    let confirmP = document.getElementById("confirmNewPass").value;
+    if (confirmId !== DEFAULT_ID) { alert("ID tidak sah!"); return; }
+    if (newP === "" || newP !== confirmP) { alert("Kata laluan tidak sepadan!"); return; }
+    localStorage.setItem("userPassword", newP);
+    alert("Berjaya disimpan!");
+    toggleForgotModal(false);
 }
 
-// NEW: Hitung Statistik
+// --- LOGIK MAP & GIS ---
+var highlightedLayers = []; 
+var map = L.map('map', {zoomControl: false, preferCanvas: true}).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
+var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: "anonymous"});
+var googleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: "anonymous"}).addTo(map);
+
+function toggleSidebar(){ document.getElementById("sidebar").classList.toggle("active"); }
+function setBaseLayer(type) {
+    if(type === 'sat') { map.addLayer(googleSatellite); map.removeLayer(googleStreet); document.getElementById('btnSat').classList.add('active'); document.getElementById('btnStreet').classList.remove('active'); }
+    else { map.addLayer(googleStreet); map.removeLayer(googleSatellite); document.getElementById('btnStreet').classList.add('active'); document.getElementById('btnSat').classList.remove('active'); }
+}
+
+// Kira Statistik
 function calculateStats() {
     let total = json_LOTFINAL_0.features.length;
-    let sCount = 0, lCount = 0;
+    let small = 0;
     json_LOTFINAL_0.features.forEach(f => {
-        let a = extractData(f.properties).area;
-        if(a < 250) sCount++; else lCount++;
+        let area = Object.values(f.properties).find(v => typeof v === 'number' && v > 50) || 0;
+        if(area < 250) small++;
     });
-    let sPerc = ((sCount/total)*100).toFixed(1);
-    let lPerc = ((lCount/total)*100).toFixed(1);
-    
+    let sPerc = ((small/total)*100).toFixed(1);
+    let lPerc = (100 - sPerc).toFixed(1);
     document.getElementById("totalLots").innerText = total;
     document.getElementById("txtSmall").innerText = sPerc + "%";
-    document.getElementById("txtLarge").innerText = lPerc + "%";
     document.getElementById("barSmall").style.width = sPerc + "%";
+    document.getElementById("txtLarge").innerText = lPerc + "%";
     document.getElementById("barLarge").style.width = lPerc + "%";
 }
 
+function clearHighlight() { highlightedLayers.forEach(l => lotLayer.resetStyle(l)); highlightedLayers = []; }
+
+function highlightFeature(layer) {
+    layer.setStyle({ fillColor: "#ffeb3b", color: "#f57f17", fillOpacity: 0.9, weight: 3 });
+    highlightedLayers.push(layer);
+    layer.bringToFront();
+}
+
+function updateSidebar(props) {
+    document.getElementById("lotNo").innerText = props.NO_LOT || props.no_lot || "-";
+    let values = Object.values(props);
+    let longStrings = values.filter(v => typeof v === 'string' && v.length > 10);
+    document.getElementById("ownerName").innerText = longStrings.length > 0 ? longStrings[longStrings.length - 1] : "Data Tidak Ditemui";
+    let area = values.find(v => typeof v === 'number' && v > 50) || "0";
+    document.getElementById("selectedArea").innerText = area + " m²";
+}
+
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
-    style: function() { return { color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.6 }; },
+    style: function() { return { color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 }; },
     onEachFeature: function(feature, layer){
-        let data = extractData(feature.properties);
-
-        // FEATURE 1: HOVER TOOLTIP
-        layer.bindTooltip(`
-            <div style="text-align:left;">
-                <b style="color:#81c784; font-size:13px;">LOT: ${data.lot}</b><br>
-                <b>Luas:</b> ${data.area} m²<br>
-                <b>Pemilik:</b> ${data.owner}
-            </div>`, { sticky: true, className: 'leaflet-tooltip-own' }
-        );
-
-        layer.on({
-            mouseover: function(e) {
-                if(!highlightedLayers.includes(e.target)) {
-                    e.target.setStyle({ fillOpacity: 0.9, weight: 2, color: "#fff" });
-                }
-            },
-            mouseout: function(e) {
-                if(!highlightedLayers.includes(e.target)) { lotLayer.resetStyle(e.target); }
-            },
-            click: function(e) {
-                highlightedLayers.forEach(l => lotLayer.resetStyle(l));
-                highlightedLayers = [e.target];
-                e.target.setStyle({ fillColor: "#ffeb3b", fillOpacity: 0.8, weight: 3, color: "#f57f17" });
-                
-                document.getElementById("lotNo").innerText = data.lot;
-                document.getElementById("ownerName").innerText = data.owner;
-                document.getElementById("selectedArea").innerText = data.area + " m²";
-            }
+        layer.bindTooltip(`Lot: ${feature.properties.NO_LOT || 'N/A'}`, { sticky: true, className: 'leaflet-tooltip-own' });
+        layer.on('click', function() {
+            clearHighlight();
+            highlightFeature(layer); 
+            updateSidebar(feature.properties);
         });
     }
 }).addTo(map);
 
-// KEKAL ASAL: Fungsi Carian & Reset
 function searchLot(){
-    var input = document.getElementById("searchLot").value.trim();
-    lotLayer.eachLayer(l => {
-        if((l.feature.properties.NO_LOT || l.feature.properties.no_lot) == input) {
-            l.fire('click');
-            map.fitBounds(l.getBounds(), {padding: [50, 50]});
+    var input = document.getElementById("searchLot").value.trim().toLowerCase();
+    var found = false;
+    clearHighlight();
+    lotLayer.eachLayer(function(layer){
+        let lotVal = (layer.feature.properties.NO_LOT || layer.feature.properties.no_lot || "").toString().toLowerCase();
+        if(lotVal === input){
+            found = true;
+            highlightFeature(layer);
+            updateSidebar(layer.feature.properties);
+            map.fitBounds(layer.getBounds(), {padding: [50, 50]});
         }
     });
+    if(!found && input !== "") alert("No Lot tidak dijumpai!");
 }
+
 function resetMap(){
-    highlightedLayers.forEach(l => lotLayer.resetStyle(l));
-    highlightedLayers = [];
+    clearHighlight();
     document.getElementById("lotNo").innerText="-";
     document.getElementById("ownerName").innerText="-";
     document.getElementById("selectedArea").innerText="-";
     map.fitBounds(lotLayer.getBounds());
 }
 
-// KEKAL ASAL: Logik PDF
+// --- LOGIK PDF PROFESIONAL ---
 function openPdfModal() { document.getElementById("pdfModal").style.display = "flex"; }
 function closeModal() { document.getElementById("pdfModal").style.display = "none"; }
 
 async function generateFinalPDF() {
-    const acc = document.getElementById("accessorName").value;
-    if(!acc) { alert("Sila isi nama!"); return; }
+    const accessor = document.getElementById("accessorName").value;
+    if(!accessor) { alert("Sila isi nama!"); return; }
+    const lotNo = document.getElementById("lotNo").innerText;
+    const owner = document.getElementById("ownerName").innerText;
+    const area = document.getElementById("selectedArea").innerText;
+    
     closeModal();
     const canvas = await html2canvas(document.getElementById('map'), { useCORS: true, scale: 2 });
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('l', 'mm', 'a3');
-    
-    // Lukisan Frame & Data (Ringkasan Logik Asal)
+
+    // 1. Frame
     doc.setLineWidth(1); doc.rect(10, 10, 400, 277);
-    doc.line(95, 10, 95, 287);
-    doc.setFontSize(20); doc.text("PELAN AKUI", 247, 25, {align: "center"});
+    doc.setLineWidth(0.8); doc.line(95, 10, 95, 287);
+
+    // 2. Header (Times New Roman)
+    try { doc.addImage(document.getElementById("logoPuo"), 'PNG', 35, 18, 25, 28); } catch(e){}
+    doc.setFont("times", "bold"); doc.setFontSize(14);
+    doc.text("POLITEKNIK UNGKU OMAR", 47.5, 55, {align: "center"});
+    doc.setLineWidth(0.5); doc.line(18, 58, 87, 58);
+
+    doc.setFontSize(11); doc.setFont("times", "normal");
+    doc.text("NEGERI JOHOR", 47.5, 68, {align: "center"});
+    doc.setFont("times", "bold"); doc.setTextColor(180, 0, 0);
+    doc.text("DAERAH TANGKAK", 47.5, 75, {align: "center"});
+    doc.setTextColor(0); doc.text("MUKIM KESANG", 47.5, 82, {align: "center"});
+
+    // 3. Label Data (Kemas & Teratur)
+    doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(100);
+    doc.text("INFORMASI LOT", 18, 100);
+    doc.line(18, 102, 87, 102);
+
+    const labels = ["NO. LOT:", "NAMA PEMILIK:", "KELUASAN:"];
+    const values = [lotNo === "-" ? "SEMUA LOT" : lotNo, (lotNo === "-" ? "PELAN UMUM" : owner).toUpperCase(), area];
+    
+    let currentY = 115;
+    for(let i=0; i<3; i++){
+        doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(120);
+        doc.text(labels[i], 18, currentY);
+        doc.setFont("times", "bold"); doc.setFontSize(11); doc.setTextColor(0);
+        let wrappedVal = doc.splitTextToSize(values[i], 70);
+        doc.text(wrappedVal, 18, currentY + 6);
+        currentY += 25;
+    }
+
+    // 4. PA Number Logic
+    let paNum = lotNo === "-" ? "PA 413912 & PA 413913" : (["11462", "11463", "11464", "11465", "11466", "11467", "11468", "11469", "11470", "11471", "11472", "11473", "11474", "11475", "11476", "11477", "11478", "11479", "11480", "11481", "11482", "11483", "11484", "11485", "11486", "11487"].includes(lotNo) ? "PA 413912" : "PA 413913");
+    doc.setFontSize(45); doc.setFont("times", "bold");
+    doc.text(paNum, 105, 270);
+
+    // 5. Pengesahan
+    doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.setTextColor(100);
+    doc.text("DISEMAK OLEH:", 18, 255);
+    doc.setFont("times", "bold"); doc.setFontSize(13); doc.setTextColor(0);
+    doc.text(accessor.toUpperCase(), 18, 263);
+    doc.line(18, 265, 87, 265);
+
+    // 6. Peta & Tajuk
+    doc.setFontSize(26); doc.text("PELAN AKUI", 247, 25, {align: "center"});
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 100, 35, 295, 205);
-    doc.setFontSize(12); doc.text("Pemeriksa: " + acc.toUpperCase(), 18, 260);
-    doc.save("Laporan_Lot.pdf");
+
+    doc.save(`Laporan_Lot_${lotNo}.pdf`);
 }
 </script>
 </body>
