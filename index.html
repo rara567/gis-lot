@@ -105,6 +105,18 @@
         .zoom-btn { width: 50px; height: 50px; background-color: #1b5e20; color: white; border: 2px solid #81c784; border-radius: 10px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
         #footer { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(27, 94, 32, 0.95); color: white; text-align: center; padding: 10px 0; font-size: 13px; z-index: 1000; }
+
+        /* --- STYLES UNTUK TOOLTIP (HOVER) --- */
+        .custom-tooltip {
+            background-color: rgba(0, 0, 0, 0.85);
+            border: 1px solid #81c784;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .custom-tooltip b { color: #81c784; }
     </style>
 </head>
 
@@ -263,19 +275,60 @@ function highlightFeature(layer) {
     layer.bringToFront();
 }
 
-function updateSidebar(props) {
-    document.getElementById("lotNo").innerText = props.NO_LOT || props.no_lot || "-";
+// FUNGSI UTAMA UNTUK AMBIL DATA PROPERTY
+function getLotData(props) {
+    let lotNo = props.NO_LOT || props.no_lot || "-";
+    
     let values = Object.values(props);
     let longStrings = values.filter(v => typeof v === 'string' && v.length > 10);
-    document.getElementById("ownerName").innerText = longStrings.length > 0 ? longStrings[longStrings.length - 1] : "Data Tidak Ditemui";
-    let area = values.find(v => typeof v === 'number' && v > 50) || "0";
-    document.getElementById("selectedArea").innerText = area + " m²";
+    let owner = longStrings.length > 0 ? longStrings[longStrings.length - 1] : "Data Tidak Ditemui";
+    
+    let areaVal = values.find(v => typeof v === 'number' && v > 50) || "0";
+    let area = areaVal + " m²";
+
+    return { lotNo, owner, area };
+}
+
+function updateSidebar(props) {
+    let data = getLotData(props);
+    document.getElementById("lotNo").innerText = data.lotNo;
+    document.getElementById("ownerName").innerText = data.owner;
+    document.getElementById("selectedArea").innerText = data.area;
 }
 
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     style: function() { return { color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 }; },
     onEachFeature: function(feature, layer){
         document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
+        
+        // AMBIL DATA UNTUK TOOLTIP
+        let data = getLotData(feature.properties);
+
+        // --- FEATURE BARU: HOVER TOOLTIP ---
+        layer.bindTooltip(`
+            <div class='custom-tooltip'>
+                <b>NO LOT:</b> ${data.lotNo}<br>
+                <b>LUAS:</b> ${data.area}<br>
+                <b>PEMILIK:</b> ${data.owner}
+            </div>`, 
+            { sticky: true, direction: "top", opacity: 0.9 }
+        );
+
+        // KESAN VISUAL APABILA MOUSE OVER
+        layer.on('mouseover', function(e) {
+            if (!highlightedLayers.includes(layer)) {
+                layer.setStyle({ fillOpacity: 0.9, weight: 2, color: "#ffffff" });
+            }
+        });
+
+        // KEMBALIKAN ASAL APABILA MOUSE OUT
+        layer.on('mouseout', function(e) {
+            if (!highlightedLayers.includes(layer)) {
+                lotLayer.resetStyle(layer);
+            }
+        });
+
+        // KEKALKAN FUNGSI ASAL (KLIK)
         layer.on('click', function() {
             clearHighlight();
             highlightFeature(layer); 
