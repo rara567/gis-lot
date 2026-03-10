@@ -105,6 +105,17 @@
         .zoom-btn { width: 50px; height: 50px; background-color: #1b5e20; color: white; border: 2px solid #81c784; border-radius: 10px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
         #footer { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(27, 94, 32, 0.95); color: white; text-align: center; padding: 10px 0; font-size: 13px; z-index: 1000; }
+
+        /* Gaya untuk Tooltip Hover */
+        .leaflet-tooltip-own {
+            background: #1a1c23;
+            border: 1px solid #81c784;
+            color: white;
+            border-radius: 5px;
+            padding: 8px;
+            font-size: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
     </style>
 </head>
 
@@ -263,23 +274,62 @@ function highlightFeature(layer) {
     layer.bringToFront();
 }
 
-function updateSidebar(props) {
-    document.getElementById("lotNo").innerText = props.NO_LOT || props.no_lot || "-";
+// Fungsi bantu untuk ekstrak data props
+function getLotData(props) {
+    let lot = props.NO_LOT || props.no_lot || "-";
     let values = Object.values(props);
-    let longStrings = values.filter(v => typeof v === 'string' && v.length > 10);
-    document.getElementById("ownerName").innerText = longStrings.length > 0 ? longStrings[longStrings.length - 1] : "Data Tidak Ditemui";
+    let owner = values.filter(v => typeof v === 'string' && v.length > 10).pop() || "Data Tidak Ditemui";
     let area = values.find(v => typeof v === 'number' && v > 50) || "0";
-    document.getElementById("selectedArea").innerText = area + " m²";
+    return { lot, owner, area };
+}
+
+function updateSidebar(props) {
+    let data = getLotData(props);
+    document.getElementById("lotNo").innerText = data.lot;
+    document.getElementById("ownerName").innerText = data.owner;
+    document.getElementById("selectedArea").innerText = data.area + " m²";
 }
 
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     style: function() { return { color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 }; },
     onEachFeature: function(feature, layer){
         document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
-        layer.on('click', function() {
-            clearHighlight();
-            highlightFeature(layer); 
-            updateSidebar(feature.properties);
+        
+        // --- TAMBAHAN FEATURE HOVER ---
+        let data = getLotData(feature.properties);
+        let tooltipContent = `
+            <div style="text-align:left;">
+                <b style="color:#81c784;">NO LOT: ${data.lot}</b><br>
+                <b>LUAS:</b> ${data.area} m²<br>
+                <b>PEMILIK:</b> ${data.owner}
+            </div>
+        `;
+        
+        layer.bindTooltip(tooltipContent, {
+            sticky: true, 
+            className: 'leaflet-tooltip-own',
+            offset: [10, 0]
+        });
+
+        layer.on({
+            mouseover: function(e) {
+                var l = e.target;
+                // Jika bukan layer yang sedang 'selected' (highlighted), beri gaya hover nipis
+                if (!highlightedLayers.includes(l)) {
+                    l.setStyle({ fillOpacity: 0.9, weight: 2, color: "#ffffff" });
+                }
+            },
+            mouseout: function(e) {
+                var l = e.target;
+                if (!highlightedLayers.includes(l)) {
+                    lotLayer.resetStyle(l);
+                }
+            },
+            click: function() {
+                clearHighlight();
+                highlightFeature(layer); 
+                updateSidebar(feature.properties);
+            }
         });
     }
 }).addTo(map);
@@ -308,7 +358,7 @@ function resetMap(){
     map.fitBounds(lotLayer.getBounds());
 }
 
-// --- LOGIK PDF TERKINI (DOKUMEN RASMI REMOVED) ---
+// --- LOGIK PDF ---
 function openPdfModal() { document.getElementById("pdfModal").style.display = "flex"; }
 function closeModal() { document.getElementById("pdfModal").style.display = "none"; }
 
@@ -326,14 +376,10 @@ async function generateFinalPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('l', 'mm', 'a3');
 
-    // 1. Double Border
     doc.setLineWidth(1.2); doc.rect(10, 10, 400, 277);
     doc.setLineWidth(0.3); doc.rect(12, 12, 396, 273);
-
-    // 2. Sidebar Laporan
     doc.setLineWidth(0.8); doc.line(95, 10, 95, 287);
 
-    // 3. Header Rasmi (Times New Roman)
     try { doc.addImage(document.getElementById("logoPuo"), 'PNG', 35, 18, 25, 28); } catch(e){}
     doc.setFont("times", "bold"); doc.setFontSize(14);
     doc.text("POLITEKNIK UNGKU OMAR", 47.5, 55, {align: "center"});
@@ -345,7 +391,6 @@ async function generateFinalPDF() {
     doc.text("DAERAH TANGKAK", 47.5, 75, {align: "center"});
     doc.setTextColor(0); doc.text("MUKIM KESANG", 47.5, 82, {align: "center"});
 
-    // 4. Maklumat Data Lot
     doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.setTextColor(100);
     doc.text("INFORMASI LOT", 18, 100);
     doc.setDrawColor(200); doc.line(18, 102, 87, 102);
@@ -363,7 +408,6 @@ async function generateFinalPDF() {
         currentY += 22;
     }
 
-    // 5. Penentuan PA Number
     let paNum = "";
     const LOTS_PA_413912 = ["11462", "11463", "11464", "11465", "11466", "11467", "11468", "11469", "11470", "11471", "11472", "11473", "11474", "11475", "11476", "11477", "11478", "11479", "11480", "11481", "11482", "11483", "11484", "11485", "11486", "11487"];
     if (lotNo === "-") paNum = "PA 413912 & PA 413913";
@@ -373,7 +417,6 @@ async function generateFinalPDF() {
     doc.setFontSize(45); doc.setFont("times", "bold");
     doc.text(paNum, 105, 270);
 
-    // 6. Pengesahan
     doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.setTextColor(100);
     doc.text("TARIKH CETAKAN: " + new Date().toLocaleDateString(), 18, 230);
     doc.text("DISEMAK OLEH:", 18, 255);
@@ -381,12 +424,10 @@ async function generateFinalPDF() {
     doc.text(accessor.toUpperCase(), 18, 263);
     doc.line(18, 265, 87, 265);
 
-    // 7. Peta & Tajuk Utama
     doc.setFontSize(26); doc.setTextColor(0);
     doc.text("PELAN AKUI", 247, 25, {align: "center"});
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 100, 35, 295, 205);
 
-    // 8. Footer (Watermark Dibuang)
     doc.setTextColor(150); doc.setFontSize(8); doc.setFont("helvetica", "italic");
     doc.text("Dokumen ini dijana secara digital melalui Sistem Saujana Putra Smart Resident.", 247, 283, {align: "center"});
 
