@@ -12,8 +12,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
-        /* CSS GLOBAL */
-        html, body { margin:0; padding:0; height:100%; font-family: 'Roboto', sans-serif; background-color: #f5e6be; }
+        /* CSS GLOBAL - KEKAL ASAL */
+        html, body {
+            margin:0; padding:0; height:100%;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5e6be;
+        }
         #map { height:100vh; z-index: 1; }
 
         /* --- SISTEM LOGIN OVERLAY --- */
@@ -22,11 +26,13 @@
             background-color: #0f111a; display: flex; justify-content: center;
             align-items: center; z-index: 9999; transition: opacity 0.5s ease;
         }
+
         .login-card {
             background: #1a1c23; padding: 40px; border-radius: 15px; width: 380px;
             text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.7);
             border: 1px solid #333; position: relative;
         }
+
         .login-card h2 { color: white; margin-bottom: 30px; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 12px; }
 
         #forgotModal {
@@ -34,6 +40,7 @@
             background: #12141d; border-radius: 15px; padding: 30px; box-sizing: border-box;
             z-index: 10000; flex-direction: column; text-align: left; border: 1px solid #333;
         }
+
         .forgot-header { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 15px; }
         .alert-box { background: rgba(30, 58, 138, 0.3); border: 1px solid #1e40af; color: #60a5fa; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; }
         .input-group { text-align: left; margin-bottom: 15px; }
@@ -52,6 +59,7 @@
             padding-left: 30px; gap:25px; z-index:1000;
             overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
+
         .header-bg-video { position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%; z-index: 1; transform: translate(-50%, -50%); opacity: 0.4; object-fit: cover; pointer-events: none; }
         #header img { height: 85px; position: relative; z-index: 2; }
         #header .custom-font { font-family: 'Dancing Script', cursive; font-size: 52px; font-weight: 700; letter-spacing: 2px; position: relative; z-index: 2; text-shadow: 3px 3px 8px rgba(0,0,0,0.7); }
@@ -63,6 +71,7 @@
             display: flex; flex-direction: column; align-items: center; gap: 8px;
             box-shadow: 4px 0 10px rgba(0,0,0,0.3); transition: 0.3s ease;
         }
+
         .bar { width: 30px; height: 4px; background-color: white; margin: 2px 0; border-radius: 2px; }
 
         #sidebar {
@@ -75,13 +84,9 @@
 
         .sidebar-header { font-size: 22px; font-weight: bold; margin: 40px 0 20px 0; border-bottom: 2px solid #2e7d32; padding-bottom: 10px; color: #81c784; }
         .widget { background: #1a1c23; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
-        .widget h3 { font-size: 11px; color: #81c784; text-transform: uppercase; margin: 0 0 12px 0; letter-spacing: 1px; }
+        .widget h3 { font-size: 13px; color: #81c784; text-transform: uppercase; margin: 0 0 12px 0; }
         
-        /* Statistik Visual */
-        .stat-bar { background: #111; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 8px; margin-top: 4px; }
-        .stat-fill { height: 100%; width: 0%; transition: width 1s ease-in-out; }
-
-        .layer-btn { flex: 1; padding: 10px; border: 1px solid #444; border-radius: 8px; background: #111; color: #ccc; cursor: pointer; font-size: 11px; font-weight: bold; }
+        .layer-btn { flex: 1; padding: 10px; border: 1px solid #444; border-radius: 8px; background: #111; color: #ccc; cursor: pointer; font-size: 12px; font-weight: bold; }
         .layer-btn.active { background: #2e7d32; color: white; border-color: #81c784; }
 
         .btn { width:100%; padding:12px; border:none; border-radius:8px; cursor:pointer; font-weight: bold; margin-bottom: 10px; }
@@ -92,15 +97,12 @@
         .box p { margin:0; font-size:11px; color:#aaa; text-transform: uppercase; }
         .box span { font-size:16px; font-weight:bold; color:#81c784; display: block; margin-top: 5px; word-wrap: break-word; }
 
-        /* Tooltip */
-        .leaflet-tooltip-own {
-            background: #1a1c23 !important; border: 1px solid #81c784 !important; color: white !important;
-            padding: 8px; font-size: 12px; border-left: 4px solid #81c784 !important;
-        }
-
         .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); align-items: center; justify-content: center; }
         .modal-content { background: #242731; padding: 30px; border-radius: 15px; width: 350px; text-align: center; border: 2px solid #2e7d32; color: white; }
         .modal-content input { width: 100%; padding: 12px; margin: 20px 0; border-radius: 8px; border: 1px solid #444; background: #111; color: white; box-sizing: border-box; }
+
+        .custom-zoom-container { position: absolute; bottom: 50px; right: 20px; z-index: 1500; display: flex; flex-direction: column; gap: 10px; }
+        .zoom-btn { width: 50px; height: 50px; background-color: #1b5e20; color: white; border: 2px solid #81c784; border-radius: 10px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
         #footer { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(27, 94, 32, 0.95); color: white; text-align: center; padding: 10px 0; font-size: 13px; z-index: 1000; }
     </style>
@@ -127,7 +129,7 @@
                 <h3 style="margin:0;"><span style="color:#ffeb3b;">🔑</span> Kemaskini Kata Laluan</h3>
                 <span style="cursor:pointer; font-size:20px;" onclick="toggleForgotModal(false)">×</span>
             </div>
-            <div class="alert-box">Sahkan ID untuk menetapkan semula kata laluan.</div>
+            <div class="alert-box">Sila sahkan ID untuk menetapkan semula kata laluan.</div>
             <div class="input-group">
                 <label>Sahkan ID Pengguna:</label>
                 <input type="text" id="confirmId">
@@ -146,7 +148,9 @@
 </div>
 
 <div id="header">
-    <video autoplay muted loop playsinline class="header-bg-video"><source src="video-mapping.mp4" type="video/mp4"></video>
+    <video autoplay muted loop playsinline class="header-bg-video">
+        <source src="video-mapping.mp4" type="video/mp4">
+    </video>
     <img src="puo.png" alt="Logo" id="logoPuo">
     <span class="custom-font">saujana putra smart resident</span>
 </div>
@@ -159,14 +163,6 @@
 <div id="sidebar">
     <button style="float:right; background:none; border:none; color:#ff5252; font-size:28px; cursor:pointer;" onclick="toggleSidebar()">✖</button>
     <div class="sidebar-header">DASHBOARD</div>
-
-    <div class="widget">
-        <h3>📊 Statistik Keluasan</h3>
-        <div style="font-size:10px; color:#aaa; display:flex; justify-content:space-between;"><span>Kecil (< 250m²)</span><span id="txtSmall">0%</span></div>
-        <div class="stat-bar"><div id="barSmall" class="stat-fill" style="background: #81c784;"></div></div>
-        <div style="font-size:10px; color:#aaa; display:flex; justify-content:space-between;"><span>Besar (> 250m²)</span><span id="txtLarge">0%</span></div>
-        <div class="stat-bar"><div id="barLarge" class="stat-fill" style="background: #0288d1;"></div></div>
-    </div>
 
     <div class="widget">
         <h3>🗺️ Interface Layer</h3>
@@ -195,12 +191,17 @@
 
 <div id="pdfModal" class="modal">
     <div class="modal-content">
-        <h3>📄 Penjanaan Laporan</h3>
-        <p>Sila masukkan nama pemeriksa:</p>
+        <h3 style="color:#81c784;" id="pdfModalTitle">📄 Penjanaan Laporan</h3>
+        <p>Sila masukkan nama anda:</p>
         <input type="text" id="accessorName" placeholder="Nama Penuh...">
         <button class="btn primary" onclick="generateFinalPDF()">Muat Turun PDF</button>
         <button class="btn" style="background:#444;" onclick="closeModal()">Batal</button>
     </div>
+</div>
+
+<div class="custom-zoom-container">
+    <button class="zoom-btn" onclick="map.zoomIn()">+</button>
+    <button class="zoom-btn" onclick="map.zoomOut()">−</button>
 </div>
 
 <div id="map"></div>
@@ -210,9 +211,10 @@
 <script src="data/LOTFINAL_0.js"></script>
 
 <script>
-// --- LOGIN & STORAGE ---
+// --- LOGIK LOGIN & STORAGE ---
 const DEFAULT_ID = "admin";
 const DEFAULT_PASS = "puo123";
+
 function getStoredPass() { return localStorage.getItem("userPassword") || DEFAULT_PASS; }
 
 function checkLogin() {
@@ -220,11 +222,12 @@ function checkLogin() {
     var passInput = document.getElementById("userPass").value;
     if (idInput === DEFAULT_ID && passInput === getStoredPass()) {
         document.getElementById("loginOverlay").style.opacity = "0";
-        setTimeout(() => { document.getElementById("loginOverlay").style.display = "none"; calculateStats(); }, 500);
+        setTimeout(() => { document.getElementById("loginOverlay").style.display = "none"; }, 500);
     } else { alert("ID atau Kata Laluan Salah!"); }
 }
 
 function toggleForgotModal(show) { document.getElementById("forgotModal").style.display = show ? "flex" : "none"; }
+
 function saveNewPassword() {
     let confirmId = document.getElementById("confirmId").value;
     let newP = document.getElementById("newPass").value;
@@ -243,29 +246,16 @@ var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={
 var googleSatellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: "anonymous"}).addTo(map);
 
 function toggleSidebar(){ document.getElementById("sidebar").classList.toggle("active"); }
+
 function setBaseLayer(type) {
-    if(type === 'sat') { map.addLayer(googleSatellite); map.removeLayer(googleStreet); document.getElementById('btnSat').classList.add('active'); document.getElementById('btnStreet').classList.remove('active'); }
-    else { map.addLayer(googleStreet); map.removeLayer(googleSatellite); document.getElementById('btnStreet').classList.add('active'); document.getElementById('btnSat').classList.remove('active'); }
+    if(type === 'sat') { map.addLayer(googleSatellite); map.removeLayer(googleStreet); }
+    else { map.addLayer(googleStreet); map.removeLayer(googleSatellite); }
 }
 
-// Kira Statistik
-function calculateStats() {
-    let total = json_LOTFINAL_0.features.length;
-    let small = 0;
-    json_LOTFINAL_0.features.forEach(f => {
-        let area = Object.values(f.properties).find(v => typeof v === 'number' && v > 50) || 0;
-        if(area < 250) small++;
-    });
-    let sPerc = ((small/total)*100).toFixed(1);
-    let lPerc = (100 - sPerc).toFixed(1);
-    document.getElementById("totalLots").innerText = total;
-    document.getElementById("txtSmall").innerText = sPerc + "%";
-    document.getElementById("barSmall").style.width = sPerc + "%";
-    document.getElementById("txtLarge").innerText = lPerc + "%";
-    document.getElementById("barLarge").style.width = lPerc + "%";
+function clearHighlight() {
+    highlightedLayers.forEach(l => lotLayer.resetStyle(l));
+    highlightedLayers = [];
 }
-
-function clearHighlight() { highlightedLayers.forEach(l => lotLayer.resetStyle(l)); highlightedLayers = []; }
 
 function highlightFeature(layer) {
     layer.setStyle({ fillColor: "#ffeb3b", color: "#f57f17", fillOpacity: 0.9, weight: 3 });
@@ -285,7 +275,7 @@ function updateSidebar(props) {
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     style: function() { return { color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 }; },
     onEachFeature: function(feature, layer){
-        layer.bindTooltip(`Lot: ${feature.properties.NO_LOT || 'N/A'}`, { sticky: true, className: 'leaflet-tooltip-own' });
+        document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
         layer.on('click', function() {
             clearHighlight();
             highlightFeature(layer); 
@@ -318,7 +308,7 @@ function resetMap(){
     map.fitBounds(lotLayer.getBounds());
 }
 
-// --- LOGIK PDF PROFESIONAL ---
+// --- LOGIK PDF TERKINI (DOKUMEN RASMI REMOVED) ---
 function openPdfModal() { document.getElementById("pdfModal").style.display = "flex"; }
 function closeModal() { document.getElementById("pdfModal").style.display = "none"; }
 
@@ -330,15 +320,20 @@ async function generateFinalPDF() {
     const area = document.getElementById("selectedArea").innerText;
     
     closeModal();
+    await new Promise(r => setTimeout(r, 1200));
+    
     const canvas = await html2canvas(document.getElementById('map'), { useCORS: true, scale: 2 });
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('l', 'mm', 'a3');
 
-    // 1. Frame
-    doc.setLineWidth(1); doc.rect(10, 10, 400, 277);
+    // 1. Double Border
+    doc.setLineWidth(1.2); doc.rect(10, 10, 400, 277);
+    doc.setLineWidth(0.3); doc.rect(12, 12, 396, 273);
+
+    // 2. Sidebar Laporan
     doc.setLineWidth(0.8); doc.line(95, 10, 95, 287);
 
-    // 2. Header (Times New Roman)
+    // 3. Header Rasmi (Times New Roman)
     try { doc.addImage(document.getElementById("logoPuo"), 'PNG', 35, 18, 25, 28); } catch(e){}
     doc.setFont("times", "bold"); doc.setFontSize(14);
     doc.text("POLITEKNIK UNGKU OMAR", 47.5, 55, {align: "center"});
@@ -350,41 +345,52 @@ async function generateFinalPDF() {
     doc.text("DAERAH TANGKAK", 47.5, 75, {align: "center"});
     doc.setTextColor(0); doc.text("MUKIM KESANG", 47.5, 82, {align: "center"});
 
-    // 3. Label Data (Kemas & Teratur)
-    doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(100);
+    // 4. Maklumat Data Lot
+    doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.setTextColor(100);
     doc.text("INFORMASI LOT", 18, 100);
-    doc.line(18, 102, 87, 102);
+    doc.setDrawColor(200); doc.line(18, 102, 87, 102);
 
     const labels = ["NO. LOT:", "NAMA PEMILIK:", "KELUASAN:"];
     const values = [lotNo === "-" ? "SEMUA LOT" : lotNo, (lotNo === "-" ? "PELAN UMUM" : owner).toUpperCase(), area];
     
-    let currentY = 115;
+    let currentY = 112;
     for(let i=0; i<3; i++){
-        doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(120);
+        doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(120);
         doc.text(labels[i], 18, currentY);
-        doc.setFont("times", "bold"); doc.setFontSize(11); doc.setTextColor(0);
-        let wrappedVal = doc.splitTextToSize(values[i], 70);
-        doc.text(wrappedVal, 18, currentY + 6);
-        currentY += 25;
+        doc.setFont("times", "bold"); doc.setFontSize(12); doc.setTextColor(0);
+        let wrappedVal = doc.splitTextToSize(values[i], 68);
+        doc.text(wrappedVal, 18, currentY + 7);
+        currentY += 22;
     }
 
-    // 4. PA Number Logic
-    let paNum = lotNo === "-" ? "PA 413912 & PA 413913" : (["11462", "11463", "11464", "11465", "11466", "11467", "11468", "11469", "11470", "11471", "11472", "11473", "11474", "11475", "11476", "11477", "11478", "11479", "11480", "11481", "11482", "11483", "11484", "11485", "11486", "11487"].includes(lotNo) ? "PA 413912" : "PA 413913");
+    // 5. Penentuan PA Number
+    let paNum = "";
+    const LOTS_PA_413912 = ["11462", "11463", "11464", "11465", "11466", "11467", "11468", "11469", "11470", "11471", "11472", "11473", "11474", "11475", "11476", "11477", "11478", "11479", "11480", "11481", "11482", "11483", "11484", "11485", "11486", "11487"];
+    if (lotNo === "-") paNum = "PA 413912 & PA 413913";
+    else if (LOTS_PA_413912.includes(lotNo)) paNum = "PA 413912";
+    else paNum = "PA 413913";
+
     doc.setFontSize(45); doc.setFont("times", "bold");
     doc.text(paNum, 105, 270);
 
-    // 5. Pengesahan
+    // 6. Pengesahan
     doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.setTextColor(100);
+    doc.text("TARIKH CETAKAN: " + new Date().toLocaleDateString(), 18, 230);
     doc.text("DISEMAK OLEH:", 18, 255);
     doc.setFont("times", "bold"); doc.setFontSize(13); doc.setTextColor(0);
     doc.text(accessor.toUpperCase(), 18, 263);
     doc.line(18, 265, 87, 265);
 
-    // 6. Peta & Tajuk
-    doc.setFontSize(26); doc.text("PELAN AKUI", 247, 25, {align: "center"});
+    // 7. Peta & Tajuk Utama
+    doc.setFontSize(26); doc.setTextColor(0);
+    doc.text("PELAN AKUI", 247, 25, {align: "center"});
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 100, 35, 295, 205);
 
-    doc.save(`Laporan_Lot_${lotNo}.pdf`);
+    // 8. Footer (Watermark Dibuang)
+    doc.setTextColor(150); doc.setFontSize(8); doc.setFont("helvetica", "italic");
+    doc.text("Dokumen ini dijana secara digital melalui Sistem Saujana Putra Smart Resident.", 247, 283, {align: "center"});
+
+    doc.save((lotNo !== "-" ? "Laporan_Lot_" + lotNo : "Pelan_Keseluruhan") + ".pdf");
 }
 </script>
 </body>
