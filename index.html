@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>VIRTUAL LOT - PROFESSIONAL PA REPORT</title>
 
-    <link rel="stylesheet" href="css/leaflet.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -17,6 +17,7 @@
             margin:0; padding:0; height:100%;
             font-family: 'Roboto', sans-serif;
             background-color: #f5e6be;
+            overflow: hidden;
         }
         #map { height:100vh; z-index: 1; }
 
@@ -62,7 +63,7 @@
 
         .header-bg-video { position: absolute; top: 50%; left: 50%; min-width: 100%; min-height: 100%; z-index: 1; transform: translate(-50%, -50%); opacity: 0.4; object-fit: cover; pointer-events: none; }
         #header img { height: 85px; position: relative; z-index: 2; }
-        #header .custom-font { font-family: 'Dancing Script', cursive; font-size: 52px; font-weight: 700; letter-spacing: 2px; position: relative; z-index: 2; text-shadow: 3px 3px 8px rgba(0,0,0,0.7); }
+        #header .custom-font { font-family: 'Dancing Script', cursive; font-size: 52px; font-weight: 700; letter-spacing: 2px; position: relative; z-index: 2; text-shadow: 3px 3px 8px rgba(0,0,0,0.7); text-transform: capitalize; }
 
         #toggleBtn {
             position: absolute; top: 145px; left: 0; z-index: 1100;
@@ -106,18 +107,9 @@
 
         #footer { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(27, 94, 32, 0.95); color: white; text-align: center; padding: 10px 0; font-size: 13px; z-index: 1000; }
 
-        .custom-tooltip {
-            background-color: rgba(0, 0, 0, 0.85);
-            border: 1px solid #81c784;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
+        .custom-tooltip { background-color: rgba(0, 0, 0, 0.85); border: 1px solid #81c784; color: white; padding: 10px; border-radius: 5px; font-size: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         .custom-tooltip b { color: #81c784; }
 
-        /* Style for Switch Toggle */
         .switch-container { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid #333; }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -171,7 +163,7 @@
     <video autoplay muted loop playsinline class="header-bg-video">
         <source src="video-mapping.mp4" type="video/mp4">
     </video>
-    <img src="puo.png" alt="Logo" id="logoPuo">
+    <img src="puo.png" alt="Logo" id="logoPuo" onerror="this.src='https://via.placeholder.com/80x80?text=PUO'">
     <span class="custom-font">saujana putra smart resident</span>
 </div>
 
@@ -232,9 +224,10 @@
 </div>
 
 <div id="map"></div>
+
 <div id="footer">Hak Cipta Terpelihara 2026 © Hzrul | Politeknik Ungku Omar</div>
 
-<script src="js/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="data/LOTFINAL_0.js"></script>
 
 <script>
@@ -288,7 +281,6 @@ function setBaseLayer(type) {
     }
 }
 
-// --- FEATURE BARU: TOGGLE VISIBILITY ---
 function toggleLotVisibility(isVisible) {
     if (isVisible) {
         if (!map.hasLayer(lotLayer)) map.addLayer(lotLayer);
@@ -365,7 +357,6 @@ function searchLot(){
     var found = false;
     clearHighlight();
 
-    // Pastikan layer dipaparkan jika pengguna sedang mencari
     if (!map.hasLayer(lotLayer)) {
         map.addLayer(lotLayer);
         document.getElementById("toggleLotLayer").checked = true;
@@ -391,7 +382,7 @@ function resetMap(){
     map.fitBounds(lotLayer.getBounds());
 }
 
-// --- LOGIK PDF ---
+// --- LOGIK PDF (Mengekalkan reka bentuk PA Report yang kompleks) ---
 function openPdfModal() { document.getElementById("pdfModal").style.display = "flex"; }
 function closeModal() { document.getElementById("pdfModal").style.display = "none"; }
 
@@ -399,7 +390,6 @@ async function generateFinalPDF() {
     const accessor = document.getElementById("accessorName").value;
     if(!accessor) { alert("Sila isi nama!"); return; }
     
-    // Pastikan layer ON semasa snapshot diambil untuk PDF
     const layerWasOff = !map.hasLayer(lotLayer);
     if (layerWasOff) map.addLayer(lotLayer);
 
@@ -412,17 +402,18 @@ async function generateFinalPDF() {
     
     const canvas = await html2canvas(document.getElementById('map'), { useCORS: true, scale: 2 });
     
-    // Kembalikan ke keadaan asal selepas snapshot
     if (layerWasOff) map.removeLayer(lotLayer);
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('l', 'mm', 'a3');
 
+    // Drawing Borders
     doc.setLineWidth(1.2); doc.rect(10, 10, 400, 277);
     doc.setLineWidth(0.3); doc.rect(12, 12, 396, 273);
     doc.setLineWidth(0.8); doc.line(95, 10, 95, 287);
 
-    try { doc.addImage(document.getElementById("logoPuo"), 'PNG', 35, 18, 25, 28); } catch(e){}
+    // Left Panel - Institutional Info
+    try { doc.addImage(document.getElementById("logoPuo").src, 'PNG', 35, 18, 25, 28); } catch(e){}
     doc.setFont("times", "bold"); doc.setFontSize(14);
     doc.text("POLITEKNIK UNGKU OMAR", 47.5, 55, {align: "center"});
     doc.setLineWidth(0.5); doc.line(18, 58, 87, 58);
@@ -433,6 +424,7 @@ async function generateFinalPDF() {
     doc.text("DAERAH TANGKAK", 47.5, 75, {align: "center"});
     doc.setTextColor(0); doc.text("MUKIM KESANG", 47.5, 82, {align: "center"});
 
+    // Lot Info Labels
     doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.setTextColor(100);
     doc.text("INFORMASI LOT", 18, 100);
     doc.setDrawColor(200); doc.line(18, 102, 87, 102);
@@ -450,6 +442,7 @@ async function generateFinalPDF() {
         currentY += 22;
     }
 
+    // PA Number Logic
     let paNum = "";
     const LOTS_PA_413912 = ["11462", "11463", "11464", "11465", "11466", "11467", "11468", "11469", "11470", "11471", "11472", "11473", "11474", "11475", "11476", "11477", "11478", "11479", "11480", "11481", "11482", "11483", "11484", "11485", "11486", "11487"];
     if (lotNo === "-") paNum = "PA 413912 & PA 413913";
@@ -459,6 +452,7 @@ async function generateFinalPDF() {
     doc.setFontSize(45); doc.setFont("times", "bold");
     doc.text(paNum, 105, 270);
 
+    // Footer Info PDF
     doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.setTextColor(100);
     doc.text("TARIKH CETAKAN: " + new Date().toLocaleDateString(), 18, 230);
     doc.text("DISEMAK OLEH:", 18, 255);
@@ -466,6 +460,7 @@ async function generateFinalPDF() {
     doc.text(accessor.toUpperCase(), 18, 263);
     doc.line(18, 265, 87, 265);
 
+    // Map Snapshot & Title
     doc.setFontSize(26); doc.setTextColor(0);
     doc.text("PELAN AKUI", 247, 25, {align: "center"});
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 100, 35, 295, 205);
