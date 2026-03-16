@@ -575,7 +575,7 @@ async function generateFinalPDF() {
     doc.line(18, 265, 87, 265);
 
     doc.setFontSize(26); doc.setTextColor(0);
-    doc.text("PETA", 247, 25, {align: "center"});
+    doc.text("", 247, 25, {align: "center"});
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 100, 35, 295, 205);
 
     doc.setTextColor(150); doc.setFontSize(8); doc.setFont("helvetica", "italic");
