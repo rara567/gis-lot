@@ -258,13 +258,11 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="data/LOTFINAL_0.js"></script>
-
-<script>
+<script src="data/BKLMERGED_1.js"></script> <script>
 // --- LOGIK LOGIN & STORAGE ---
 const DEFAULT_ID = "admin";
 const DEFAULT_PASS = "puo123";
 
-// Inisialisasi Database Pengguna di LocalStorage jika belum ada
 if (!localStorage.getItem("usersDB")) {
     const initialDB = {};
     initialDB[DEFAULT_ID] = DEFAULT_PASS;
@@ -301,7 +299,6 @@ function handleSignup() {
     if (users[id]) { alert("ID ini telah wujud! Sila guna ID lain."); return; }
     if (pass !== confirm) { alert("Kata laluan tidak sepadan!"); return; }
 
-    // Simpan ke "Database"
     users[id] = pass;
     localStorage.setItem("usersDB", JSON.stringify(users));
     
@@ -325,7 +322,7 @@ function saveNewPassword() {
     toggleForgotModal(false);
 }
 
-// --- LOGIK MAP & GIS (TIADA PERUBAHAN) ---
+// --- LOGIK MAP & GIS ---
 var highlightedLayers = []; 
 var map = L.map('map', {zoomControl: false, preferCanvas: true}).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
 var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: "anonymous"});
@@ -347,11 +344,14 @@ function setBaseLayer(type) {
     }
 }
 
+// FUNGSI KEMASKINI: Toggle Lot dan Batu Sempadan sekali
 function toggleLotVisibility(isVisible) {
     if (isVisible) {
         if (!map.hasLayer(lotLayer)) map.addLayer(lotLayer);
+        if (!map.hasLayer(boundaryLayer)) map.addLayer(boundaryLayer);
     } else {
         if (map.hasLayer(lotLayer)) map.removeLayer(lotLayer);
+        if (map.hasLayer(boundaryLayer)) map.removeLayer(boundaryLayer);
     }
 }
 
@@ -383,6 +383,7 @@ function updateSidebar(props) {
     document.getElementById("selectedArea").innerText = data.area;
 }
 
+// --- LAYER LOT POLYGON ---
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     style: function() { return { color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 }; },
     onEachFeature: function(feature, layer){
@@ -418,6 +419,47 @@ var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     }
 }).addTo(map);
 
+// --- FEATURE BARU: LAYER BATU SEMPADAN (COORDINATES) ---
+var boundaryStyle = {
+    radius: 4,
+    fillColor: "#ff007f", // Pink cerah
+    color: "#ffffff",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+};
+
+var boundaryLayer = L.geoJSON(json_BKLMERGED_1, {
+    pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng, boundaryStyle);
+    },
+    onEachFeature: function (feature, layer) {
+        // Ambil data koordinat U dan B daripada properties GeoJSON anda
+        var utara = feature.properties.U;
+        var barat = feature.properties.B;
+
+        // Tooltip Hover Koordinat
+        layer.bindTooltip(`
+            <div style="background: #222; color: #fff; padding: 8px; border-radius: 5px; border: 1px solid #ff007f;">
+                <strong style="color: #ff007f;">📍 BATU SEMPADAN</strong><br>
+                <hr style="margin: 5px 0; border: 0; border-top: 1px solid #444;">
+                <b>UTARA (U):</b> ${utara}<br>
+                <b>BARAT (B):</b> ${barat}<br>
+                <small style="color: #bbb;">Layer: ${feature.properties.layer}</small>
+            </div>`, 
+            { sticky: true, direction: "top", offset: [0, -5] }
+        );
+
+        // Kesan Hover
+        layer.on('mouseover', function () {
+            this.setStyle({ fillColor: '#ffff00', radius: 6, weight: 2 });
+        });
+        layer.on('mouseout', function () {
+            boundaryLayer.resetStyle(this);
+        });
+    }
+}).addTo(map);
+
 function searchLot(){
     var input = document.getElementById("searchLot").value.trim().toLowerCase();
     var found = false;
@@ -425,6 +467,7 @@ function searchLot(){
 
     if (!map.hasLayer(lotLayer)) {
         map.addLayer(lotLayer);
+        map.addLayer(boundaryLayer);
         document.getElementById("toggleLotLayer").checked = true;
     }
 
@@ -457,7 +500,10 @@ async function generateFinalPDF() {
     if(!accessor) { alert("Sila isi nama!"); return; }
     
     const layerWasOff = !map.hasLayer(lotLayer);
-    if (layerWasOff) map.addLayer(lotLayer);
+    if (layerWasOff) {
+        map.addLayer(lotLayer);
+        map.addLayer(boundaryLayer);
+    }
 
     const lotNo = document.getElementById("lotNo").innerText;
     const owner = document.getElementById("ownerName").innerText;
@@ -468,17 +514,18 @@ async function generateFinalPDF() {
     
     const canvas = await html2canvas(document.getElementById('map'), { useCORS: true, scale: 2 });
     
-    if (layerWasOff) map.removeLayer(lotLayer);
+    if (layerWasOff) {
+        map.removeLayer(lotLayer);
+        map.removeLayer(boundaryLayer);
+    }
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('l', 'mm', 'a3');
 
-    // Drawing Borders
     doc.setLineWidth(1.2); doc.rect(10, 10, 400, 277);
     doc.setLineWidth(0.3); doc.rect(12, 12, 396, 273);
     doc.setLineWidth(0.8); doc.line(95, 10, 95, 287);
 
-    // Left Panel
     try { doc.addImage(document.getElementById("logoPuo").src, 'PNG', 35, 18, 25, 28); } catch(e){}
     doc.setFont("times", "bold"); doc.setFontSize(14);
     doc.text("POLITEKNIK UNGKU OMAR", 47.5, 55, {align: "center"});
@@ -490,7 +537,6 @@ async function generateFinalPDF() {
     doc.text("DAERAH TANGKAK", 47.5, 75, {align: "center"});
     doc.setTextColor(0); doc.text("MUKIM KESANG", 47.5, 82, {align: "center"});
 
-    // Lot Info
     doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.setTextColor(100);
     doc.text("INFORMASI LOT", 18, 100);
     doc.setDrawColor(200); doc.line(18, 102, 87, 102);
