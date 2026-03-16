@@ -463,7 +463,6 @@ var boundaryLayer = L.geoJSON(json_BKLMERGED_1, {
             { sticky: true, direction: "top", offset: [0, -5] }
         );
 
-        // Hover Effect: Kekalkan saiz radius 4
         layer.on('mouseover', function () {
             this.setStyle({ fillColor: '#ffff00', radius: 4, weight: 2 });
         });
@@ -564,8 +563,7 @@ async function generateFinalPDF() {
         currentY += 22;
     }
 
-    doc.setFontSize(45); doc.setFont("times", "bold");
-    doc.text("PETA", 105, 270);
+    // LABEL "PETA" TELAH DIBUANG DARI SINI
 
     doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.setTextColor(100);
     doc.text("TARIKH CETAKAN: " + new Date().toLocaleDateString(), 18, 230);
@@ -575,7 +573,7 @@ async function generateFinalPDF() {
     doc.line(18, 265, 87, 265);
 
     doc.setFontSize(26); doc.setTextColor(0);
-    doc.text("", 247, 25, {align: "center"});
+    doc.text("PETA", 247, 25, {align: "center"});
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 100, 35, 295, 205);
 
     doc.setTextColor(150); doc.setFontSize(8); doc.setFont("helvetica", "italic");
