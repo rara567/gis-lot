@@ -24,29 +24,36 @@
         /* --- SISTEM LOGIN OVERLAY --- */
         #loginOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #0f111a; display: flex; justify-content: center;
+            background-color: #000; /* Hitam pekat sebagai fallback */
+            display: flex; justify-content: center;
             align-items: center; z-index: 9999; transition: opacity 0.5s ease;
+            overflow: hidden;
+        }
+
+        /* Video Background untuk Login */
+        .login-bg-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -1;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            opacity: 0.6; /* Gelapkan sedikit supaya form jelas */
         }
 
         .login-card {
-            background: rgba(26, 28, 35, 0.85); /* Transparent sikit untuk nampak video */
+            background: rgba(26, 28, 35, 0.9); /* Lutsinar sedikit (Glassmorphism) */
             padding: 40px; border-radius: 15px; width: 380px;
-            text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.7);
-            border: 1px solid rgba(255,255,255,0.1); 
-            position: relative; overflow: hidden; /* Penting untuk video */
-            backdrop-filter: blur(10px);
+            text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            border: 1px solid #444; position: relative;
+            backdrop-filter: blur(5px); /* Efek kabur pada belakang form */
         }
 
-        /* --- VIDEO BACKGROUND DALAM LOGIN CARD --- */
-        .login-video-bg {
-            position: absolute; top: 50%; left: 50%; 
-            min-width: 100%; min-height: 100%;
-            width: auto; height: auto; z-index: -1;
-            transform: translate(-50%, -50%);
-            object-fit: cover; opacity: 0.3; /* Kawal kejelasan video */
-        }
-
-        .login-card h2 { color: white; margin-bottom: 30px; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 12px; position: relative; }
+        .login-card h2 { color: white; margin-bottom: 30px; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 12px; }
 
         #forgotModal, #signupModal {
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -56,14 +63,14 @@
 
         .modal-header { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 15px; }
         .alert-box { background: rgba(30, 58, 138, 0.3); border: 1px solid #1e40af; color: #60a5fa; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; }
-        .input-group { text-align: left; margin-bottom: 15px; position: relative; }
+        .input-group { text-align: left; margin-bottom: 15px; }
         .input-group label { color: #aaa; font-size: 13px; display: block; margin-bottom: 6px; font-weight: bold; }
-        .input-group input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: rgba(36, 39, 49, 0.8); color: white; box-sizing: border-box; outline: none; }
+        .input-group input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #242731; color: white; box-sizing: border-box; outline: none; }
 
-        .btn-login, .btn-save { width: 100%; padding: 14px; background: #2e7d32; border: 1px solid #444; color: white; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; margin-top: 10px; position: relative; }
+        .btn-login, .btn-save { width: 100%; padding: 14px; background: transparent; border: 1px solid #444; color: white; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; margin-top: 10px; }
         .btn-login:hover, .btn-save:hover { background: #1b5e20; border-color: #81c784; }
         
-        .link-container { display: flex; justify-content: space-between; margin-top: 25px; position: relative; }
+        .link-container { display: flex; justify-content: space-between; margin-top: 25px; }
         .forgot-pw, .signup-link { color: #ff5252; text-decoration: none; font-size: 14px; cursor: pointer; }
         .signup-link { color: #81c784; }
 
@@ -149,13 +156,12 @@
 <body>
 
 <div id="loginOverlay">
-    <div class="login-card">
-        <video autoplay muted loop playsinline class="login-video-bg">
-            <source src="video-mapping.mp4" type="video/mp4">
-        </video>
+    <video autoplay muted loop playsinline class="login-bg-video">
+        <source src="video-mapping.mp4" type="video/mp4">
+    </video>
 
-        <h2><span style="background:#ffeb3b; border-radius: 6px; padding: 2px 8px; color: #000;">🔐</span> Sistem Survey Lot PUO</h2>
-        
+    <div class="login-card">
+        <h2><span style="background:#ffeb3b; border-radius: 6px; padding: 2px 8px; color: #000;">🔐</span> Sistem Survey Lot </h2>
         <div class="input-group">
             <label>👤 Masukkan ID:</label>
             <input type="text" id="userId" placeholder="ID Pengguna">
@@ -230,6 +236,7 @@
 
 <div id="sidebar">
     <button style="float:right; background:none; border:none; color:#ff5252; font-size:28px; cursor:pointer;" onclick="toggleSidebar()">✖</button>
+    
     <div class="sidebar-header">DASHBOARD</div>
 
     <div class="user-profile-card">
@@ -246,6 +253,7 @@
             <button id="btnSat" class="layer-btn active" onclick="setBaseLayer('sat')">Satellite</button>
             <button id="btnStreet" class="layer-btn" onclick="setBaseLayer('street')">Street</button>
         </div>
+        
         <div class="switch-container">
             <span style="font-size: 12px; color: #ccc; font-weight: bold;">Display Lot Borders</span>
             <label class="switch">
@@ -253,6 +261,7 @@
                 <span class="slider"></span>
             </label>
         </div>
+
         <div class="switch-container">
             <span style="font-size: 12px; color: #ccc; font-weight: bold;">Boundary Markers</span>
             <label class="switch">
@@ -277,6 +286,7 @@
     </div>
     
     <button class="btn export" onclick="openPdfModal()">📄 Generate PDF Lot</button>
+    
     <button class="btn" style="background:#444; color:white; margin-top:20px;" onclick="location.reload()">🚪 Log Out</button>
 </div>
 
@@ -296,6 +306,7 @@
 </div>
 
 <div id="map"></div>
+
 <div id="footer">Hak Cipta Terpelihara 2026 © Hzrul | Politeknik Ungku Omar</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -313,7 +324,9 @@ if (!localStorage.getItem("usersDB")) {
     localStorage.setItem("usersDB", JSON.stringify(initialDB));
 }
 
-function getUsers() { return JSON.parse(localStorage.getItem("usersDB")); }
+function getUsers() {
+    return JSON.parse(localStorage.getItem("usersDB"));
+}
 
 function checkLogin() {
     var idInput = document.getElementById("userId").value;
@@ -337,12 +350,15 @@ function handleSignup() {
     let pass = document.getElementById("regPass").value;
     let confirm = document.getElementById("regPassConfirm").value;
     let users = getUsers();
+
     if (id === "" || pass === "") { alert("Sila isi semua ruangan!"); return; }
-    if (users[id]) { alert("ID ini telah wujud!"); return; }
+    if (users[id]) { alert("ID ini telah wujud! Sila guna ID lain."); return; }
     if (pass !== confirm) { alert("Kata laluan tidak sepadan!"); return; }
+
     users[id] = pass;
     localStorage.setItem("usersDB", JSON.stringify(users));
-    alert("Pendaftaran Berjaya!");
+    
+    alert("Pendaftaran Berjaya! Sila log masuk.");
     toggleSignupModal(false);
 }
 
@@ -351,15 +367,18 @@ function saveNewPassword() {
     let newP = document.getElementById("newPass").value;
     let confirmP = document.getElementById("confirmNewPass").value;
     let users = getUsers();
+
     if (!users[confirmId]) { alert("ID tidak dijumpai!"); return; }
     if (newP === "" || newP !== confirmP) { alert("Kata laluan tidak sepadan!"); return; }
+    
     users[confirmId] = newP;
     localStorage.setItem("usersDB", JSON.stringify(users));
-    alert("Berjaya dikemaskini!");
+    
+    alert("Kata laluan berjaya dikemaskini!");
     toggleForgotModal(false);
 }
 
-// --- LOGIK MAP & GIS (Kekal Seperti Sebelum Ini) ---
+// --- LOGIK MAP & GIS ---
 var highlightedLayers = []; 
 var map = L.map('map', {zoomControl: false, preferCanvas: true}).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
 var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: "anonymous"});
@@ -369,36 +388,52 @@ function toggleSidebar(){ document.getElementById("sidebar").classList.toggle("a
 
 function setBaseLayer(type) {
     if(type === 'sat') { 
-        map.addLayer(googleSatellite); map.removeLayer(googleStreet); 
+        map.addLayer(googleSatellite); 
+        map.removeLayer(googleStreet); 
         document.getElementById("btnSat").classList.add("active");
         document.getElementById("btnStreet").classList.remove("active");
     } else { 
-        map.addLayer(googleStreet); map.removeLayer(googleSatellite); 
+        map.addLayer(googleStreet); 
+        map.removeLayer(googleSatellite); 
         document.getElementById("btnStreet").classList.add("active");
         document.getElementById("btnSat").classList.remove("active");
     }
 }
 
 function toggleLotVisibility(isVisible) {
-    isVisible ? (map.hasLayer(lotLayer) || map.addLayer(lotLayer)) : (map.hasLayer(lotLayer) && map.removeLayer(lotLayer));
+    if (isVisible) {
+        if (!map.hasLayer(lotLayer)) map.addLayer(lotLayer);
+    } else {
+        if (map.hasLayer(lotLayer)) map.removeLayer(lotLayer);
+    }
 }
 
 function toggleBoundaryVisibility(isVisible) {
-    isVisible ? (map.hasLayer(boundaryLayer) || map.addLayer(boundaryLayer)) : (map.hasLayer(boundaryLayer) && map.removeLayer(boundaryLayer));
+    if (isVisible) {
+        if (!map.hasLayer(boundaryLayer)) map.addLayer(boundaryLayer);
+    } else {
+        if (map.hasLayer(boundaryLayer)) map.removeLayer(boundaryLayer);
+    }
 }
 
-function clearHighlight() { highlightedLayers.forEach(l => lotLayer.resetStyle(l)); highlightedLayers = []; }
+function clearHighlight() {
+    highlightedLayers.forEach(l => lotLayer.resetStyle(l));
+    highlightedLayers = [];
+}
 
 function highlightFeature(layer) {
     layer.setStyle({ fillColor: "#ffeb3b", color: "#f57f17", fillOpacity: 0.9, weight: 3 });
-    highlightedLayers.push(layer); layer.bringToFront();
+    highlightedLayers.push(layer);
+    layer.bringToFront();
 }
 
 function getLotData(props) {
     let lotNo = props.NO_LOT || props.no_lot || "-";
     let values = Object.values(props);
-    let owner = values.filter(v => typeof v === 'string' && v.length > 10).pop() || "Data Tidak Ditemui";
-    let area = (values.find(v => typeof v === 'number' && v > 50) || "0") + " m²";
+    let longStrings = values.filter(v => typeof v === 'string' && v.length > 10);
+    let owner = longStrings.length > 0 ? longStrings[longStrings.length - 1] : "Data Tidak Ditemui";
+    let areaVal = values.find(v => typeof v === 'number' && v > 50) || "0";
+    let area = areaVal + " m²";
     return { lotNo, owner, area };
 }
 
@@ -409,64 +444,186 @@ function updateSidebar(props) {
     document.getElementById("selectedArea").innerText = data.area;
 }
 
+// --- LAYER LOT POLYGON ---
 var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     style: function() { return { color:"#1b5e20", weight:1, fillColor:"#66bb6a", fillOpacity:0.7 }; },
     onEachFeature: function(feature, layer){
         document.getElementById("totalLots").innerText = json_LOTFINAL_0.features.length;
         let data = getLotData(feature.properties);
-        layer.bindTooltip(`<div class='custom-tooltip'><b>NO LOT:</b> ${data.lotNo}<br><b>LUAS:</b> ${data.area}<br><b>PEMILIK:</b> ${data.owner}</div>`, { sticky: true });
-        layer.on('click', function() { clearHighlight(); highlightFeature(layer); updateSidebar(feature.properties); });
+
+        layer.bindTooltip(`
+            <div class='custom-tooltip'>
+                <b>NO LOT:</b> ${data.lotNo}<br>
+                <b>LUAS:</b> ${data.area}<br>
+                <b>PEMILIK:</b> ${data.owner}
+            </div>`, 
+            { sticky: true, direction: "top", opacity: 0.9 }
+        );
+
+        layer.on('mouseover', function(e) {
+            if (!highlightedLayers.includes(layer)) {
+                layer.setStyle({ fillOpacity: 0.9, weight: 2, color: "#ffffff" });
+            }
+        });
+
+        layer.on('mouseout', function(e) {
+            if (!highlightedLayers.includes(layer)) {
+                lotLayer.resetStyle(layer);
+            }
+        });
+
+        layer.on('click', function() {
+            clearHighlight();
+            highlightFeature(layer); 
+            updateSidebar(feature.properties);
+        });
     }
 }).addTo(map);
 
+// --- LAYER BATU SEMPADAN ---
+var boundaryStyle = {
+    radius: 4,
+    fillColor: "#ff007f", 
+    color: "#ffffff",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+};
+
 var boundaryLayer = L.geoJSON(json_BKLMERGED_1, {
-    pointToLayer: function (f, latlng) { return L.circleMarker(latlng, {radius: 4, fillColor: "#ff007f", color: "#fff", weight: 1, fillOpacity: 0.8}); },
-    onEachFeature: function (f, layer) {
-        layer.bindTooltip(`<div style="background:#222; color:#fff; padding:8px; border-radius:5px; border:1px solid #ff007f;"><b>📍 BATU SEMPADAN</b><br>U: ${f.properties.U}<br>B: ${f.properties.B}</div>`, { sticky: true });
+    pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng, boundaryStyle);
+    },
+    onEachFeature: function (feature, layer) {
+        var utara = feature.properties.U;
+        var barat = feature.properties.B;
+
+        layer.bindTooltip(`
+            <div style="background: #222; color: #fff; padding: 8px; border-radius: 5px; border: 1px solid #ff007f;">
+                <strong style="color: #ff007f;">📍 BATU SEMPADAN</strong><br>
+                <hr style="margin: 5px 0; border: 0; border-top: 1px solid #444;">
+                <b>UTARA (U):</b> ${utara}<br>
+                <b>BARAT (B):</b> ${barat}<br>
+                <small style="color: #bbb;">Layer: ${feature.properties.layer}</small>
+            </div>`, 
+            { sticky: true, direction: "top", offset: [0, -5] }
+        );
+
+        layer.on('mouseover', function () {
+            this.setStyle({ fillColor: '#ffff00', radius: 4, weight: 2 });
+        });
+        layer.on('mouseout', function () {
+            boundaryLayer.resetStyle(this);
+        });
     }
 }).addTo(map);
 
 function searchLot(){
     var input = document.getElementById("searchLot").value.trim().toLowerCase();
-    var found = false; clearHighlight();
+    var found = false;
+    clearHighlight();
+
+    if (!map.hasLayer(lotLayer)) {
+        map.addLayer(lotLayer);
+        document.getElementById("toggleLotLayer").checked = true;
+    }
+
     lotLayer.eachLayer(function(layer){
-        if((layer.feature.properties.NO_LOT || "").toString().toLowerCase() === input){
-            found = true; highlightFeature(layer); updateSidebar(layer.feature.properties);
-            map.fitBounds(layer.getBounds());
+        let lotVal = (layer.feature.properties.NO_LOT || layer.feature.properties.no_lot || "").toString().toLowerCase();
+        if(lotVal === input){
+            found = true;
+            highlightFeature(layer);
+            updateSidebar(layer.feature.properties);
+            map.fitBounds(layer.getBounds(), {padding: [50, 50]});
         }
     });
     if(!found && input !== "") alert("No Lot tidak dijumpai!");
 }
 
-function resetMap(){ clearHighlight(); map.fitBounds(lotLayer.getBounds()); }
+function resetMap(){
+    clearHighlight();
+    document.getElementById("lotNo").innerText="-";
+    document.getElementById("ownerName").innerText="-";
+    document.getElementById("selectedArea").innerText="-";
+    map.fitBounds(lotLayer.getBounds());
+}
 
-// --- LOGIK PDF (PETA label removed) ---
+// --- LOGIK PDF ---
 function openPdfModal() { document.getElementById("pdfModal").style.display = "flex"; }
 function closeModal() { document.getElementById("pdfModal").style.display = "none"; }
 
 async function generateFinalPDF() {
     const accessor = document.getElementById("accessorName").value;
     if(!accessor) { alert("Sila isi nama!"); return; }
+    
+    const lotWasOff = !map.hasLayer(lotLayer);
+    const boundaryWasOff = !map.hasLayer(boundaryLayer);
+
+    if (lotWasOff) map.addLayer(lotLayer);
+    if (boundaryWasOff) map.addLayer(boundaryLayer);
+
+    const lotNo = document.getElementById("lotNo").innerText;
+    const owner = document.getElementById("ownerName").innerText;
+    const area = document.getElementById("selectedArea").innerText;
+    
     closeModal();
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise(r => setTimeout(r, 1200));
+    
     const canvas = await html2canvas(document.getElementById('map'), { useCORS: true, scale: 2 });
+    
+    if (lotWasOff) map.removeLayer(lotLayer);
+    if (boundaryWasOff) map.removeLayer(boundaryLayer);
+
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('l', 'mm', 'a3');
-    
+
     doc.setLineWidth(1.2); doc.rect(10, 10, 400, 277);
-    doc.line(95, 10, 95, 287);
-    
+    doc.setLineWidth(0.3); doc.rect(12, 12, 396, 273);
+    doc.setLineWidth(0.8); doc.line(95, 10, 95, 287);
+
+    try { doc.addImage(document.getElementById("logoPuo").src, 'PNG', 35, 18, 25, 28); } catch(e){}
     doc.setFont("times", "bold"); doc.setFontSize(14);
     doc.text("POLITEKNIK UNGKU OMAR", 47.5, 55, {align: "center"});
+    doc.setLineWidth(0.5); doc.line(18, 58, 87, 58);
+
+    doc.setFontSize(11); doc.setFont("times", "normal");
+    doc.text("NEGERI JOHOR", 47.5, 68, {align: "center"});
+    doc.setFont("times", "bold"); doc.setTextColor(180, 0, 0);
+    doc.text("DAERAH TANGKAK", 47.5, 75, {align: "center"});
+    doc.setTextColor(0); doc.text("MUKIM KESANG", 47.5, 82, {align: "center"});
+
+    doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.setTextColor(100);
+    doc.text("INFORMASI LOT", 18, 100);
+    doc.setDrawColor(200); doc.line(18, 102, 87, 102);
+
+    const labels = ["NO. LOT:", "NAMA PEMILIK:", "KELUASAN:"];
+    const values = [lotNo === "-" ? "SEMUA LOT" : lotNo, (lotNo === "-" ? "PELAN UMUM" : owner).toUpperCase(), area];
     
-    const lotNo = document.getElementById("lotNo").innerText;
-    doc.setFontSize(10); doc.text("INFORMASI LOT", 18, 100);
-    doc.setFontSize(12); doc.text("NO. LOT: " + lotNo, 18, 115);
-    
-    doc.setFontSize(26); doc.text("PETA", 247, 25, {align: "center"});
+    let currentY = 112;
+    for(let i=0; i<3; i++){
+        doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(120);
+        doc.text(labels[i], 18, currentY);
+        doc.setFont("times", "bold"); doc.setFontSize(12); doc.setTextColor(0);
+        let wrappedVal = doc.splitTextToSize(values[i], 68);
+        doc.text(wrappedVal, 18, currentY + 7);
+        currentY += 22;
+    }
+
+    doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.setTextColor(100);
+    doc.text("TARIKH CETAKAN: " + new Date().toLocaleDateString(), 18, 230);
+    doc.text("DISEMAK OLEH:", 18, 255);
+    doc.setFont("times", "bold"); doc.setFontSize(13); doc.setTextColor(0);
+    doc.text(accessor.toUpperCase(), 18, 263);
+    doc.line(18, 265, 87, 265);
+
+    doc.setFontSize(26); doc.setTextColor(0);
+    doc.text("PETA", 247, 25, {align: "center"});
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 100, 35, 295, 205);
-    
-    doc.save("Laporan_Lot.pdf");
+
+    doc.setTextColor(150); doc.setFontSize(8); doc.setFont("helvetica", "italic");
+    doc.text("Dokumen ini dijana secara digital melalui Sistem Saujana Putra Smart Resident.", 247, 283, {align: "center"});
+
+    doc.save((lotNo !== "-" ? "Laporan_Lot_" + lotNo : "Pelan_Keseluruhan") + ".pdf");
 }
 </script>
 </body>
