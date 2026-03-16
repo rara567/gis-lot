@@ -36,13 +36,14 @@
 
         .login-card h2 { color: white; margin-bottom: 30px; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 12px; }
 
-        #forgotModal {
+        /* Modal Pendaftaran & Lupa Kata Laluan */
+        #forgotModal, #signupModal {
             display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #12141d; border-radius: 15px; padding: 30px; box-sizing: border-box;
             z-index: 10000; flex-direction: column; text-align: left; border: 1px solid #333;
         }
 
-        .forgot-header { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 15px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 15px; }
         .alert-box { background: rgba(30, 58, 138, 0.3); border: 1px solid #1e40af; color: #60a5fa; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; }
         .input-group { text-align: left; margin-bottom: 15px; }
         .input-group label { color: #aaa; font-size: 13px; display: block; margin-bottom: 6px; font-weight: bold; }
@@ -50,7 +51,10 @@
 
         .btn-login, .btn-save { width: 100%; padding: 14px; background: transparent; border: 1px solid #444; color: white; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; margin-top: 10px; }
         .btn-login:hover, .btn-save:hover { background: #1b5e20; border-color: #81c784; }
-        .forgot-pw { color: #ff5252; display: block; margin-top: 25px; text-decoration: none; font-size: 14px; cursor: pointer; }
+        
+        .link-container { display: flex; justify-content: space-between; margin-top: 25px; }
+        .forgot-pw, .signup-link { color: #ff5252; text-decoration: none; font-size: 14px; cursor: pointer; }
+        .signup-link { color: #81c784; }
 
         /* --- HEADER & SIDEBAR --- */
         #header {
@@ -134,10 +138,14 @@
             <input type="password" id="userPass" placeholder="••••••••">
         </div>
         <button class="btn-login" onclick="checkLogin()">Log Masuk</button>
-        <span class="forgot-pw" onclick="toggleForgotModal(true)">❓ Lupa Kata Laluan?</span>
+        
+        <div class="link-container">
+            <span class="forgot-pw" onclick="toggleForgotModal(true)">❓ Lupa Kata Laluan?</span>
+            <span class="signup-link" onclick="toggleSignupModal(true)">📝 Daftar Baru</span>
+        </div>
 
         <div id="forgotModal">
-            <div class="forgot-header">
+            <div class="modal-header">
                 <h3 style="margin:0;"><span style="color:#ffeb3b;">🔑</span> Kemaskini Kata Laluan</h3>
                 <span style="cursor:pointer; font-size:20px;" onclick="toggleForgotModal(false)">×</span>
             </div>
@@ -155,6 +163,27 @@
                 <input type="password" id="confirmNewPass">
             </div>
             <button class="btn-save" onclick="saveNewPassword()">Simpan Kata Laluan</button>
+        </div>
+
+        <div id="signupModal">
+            <div class="modal-header">
+                <h3 style="margin:0; color: #81c784;">📝 Daftar Akaun Baru</h3>
+                <span style="cursor:pointer; font-size:20px;" onclick="toggleSignupModal(false)">×</span>
+            </div>
+            <div class="alert-box" style="background: rgba(129, 199, 132, 0.1); border-color: #2e7d32; color: #81c784;">Cipta ID dan Kata Laluan anda.</div>
+            <div class="input-group">
+                <label>ID Pengguna Pilihan:</label>
+                <input type="text" id="regId" placeholder="Contoh: user123">
+            </div>
+            <div class="input-group">
+                <label>Kata Laluan:</label>
+                <input type="password" id="regPass" placeholder="••••••••">
+            </div>
+            <div class="input-group">
+                <label>Sahkan Kata Laluan:</label>
+                <input type="password" id="regPassConfirm" placeholder="••••••••">
+            </div>
+            <button class="btn-save" style="background: #2e7d32; border-color: #81c784;" onclick="handleSignup()">Daftar Sekarang</button>
         </div>
     </div>
 </div>
@@ -235,31 +264,68 @@
 const DEFAULT_ID = "admin";
 const DEFAULT_PASS = "puo123";
 
-function getStoredPass() { return localStorage.getItem("userPassword") || DEFAULT_PASS; }
+// Inisialisasi Database Pengguna di LocalStorage jika belum ada
+if (!localStorage.getItem("usersDB")) {
+    const initialDB = {};
+    initialDB[DEFAULT_ID] = DEFAULT_PASS;
+    localStorage.setItem("usersDB", JSON.stringify(initialDB));
+}
+
+function getUsers() {
+    return JSON.parse(localStorage.getItem("usersDB"));
+}
 
 function checkLogin() {
     var idInput = document.getElementById("userId").value;
     var passInput = document.getElementById("userPass").value;
-    if (idInput === DEFAULT_ID && passInput === getStoredPass()) {
+    var users = getUsers();
+
+    if (users[idInput] && users[idInput] === passInput) {
         document.getElementById("loginOverlay").style.opacity = "0";
         setTimeout(() => { document.getElementById("loginOverlay").style.display = "none"; }, 500);
-    } else { alert("ID atau Kata Laluan Salah!"); }
+    } else { 
+        alert("ID atau Kata Laluan Salah!"); 
+    }
 }
 
 function toggleForgotModal(show) { document.getElementById("forgotModal").style.display = show ? "flex" : "none"; }
+function toggleSignupModal(show) { document.getElementById("signupModal").style.display = show ? "flex" : "none"; }
+
+function handleSignup() {
+    let id = document.getElementById("regId").value.trim();
+    let pass = document.getElementById("regPass").value;
+    let confirm = document.getElementById("regPassConfirm").value;
+    let users = getUsers();
+
+    if (id === "" || pass === "") { alert("Sila isi semua ruangan!"); return; }
+    if (users[id]) { alert("ID ini telah wujud! Sila guna ID lain."); return; }
+    if (pass !== confirm) { alert("Kata laluan tidak sepadan!"); return; }
+
+    // Simpan ke "Database"
+    users[id] = pass;
+    localStorage.setItem("usersDB", JSON.stringify(users));
+    
+    alert("Pendaftaran Berjaya! Sila log masuk.");
+    toggleSignupModal(false);
+}
 
 function saveNewPassword() {
-    let confirmId = document.getElementById("confirmId").value;
+    let confirmId = document.getElementById("confirmId").value.trim();
     let newP = document.getElementById("newPass").value;
     let confirmP = document.getElementById("confirmNewPass").value;
-    if (confirmId !== DEFAULT_ID) { alert("ID tidak sah!"); return; }
+    let users = getUsers();
+
+    if (!users[confirmId]) { alert("ID tidak dijumpai!"); return; }
     if (newP === "" || newP !== confirmP) { alert("Kata laluan tidak sepadan!"); return; }
-    localStorage.setItem("userPassword", newP);
-    alert("Berjaya disimpan!");
+    
+    users[confirmId] = newP;
+    localStorage.setItem("usersDB", JSON.stringify(users));
+    
+    alert("Kata laluan berjaya dikemaskini!");
     toggleForgotModal(false);
 }
 
-// --- LOGIK MAP & GIS ---
+// --- LOGIK MAP & GIS (TIADA PERUBAHAN) ---
 var highlightedLayers = []; 
 var map = L.map('map', {zoomControl: false, preferCanvas: true}).fitBounds([[2.102821,102.520895], [2.104582,102.524810]]);
 var googleStreet = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{maxZoom:20, subdomains:['mt0','mt1','mt2','mt3'], crossOrigin: "anonymous"});
@@ -382,7 +448,7 @@ function resetMap(){
     map.fitBounds(lotLayer.getBounds());
 }
 
-// --- LOGIK PDF (Mengekalkan reka bentuk PA Report yang kompleks) ---
+// --- LOGIK PDF ---
 function openPdfModal() { document.getElementById("pdfModal").style.display = "flex"; }
 function closeModal() { document.getElementById("pdfModal").style.display = "none"; }
 
@@ -412,7 +478,7 @@ async function generateFinalPDF() {
     doc.setLineWidth(0.3); doc.rect(12, 12, 396, 273);
     doc.setLineWidth(0.8); doc.line(95, 10, 95, 287);
 
-    // Left Panel - Institutional Info
+    // Left Panel
     try { doc.addImage(document.getElementById("logoPuo").src, 'PNG', 35, 18, 25, 28); } catch(e){}
     doc.setFont("times", "bold"); doc.setFontSize(14);
     doc.text("POLITEKNIK UNGKU OMAR", 47.5, 55, {align: "center"});
@@ -424,7 +490,7 @@ async function generateFinalPDF() {
     doc.text("DAERAH TANGKAK", 47.5, 75, {align: "center"});
     doc.setTextColor(0); doc.text("MUKIM KESANG", 47.5, 82, {align: "center"});
 
-    // Lot Info Labels
+    // Lot Info
     doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.setTextColor(100);
     doc.text("INFORMASI LOT", 18, 100);
     doc.setDrawColor(200); doc.line(18, 102, 87, 102);
@@ -442,17 +508,9 @@ async function generateFinalPDF() {
         currentY += 22;
     }
 
-    // PA Number Logic
-    let paNum = "";
-    const LOTS_PA_413912 = ["11462", "11463", "11464", "11465", "11466", "11467", "11468", "11469", "11470", "11471", "11472", "11473", "11474", "11475", "11476", "11477", "11478", "11479", "11480", "11481", "11482", "11483", "11484", "11485", "11486", "11487"];
-    if (lotNo === "-") paNum = "PA 413912 & PA 413913";
-    else if (LOTS_PA_413912.includes(lotNo)) paNum = "PA 413912";
-    else paNum = "PA 413913";
-
     doc.setFontSize(45); doc.setFont("times", "bold");
-    doc.text(paNum, 105, 270);
+    doc.text("PETA", 105, 270);
 
-    // Footer Info PDF
     doc.setFontSize(9); doc.setFont("helvetica", "normal"); doc.setTextColor(100);
     doc.text("TARIKH CETAKAN: " + new Date().toLocaleDateString(), 18, 230);
     doc.text("DISEMAK OLEH:", 18, 255);
@@ -460,7 +518,6 @@ async function generateFinalPDF() {
     doc.text(accessor.toUpperCase(), 18, 263);
     doc.line(18, 265, 87, 265);
 
-    // Map Snapshot & Title (TUKAR KEPADA "PETA")
     doc.setFontSize(26); doc.setTextColor(0);
     doc.text("PETA", 247, 25, {align: "center"});
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 100, 35, 295, 205);
