@@ -460,9 +460,9 @@ async function generateFinalPDF() {
     doc.text(accessor.toUpperCase(), 18, 263);
     doc.line(18, 265, 87, 265);
 
-    // Map Snapshot & Title
+    // Map Snapshot & Title (TUKAR KEPADA "PETA")
     doc.setFontSize(26); doc.setTextColor(0);
-    doc.text("PELAN AKUI", 247, 25, {align: "center"});
+    doc.text("PETA", 247, 25, {align: "center"});
     doc.addImage(canvas.toDataURL('image/png'), 'PNG', 100, 35, 295, 205);
 
     doc.setTextColor(150); doc.setFontSize(8); doc.setFont("helvetica", "italic");
