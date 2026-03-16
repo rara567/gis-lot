@@ -211,10 +211,19 @@
             <button id="btnSat" class="layer-btn active" onclick="setBaseLayer('sat')">Satellite</button>
             <button id="btnStreet" class="layer-btn" onclick="setBaseLayer('street')">Street</button>
         </div>
+        
         <div class="switch-container">
             <span style="font-size: 12px; color: #ccc; font-weight: bold;">Display Lot Borders</span>
             <label class="switch">
                 <input type="checkbox" id="toggleLotLayer" checked onchange="toggleLotVisibility(this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="switch-container">
+            <span style="font-size: 12px; color: #ccc; font-weight: bold;">Boundary Markers</span>
+            <label class="switch">
+                <input type="checkbox" id="toggleBoundaryLayer" checked onchange="toggleBoundaryVisibility(this.checked)">
                 <span class="slider"></span>
             </label>
         </div>
@@ -258,7 +267,9 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="data/LOTFINAL_0.js"></script>
-<script src="data/BKLMERGED_1.js"></script> <script>
+<script src="data/BKLMERGED_1.js"></script>
+
+<script>
 // --- LOGIK LOGIN & STORAGE ---
 const DEFAULT_ID = "admin";
 const DEFAULT_PASS = "puo123";
@@ -344,13 +355,19 @@ function setBaseLayer(type) {
     }
 }
 
-// FUNGSI KEMASKINI: Toggle Lot dan Batu Sempadan sekali
+// Fungsi Toggle Berasingan
 function toggleLotVisibility(isVisible) {
     if (isVisible) {
         if (!map.hasLayer(lotLayer)) map.addLayer(lotLayer);
-        if (!map.hasLayer(boundaryLayer)) map.addLayer(boundaryLayer);
     } else {
         if (map.hasLayer(lotLayer)) map.removeLayer(lotLayer);
+    }
+}
+
+function toggleBoundaryVisibility(isVisible) {
+    if (isVisible) {
+        if (!map.hasLayer(boundaryLayer)) map.addLayer(boundaryLayer);
+    } else {
         if (map.hasLayer(boundaryLayer)) map.removeLayer(boundaryLayer);
     }
 }
@@ -419,10 +436,10 @@ var lotLayer = L.geoJSON(json_LOTFINAL_0,{
     }
 }).addTo(map);
 
-// --- FEATURE BARU: LAYER BATU SEMPADAN (COORDINATES) ---
+// --- LAYER BATU SEMPADAN ---
 var boundaryStyle = {
     radius: 4,
-    fillColor: "#ff007f", // Pink cerah
+    fillColor: "#ff007f", 
     color: "#ffffff",
     weight: 1,
     opacity: 1,
@@ -434,11 +451,9 @@ var boundaryLayer = L.geoJSON(json_BKLMERGED_1, {
         return L.circleMarker(latlng, boundaryStyle);
     },
     onEachFeature: function (feature, layer) {
-        // Ambil data koordinat U dan B daripada properties GeoJSON anda
         var utara = feature.properties.U;
         var barat = feature.properties.B;
 
-        // Tooltip Hover Koordinat
         layer.bindTooltip(`
             <div style="background: #222; color: #fff; padding: 8px; border-radius: 5px; border: 1px solid #ff007f;">
                 <strong style="color: #ff007f;">📍 BATU SEMPADAN</strong><br>
@@ -450,7 +465,6 @@ var boundaryLayer = L.geoJSON(json_BKLMERGED_1, {
             { sticky: true, direction: "top", offset: [0, -5] }
         );
 
-        // Kesan Hover
         layer.on('mouseover', function () {
             this.setStyle({ fillColor: '#ffff00', radius: 6, weight: 2 });
         });
@@ -467,7 +481,6 @@ function searchLot(){
 
     if (!map.hasLayer(lotLayer)) {
         map.addLayer(lotLayer);
-        map.addLayer(boundaryLayer);
         document.getElementById("toggleLotLayer").checked = true;
     }
 
@@ -499,11 +512,13 @@ async function generateFinalPDF() {
     const accessor = document.getElementById("accessorName").value;
     if(!accessor) { alert("Sila isi nama!"); return; }
     
-    const layerWasOff = !map.hasLayer(lotLayer);
-    if (layerWasOff) {
-        map.addLayer(lotLayer);
-        map.addLayer(boundaryLayer);
-    }
+    // Simpan status asal layer
+    const lotWasOff = !map.hasLayer(lotLayer);
+    const boundaryWasOff = !map.hasLayer(boundaryLayer);
+
+    // Paksa on semua untuk PDF
+    if (lotWasOff) map.addLayer(lotLayer);
+    if (boundaryWasOff) map.addLayer(boundaryLayer);
 
     const lotNo = document.getElementById("lotNo").innerText;
     const owner = document.getElementById("ownerName").innerText;
@@ -514,10 +529,9 @@ async function generateFinalPDF() {
     
     const canvas = await html2canvas(document.getElementById('map'), { useCORS: true, scale: 2 });
     
-    if (layerWasOff) {
-        map.removeLayer(lotLayer);
-        map.removeLayer(boundaryLayer);
-    }
+    // Kembalikan ke status asal
+    if (lotWasOff) map.removeLayer(lotLayer);
+    if (boundaryWasOff) map.removeLayer(boundaryLayer);
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF('l', 'mm', 'a3');
